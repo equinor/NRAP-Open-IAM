@@ -1,0 +1,63 @@
+# OpenIAM Control File Example 22
+#
+# This example illustrates the setup of a Chemical Well Sealing component.
+# Although the output from a Chemical Well Sealing component cannot be
+# displayed with plot types like TimeSeries, the output from this example
+# (seal_flag: boolean indicating whether the fracture sealed; seal_time:
+# time at which the fracture sealed in seconds, or 0 s if it does not seal)
+# will be saved in .csv files).
+# Note that although this example is setup with EndTime: 2 the Chemical Well
+# Sealing component model is called only once. This means that for all 3 time points
+# 0, 1, and 2 years the saved results would be the same: these results only reflect
+# whether the evaluated fracture will seal. For the parameter values used
+# here, the fracture does seal (seal_flag = 1) and the seal_time is about
+# 1.76e+05 seconds, or about 2 days. A seal_time value of 1.76e+05 is displayed
+# for each of the three time steps (0, 1, and 2 years).
+# Note that a Chemical Well Sealing component is not impacted by the stratigraphy
+# information entered. This component type does not connect with a Stratigraphy
+# component.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#  python ../../source/openiam/openiam_cf.py --file ControlFile_ex22.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    # Time is in years
+    EndTime: 2
+    TimeStep: 1.0
+    Analysis: forward
+    Components: [ChemWellSealing1]
+    OutputDirectory: output/output_ex22_{datetime}
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        value: 250.0
+        vary: False
+    shale2Thickness:
+        value: 250.0
+        vary: False
+    shale3Thickness:
+        value: 250.0
+        vary: False
+    aquifer1Thickness:
+        value: 100.0
+        vary: False
+    aquifer2Thickness:
+        value: 100.0
+        vary: False
+    reservoirThickness:
+        value: 50.0
+        vary: False
+#-------------------------------------------------
+ChemWellSealing1:
+    Type: ChemicalWellSealing
+    Parameters:
+        fractureAperture: 2.0e-5
+        fractureLength: 20.0
+        maxOverpressure: 5.0e+6
+    Outputs: [seal_flag, seal_time]

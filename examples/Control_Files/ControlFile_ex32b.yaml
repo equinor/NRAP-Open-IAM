@@ -1,0 +1,184 @@
+# OpenIAM Control File Example 32b
+#
+# This example is similar to Control File example 32a, but this example 
+# demonstrates the use of the LookupTableStratigraphy option (also see 
+# control file example 38). The name and location of the table containing 
+# unit thicknesses and other Stratigraphy component parameters (e.g., datumPressure) 
+# must be defined in FileName and FileDirectory, respectively. The parameters
+# entered can be the values (e.g., reservoirThickness) as well as minimum
+# and maximum values (e.g., aquifer2Thickness_min or reservoirThickness_max).
+# The table is expected to have columns with x and y values representing
+# distances east and north in the domain. A parameter that varies over
+# space should be entered in the same row containing the corresponding x
+# and y values. If a parameter does not vary over space, it can be entered
+# in a column with a single row containing the value.
+#
+# In this example, the wellTop and reservoirDepth parameters of the OpenWellbore
+# are set using string inputs to match the bottom depths of aquifer 4 and shale 1,
+# respectively. Similarly, the aqu_thick and depth parameters of the
+# FutureGen2Aquifer are set to aquifer4Thickness and aquifer4Depth, respectively.
+# Note that the x and y values used by wellbore components must be an exact match of
+# the x and y values used in the LookupTableStratigraphy file. To ensure this
+# agreement, set the wellbore locations using the file option. To use the
+# LookupTable Stratigraphy option, one must therefore prepare a table
+# with the x and y values for wells and the unit thicknesses at those locations.
+# Note that the same number of units must be present at each location (e.g., you
+# can't vary numberOfShaleLayers). If you want a unit to pinch out, however, you
+# could reduce the unit's thickness to the minimum of 1 m.
+#
+# Note that having 'GenerateOutputFiles: False' and 'GenerateCombOutputFile: False'
+# within the ModelParams section will prevent the creation of individual output
+# and combined outputs files. The combined outputs files can be large
+# due to the large number of components used. In this example there is
+# one LookupTableReservoir, OpenWellbore, and FutureGen2Aquifer
+# created for each x and y value specified with the 'file' option,
+# and an output file would be created for each OpenWellbore and FutureGen2Aquifer.
+# Additionally, the AoR plot type can create a csv file with the data used
+# for the plot, and this csv file is much smaller than the combined
+# and individual output files. In this example, this option is also turned off
+# by using entry SaveCSVFiles: False in the setup of three of the four AoR plots.
+#
+# Note that the optional entry 'CriticalPressureMPa: Calculated' is given for the 
+# pressure AoR figure (see Control File examples 31a and 31d). Because spatially 
+# variable stratigraphy is used, the calculated critical pressures will vary over 
+# space. If any of these critical pressures are exceeded, the pressure AoR figure 
+# will use a red contour to highlight areas that exceeded the local critical pressure.
+# All of the critical pressure values are saved in the AoR pressure .csv file.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex32b.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 20
+    TimeStep: 1.0
+    Analysis: forward
+    Components: [LookupTableReservoir1, OpenWellbore1, FutureGen2Aquifer1]
+    OutputDirectory: 'output/output_ex32b_{datetime}'
+    GenerateOutputFiles: False
+    GenerateCombOutputFile: False
+    Logging: Error
+#-------------------------------------------------
+Stratigraphy:
+    spatiallyVariable:
+        LookupTableStratigraphy:
+            FileName: 'stratigraphy.csv'
+            FileDirectory: 'examples/Control_Files/input_data/ex32b'
+            MaxPointDistance: 100
+#-------------------------------------------------
+LookupTableReservoir1:
+    Type: LookupTableReservoir
+    FileDirectory: source/components/reservoir/lookuptables/FutureGen2/1008_sims
+    TimeFile: time_points.csv
+    ParameterFilename: parameters_and_filenames_trunc.csv
+    Interpolation2D: False
+    Parameters:
+        index: 1
+    Outputs: [pressure, CO2saturation]
+#-------------------------------------------------
+OpenWellbore1:
+    Type: OpenWellbore
+    Connection: LookupTableReservoir1
+    Locations:
+        file: source/components/reservoir/lookuptables/FutureGen2/1008_sims/fg1.csv
+        read_z_values: True
+        thin_point_density: True
+        min_x_spacing: 10000
+        min_y_spacing: 10000
+    LeakTo: aquifer4
+    Controls:
+        critPressureApproach: True
+    Parameters:
+        wellRadius:
+            value: 0.05
+            vary: False
+        logReservoirTransmissivity:
+            value: -10.0
+            vary: False
+        logAquiferTransmissivity:
+            value: -10.0
+            vary: False
+        brineSalinity:
+            value: 0.0475
+            vary: False
+        wellTop:
+            value: aquifer4Depth
+            vary: False
+        reservoirDepth:
+            value: shale1Depth
+            vary: False
+        brineDensity:
+            value: 1075
+            vary: False
+    Outputs: [CO2_aquifer,
+              brine_aquifer]
+#-------------------------------------------------
+FutureGen2Aquifer1:
+    Type: FutureGen2Aquifer
+    Connection: OpenWellbore1
+    AquiferName: aquifer4
+    Parameters:
+        aqu_thick:
+            value: aquifer4Thickness
+            vary: False
+        depth:
+            value: aquifer4Depth
+            vary: False
+        por:
+            value: 0.18
+            vary: False
+        log_permh:
+            value: -11.92
+            vary: False
+        log_aniso:
+            value: 0.3
+            vary: False
+        rel_vol_frac_calcite:
+            value: 0.01
+            vary: False
+    Outputs: [pH_volume, TDS_volume]
+#-------------------------------------------------
+Plots:
+    Strat_Plot:
+        Stratigraphy:
+            FigureDPI: 100
+            PlotWellbores: True
+            PlotWellLabels: False
+            PlotInjectionSites: True
+            PlotInjectionSiteLabels: True
+            PlotStratComponents: True
+            InjectionCoordx: 2.37e5
+            InjectionCoordy: 4.41e6
+            View:
+                ViewAngleElevation: [5, 5, 5, 5, 5, 5, 5]
+                ViewAngleAzimuth: [270, 285, 300, 315, 330, 345, 360]
+    AoR_Pressure:
+        AoR: [pressure]
+        PlotInjectionSites: True
+        InjectionCoordx: 2.37e5
+        InjectionCoordy: 4.41e6
+        FigureDPI: 100
+        SaveCSVFiles: True
+        CriticalPressureMPa: Calculated
+    AoR_CO2Sat:
+        AoR: [CO2saturation]
+        PlotInjectionSites: True
+        InjectionCoordx: 2.37e5
+        InjectionCoordy: 4.41e6
+        FigureDPI: 100
+        SaveCSVFiles: False
+    AoR_pH:
+        AoR: [pH_volume]
+        PlotInjectionSites: True
+        InjectionCoordx: 2.37e5
+        InjectionCoordy: 4.41e6
+        FigureDPI: 100
+        SaveCSVFiles: False
+    AoR_TDS:
+        AoR: [TDS_volume]
+        PlotInjectionSites: True
+        InjectionCoordx: 2.37e5
+        InjectionCoordy: 4.41e6
+        FigureDPI: 100
+        SaveCSVFiles: False

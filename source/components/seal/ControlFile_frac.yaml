@@ -1,0 +1,61 @@
+---
+# Seal_Frac Input Example - FRACTURE MODEL - METRIC UNITS
+#   This example YAML file illustrates input for fracture model
+#   Note: units are in parentheses together with values.
+#   Code is part of the NRAP Integrated Assessment Model, Seal_Flux.
+# Last Modified: 15 May 2022 (61 Lines)
+# Author: E.N. Lindner
+#------------------------------------------------------------------------------
+Connectivity:
+    geometric: 1.000            # Connectivity and roughness factor for site
+Controls:
+    randomFracApproach: Yes                         # Yes/No; Generate random
+    userFracApproach: Yes                           # Yes/No; Input from file
+    apertureLengthApproach: No                      # Yes/No; Aperture-correl.
+    pressureApproach: No                            # Yes/No; P-A concept
+    plotFracApproach: No                            # Yes/No; Generate plots
+RandomFracs:
+    Density:
+        aveDensity: {valu: 2.0e-04, unit: per_m^2}
+        minDensity: {valu: 1.0e-04, unit: per_m^2}
+        maxDensity: {valu: 3.0e-04, unit: per_m^2}
+    Orientation:
+        aveTrend: 30.0                              # degrees from North;
+        spreadTrend: 20.0                           # approximately 2-sigma
+    Length:
+        function: LOGnormal                         # lognormal or powerlaw
+        aveLength: {valu: 50.0, unit: m}            # for lognormal
+        stdDevLength: {valu: 20.0, unit: m}         # for lognormal
+        expLength: {valu: -0.8 , unit: m}           # for powerlaw where x = m
+        minLength: {valu: 1.0e-1, unit: m}
+        maxLength: {valu:  500.0 , unit: m}
+    VaryAperture:
+        aveAperture: {valu: 5.0e-4, unit: mm}       # Also reference aperture
+        stdDevAperture: {valu: 1.0e-4, unit: mm}
+        minAperture: {valu: 1.0e-6, unit: mm}
+        maxAperture: {valu: 5.0e-3, unit: mm}
+    CorrelateAperture:
+        alpha: 0.6                                  # exponent for correlation
+        beta: {valu: 0.00010, unit: mm}             # aperture -1 meter fracture
+    Threshold:
+        refEntry: {valu: 5.0e+03, unit: Pa}         # Reference to mean aperture
+    PressureCorrection:
+        resAperture: {valu: 0.005, unit: mm}        # resid.' hydraulic aperture
+        wideAperture: {valu: 0.0500 , unit: mm}     # maximum hydraulic aperture
+        stressLimit: {valu: 2.5e+07, unit: Pa}      # stress limit - nonlinear
+        theta: 2.5                                  # stiffness history factor
+InputFracs:
+    Filename: user_fracture_input                   # User input directory
+    Threshold:
+        refAperture: {valu: 1.00e-2, unit: mm}
+        refPressure: {valu: 1.0e+06, unit: Pa}
+RockMatrix:
+    Permeability:
+        aveMatrix: {valu: 1.00e-08, unit: mD}       # microdarcys
+        stdDevMatrix: {valu: 1.00e-10, unit: mD}    # microdarcys
+        minMatrix: {valu: 1.0e-09, unit: mD}        # microdarcys
+        maxMatrix: {valu: 3.00e-06, unit: mD}       # microdarcys
+    Threshold:
+        matrixPerm: {valu: 1.0e-08, unit: mD}       # microdarcys
+        matrixPress: {valu: 1.0e+06, unit: Pa}
+### End

@@ -1,0 +1,79 @@
+# OpenIAM Control File Example 48
+#
+# This example demonstrates the use of the FaultFlow component.
+# Note that the example was made to be similar to test_case1()
+# within fault_flow_component.py.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex41.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    TimePoints: 'examples/Control_Files/input_data/ex48/time_points.csv'
+    Analysis: forward
+    Components: [FaultFlow1]
+    OutputDirectory: output/output_ex48_{datetime}
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        vary: False
+        value: 250.0
+    shale2Thickness:
+        vary: False
+        value: 250.0
+    shale3Thickness:
+        vary: False
+        value: 250.0
+    aquifer1Thickness:
+        vary: False
+        value: 100.0
+    aquifer2Thickness:
+        vary: False
+        value: 100.0
+    reservoirThickness:
+        vary: False
+        value: 30.0
+#-------------------------------------------------
+FaultFlow1:
+    Type: FaultFlow
+    DynamicParameters:
+        pressure: [3.03585e+07, 3.03585e+07, 3.03585e+07, 3.03585e+07,
+                   3.03585e+07, 3.03585e+07, 3.03585e+07, 3.03585e+07,
+                   3.03585e+07, 3.03585e+07, 3.03585e+07, 3.03585e+07,
+                   3.03585e+07, 3.03586e+07, 3.036e+07, 3.03624e+07,
+                   3.03666e+07, 3.03737e+07, 3.0384e+07, 3.03984e+07,
+                   3.04173e+07, 3.05913e+07, 3.09064e+07, 3.13494e+07,
+                   3.18898e+07, 3.24918e+07, 3.3122e+07, 3.37556e+07,
+                   3.43762e+07, 3.49743e+07,3.55424e+07, 3.6076e+07,
+                   3.65728e+07, 3.70339e+07, 3.74603e+07, 3.78541e+07,
+                   3.8218e+07, 3.95e+07, 4.02828e+07, 4.06238e+07,
+                   4.09151e+07, 4.11636e+07, 4.13764e+07, 4.15584e+07,
+                   4.17143e+07, 4.1848e+07]
+        CO2saturation: [0.002, 0.002, 0.002, 0.002,
+                        0.002, 0.002, 0.002, 0.002,
+                        0.002, 0.002, 0.002, 0.002,
+                        0.002, 0.002, 0.00199992, 0.00199979,
+                        0.00199955, 0.00199917, 0.0019986, 0.00199781,
+                        0.00199678, 0.00198733, 0.00197054, 0.00194762,
+                        0.00192069, 0.00189196, 0.00186322, 0.00183561,
+                        0.00180975, 0.00178586, 0.00176405, 0.00174431,
+                        0.00172655, 0.00171057, 0.0016962, 0.00168327,
+                        0.00167161, 0.00163, 0.00161008, 0.00160062,
+                        0.00159269, 0.00158602, 0.00158039, 0.00157563,
+                        0.00157158, 0.00156815]
+    Segments:
+        Number: 1
+    Parameters:
+        nSegments: 1
+    Outputs: [brine_aquifer_total, CO2_aquifer_total]
+#-------------------------------------------------
+Plots:
+    Brine_Leakage:
+        TimeSeries: [brine_aquifer_total]
+    CO2_Leakage:
+        TimeSeries: [CO2_aquifer_total]

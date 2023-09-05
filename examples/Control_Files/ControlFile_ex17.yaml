@@ -1,0 +1,170 @@
+# OpenIAM Control File Example 17
+#
+# This example demonstrates the use of the FaultFlow component. Here, the
+# component is explicitly provided with the reservoir pressures and CO2 saturations
+# though the DynamicParameters entry (in the Fault1 section). Note that
+# the timing of these values corresponds to the times entered with the
+# TimePoints entry in the ModelParams section. Based on these inputs and
+# the parameters used (e.g., fault location, fault strike and dip, and
+# fault aperture), the FaultFlow component produces the CO2 and brine
+# leakage rates into an overlying aquifer.
+#
+# Note that the FaultFlow component does not connect with the Stratigraphy
+# component, so it will ignore the information entered under Stratigraphy.
+# The characteristics of the aquifer receiving leakage are entered through
+# FaultFlow parameters like aquiferDepth, aquiferTemperature, and aquiferPressure.
+# Additionally, some details regarding the injection operation are controlled
+# through the pressure and CO2saturations provided as well as parameters like
+# injectX, injectY, injectDepth, injectPressure, and finalPressure. A FaultFlow
+# component can still use pressures and CO2 saturations provided from a
+# reservoir component, however: see control file example 18.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#  python ../../source/openiam/openiam_cf.py --file ControlFile_ex17.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    TimePoints: [0.00E+00, 8.49E-02, 1.64E-01, 2.49E-01, 3.31E-01, 4.16E-01,
+                 4.98E-01, 5.83E-01, 6.68E-01, 7.50E-01, 8.35E-01, 9.17E-01,
+                 1.00E+00, 2.00E+00, 4.00E+00, 5.00E+00, 6.00E+00, 7.00E+00,
+                 8.00E+00, 9.00E+00, 1.00E+01, 1.50E+01, 2.00E+01, 2.50E+01,
+                 3.00E+01, 3.50E+01, 4.00E+01, 4.50E+01, 5.00E+01, 5.50E+01,
+                 6.00E+01, 6.50E+01, 7.00E+01, 7.50E+01, 8.00E+01, 8.50E+01,
+                 9.00E+01, 1.10E+02, 1.30E+02, 1.40E+02, 1.50E+02,
+                 1.60E+02, 1.70E+02, 1.80E+02, 1.90E+02, 2.00E+02]
+    Analysis: forward
+    Components: [Fault1]
+    OutputDirectory: output/output_ex17_{datetime}
+    Logging: Debug
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        vary: False
+        value: 525.0
+    shale2Thickness:
+        vary: False
+        value: 475.0
+    shale3Thickness:
+        vary: False
+        value: 11.2
+    aquifer1Thickness:
+        vary: False
+        value: 1.4
+    aquifer2Thickness:
+        vary: False
+        value: 19.2
+    reservoirThickness:
+        vary: False
+        value: 51.2
+#------------------------------------------------------------------------------
+Fault1:
+    Type: FaultFlow
+    DynamicParameters:
+        pressure: [[3.035851266631769761e+07], [3.035851266631769761e+07],
+                   [3.035851266631769761e+07], [3.035851266631769761e+07],
+                   [3.035851266631769761e+07], [3.035851266631769761e+07],
+                   [3.035851266631769761e+07], [3.035851266631769761e+07],
+                   [3.035851266631769761e+07], [3.035851266631769761e+07],
+                   [3.035851266631769761e+07], [3.035851266631769761e+07],
+                   [3.035851266631769761e+07], [3.035858161389059946e+07],
+                   [3.036002951292150095e+07], [3.036237373040009663e+07],
+                   [3.036664847991989926e+07], [3.037368113235569745e+07],
+                   [3.038402326829069853e+07], [3.039843331102679670e+07],
+                   [3.041732494600139558e+07], [3.059127967242810130e+07],
+                   [3.090643902815400064e+07], [3.134935823646359891e+07],
+                   [3.188976931285379827e+07], [3.249181951941659674e+07],
+                   [3.312200033572259545e+07], [3.375555958310069889e+07],
+                   [3.437615668677359819e+07], [3.497427688168109953e+07],
+                   [3.554240488237709552e+07], [3.607599014905019850e+07],
+                   [3.657275741179469973e+07], [3.703387877934990078e+07],
+                   [3.746025057016349584e+07], [3.785414805414119363e+07],
+                   [3.821798439633449912e+07], [3.9500000e+07],
+                   [4.028282630954369903e+07], [4.062384100510709733e+07],
+                   [4.091507555303669721e+07], [4.116363155334119499e+07],
+                   [4.137640376331059635e+07], [4.155835640819369256e+07],
+                   [4.171431581809349358e+07], [4.184800516194659472e+07]]
+        CO2saturation: [[2.000000000000000042e-03], [2.000000000000000042e-03],
+                        [2.000000000000000042e-03], [2.000000000000000042e-03],
+                        [2.000000000000000042e-03], [2.000000000000000042e-03],
+                        [2.000000000000000042e-03], [2.000000000000000042e-03],
+                        [2.000000000000000042e-03], [2.000000000000000042e-03],
+                        [2.000000000000000042e-03], [2.000000000000000042e-03],
+                        [2.000000000000000042e-03], [2.000000000000000042e-03],
+                        [1.999920000000000083e-03], [1.999789999999999988e-03],
+                        [1.999550000000000112e-03], [1.999170000000000200e-03],
+                        [1.998600000000000116e-03], [1.997810000000000037e-03],
+                        [1.996780000000000083e-03], [1.987329999999999826e-03],
+                        [1.970539999999999792e-03], [1.947619999999999950e-03],
+                        [1.920690000000000071e-03], [1.891960000000000039e-03],
+                        [1.863220000000000067e-03], [1.835610000000000106e-03],
+                        [1.809749999999999944e-03], [1.785860000000000008e-03],
+                        [1.764050000000000080e-03], [1.744310000000000001e-03],
+                        [1.726550000000000090e-03], [1.710570000000000016e-03],
+                        [1.696199999999999921e-03], [1.683269999999999949e-03],
+                        [1.671610000000000023e-03], [1.630E-03],
+                        [1.610080000000000061e-03], [1.600620000000000081e-03],
+                        [1.592689999999999904e-03], [1.586020000000000051e-03],
+                        [1.580390000000000093e-03], [1.575629999999999956e-03],
+                        [1.571579999999999939e-03], [1.568149999999999926e-03]]
+    Segments:
+        Number: 1   # number of fault segments
+        Locations:
+            coordx: [388618.7]  # x-coordinate of the center of each segment
+            coordy: [3436341.1] # y-coordinate of the center of each segment
+    Controls:
+        # the only 4 available options: considerNearApproach, profileType,
+        # pressureApproach, interpolateApproach
+        considerNearApproach: False
+        profileType: 0
+        pressureApproach: False
+        interpolateApproach: False
+    Parameters:
+        # Fault core parameters
+        strike: 95.4                # cannot be random
+        dip: 90.0                   # deg; right hand rule from strike
+        length: 100.0               # m; length at surface from start point
+        xStart: 388618.7            # m; x-coordinate, fault start point
+        yStart: 3436341.1           # m; y-coordinate, fault start point
+        SGR: 0.0                    # %; SGR = shale gouge ratio
+        stateVariable: 1.0          # -; Non-Isothermal correction factor
+        # Aperture
+        aperture: 1.0e-4            # in meters; can be list
+        # Field parameters
+        aquiferDepth: 500.0         # m; Depth to the base of deepest aquifer
+        injectDepth: 2884.31        # m; Depth to the top of injection horizon
+        aquiferPressure: 4.9e+06    # Pa; Pressure at aquifer base depth
+        fieldPressure: 2.85e+7      # Pa; Initial Pressure at injection depth
+        injectPressure: 3.0778e+7   # Pa; Ave. pressure at depth during injection
+        finalPressure: 3.90e+7      # Pa; Ave. pressure at depth after injection
+        aquiferTemperature: 30.0    # oC; Temperature at aquifer depth
+        injectTemperature: 98.9     # oC; Temperature at injection depth
+        injectX: 388505.9           # m; X coordinate of injection well
+        injectY: 3434629.9          # m; Y coordinate of injection well
+        # Conditions
+        salinity: 50000.0           # ppm; at injection horizon
+        CO2Density: 430.0           # kg/m^3; average
+        CO2Viscosity: 3.72e-5       # Pa*s
+        brineDensity: 988.00        # kg/m^3
+        brineViscosity: 4.36e-4     # Pa*s
+        CO2Solubility: 2.0e-3       # mol/kg
+        # Relative flow parameters
+        brineResSaturation: 0.15    # -; Residual wetting saturation
+        CO2ResSaturation: 0.00      # -; Residual nonwetting saturation
+        relativeModel: BC           # -; Model type; options: BC
+        permRatio: 0.6              # -; Ratio of nonwetting/wetting
+        entryPressure: 1.0e+05      # Pa; Threshold value
+        lambda:  2.5                # -; Brooks Corey Model lamda parameter
+        # Stress parameters
+        maxHorizontal: 3.0e+07      # Pa; max. secondary stress at injection depth
+        minHorizontal: 2.0e+07      # Pa; min. secondary stress at injection depth
+        maxTrend: 55.0              # deg; strike of max. stress from North
+    Outputs: ['CO2_aquifer_total', 'brine_aquifer_total']
+#------------------------------------------------------------------------------
+Plots:
+    Plot1:
+        TimeSeries: ['CO2_aquifer_total']
+    Plot2:
+        TimeSeries: ['brine_aquifer_total']

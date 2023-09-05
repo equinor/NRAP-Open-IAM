@@ -1,0 +1,165 @@
+# OpenIAM Control File Example 35
+#
+# This example is similar to the example Control File Example 34. Please refer
+# to the description for that example. This example, however, has units that dip
+# to the south. This example demonstrates how the units can pinch out
+# if their depths become too small. Note, however, that each unit can only
+# be reduced to a minimum depth of 1 m: the unit is still there, it is just very
+# thin. This example also uses the option "PlotStratComponents: True" within
+# the Stratigraphy Plot. When using the option "spatiallyVariable: strikeAndDip"
+# within the Stratigraphy section, the code actually creates a separate stratigraphy
+# component for every other component (e.g., each OpenWellbore).
+# The unit thicknesses for each stratigraphy component are calculated based
+# on the component's location and the strike and dip values used.
+# The component for which the stratigraphy component was made is then given
+# the parameters of the newly created stratigraphy component. The wellbores
+# are plotted as vertical lines, and the unit depths along each wellbores
+# are plotted as red or blue circles (for the tops of shales or aquifers,
+# respectively). By varying the ViewAngleElevation and ViewAngleAzimuth values,
+# this example is meant to further demonstrate the stratigraphy created with
+# the strike and dip option. The options "PlotWellLabels: False"
+# and "StrikeAndDipSymbol: PlotSymbol: False" are used so that the markers
+# representing unit depths can be seen more clearly. Additionally,
+# having "PlotInjectionLocations: True" makes the code plot the injection sites
+# used by the reservoir components. Note that injection sites must be explicity
+# given with the InjectionCoordx and InjectionCoordy (x and y values, respectively)
+# for LookupTableReservoir components. Other types of reservoir components store the
+# x and y values, so InjectionCoordx and InjectionCoordy do not need to be provided.
+# For more details check Control File example 37. This example also demonstrates how
+# one can save the Stratigraphy plot as a certain type of image file (here, .tiff).
+#
+# There are also three StratigraphyColumn plots demonstrating how unit thicknesses
+# change across the domain. The top units pinch out to the north - because both shale
+# 3 and aquifer 2 have thicknesses of 1 m for StratCol3, the labels for those
+# units would overlap each other. To prevent that overlap, the labels have
+# been provided as blank ('') entries. See control file example 33b for more details
+# regarding unit labels. Because the text used to display depths would also overlap,
+# this text is disabled in StratCol2 and StratCol3 with the entry "DepthText: False".
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex35.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 50
+    TimeStep: 1.0
+    Analysis: forward
+    Components: [SimpleReservoir1, OpenWellbore1]
+    OutputDirectory: output/output_ex35_{datetime}
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    spatiallyVariable:
+        strikeAndDip:
+            strike: 270
+            dip: 25
+            dipDirection: S
+            coordxRefPoint: 0
+            coordyRefPoint: 0
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        value: 750.0
+        vary: False
+    shale2Thickness:
+        value: 950.0
+        vary: False
+    shale3Thickness:
+        value: 365
+        vary: False
+    aquifer1Thickness:
+        vary: False
+        value: 200
+    aquifer2Thickness:
+        vary: False
+        value: 200
+    reservoirThickness:
+        vary: False
+        value: 150
+#-------------------------------------------------
+SimpleReservoir1:
+    Type: SimpleReservoir
+    Parameters:
+        injRate:
+            value: 1
+            vary: False
+        logResPerm:
+            value: -10.15
+            vary: False
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+OpenWellbore1:
+    Type: OpenWellbore
+    Connection: SimpleReservoir1
+    Locations:
+        grid:
+            xmin: 500
+            xmax: 2000
+            xsize: 4
+            ymin: 500
+            ymax: 2000
+            ysize: 4
+    LeakTo: aquifer2
+    Controls:
+        critPressureApproach: True
+    Parameters:
+        wellRadius:
+            value: 0.05
+            vary: False
+        logReservoirTransmissivity:
+            value: -10.97
+            vary: False
+        logAquiferTransmissivity:
+            value: -10.0
+            vary: False
+        brineSalinity:
+            value: 0.2
+            vary: False
+        wellTop:
+            value: aquifer2Depth
+            vary: False
+        reservoirDepth:
+            value: shale1Depth
+            vary: False
+        brineDensity:
+            value: 1025
+            vary: False
+    Outputs: [CO2_aquifer,
+              brine_aquifer]
+#-------------------------------------------------
+Plots:
+    StratPlot.tiff:
+        Stratigraphy:
+            FigureDPI: 200
+            PlotInjectionSites: True
+            PlotInjectionSiteLabels: True
+            PlotWellbores: True
+            PlotWellLabels: False
+            PlotStratComponents: True
+            StrikeAndDipSymbol:
+                PlotSymbol: False
+            View:
+                ViewAngleElevation: [10, 30, -2, 0, 2]
+                ViewAngleAzimuth: [300, 300, 0, 0, 0]
+    StratCol1.tiff:
+        StratigraphicColumn:
+            FigureDPI: 200
+            XValue: 0
+            YValue: 0
+    StratCol2.tiff:
+        StratigraphicColumn:
+            FigureDPI: 200
+            XValue: 0
+            YValue: 1000
+            DepthText: False
+    StratCol3.tiff:
+        StratigraphicColumn:
+            Shale3Label: ''
+            Aquifer2Label: ''
+            FigureDPI: 200
+            XValue: 0
+            YValue: 2000
+            DepthText: False

@@ -1,0 +1,138 @@
+# OpenIAM Control File Example 23
+#
+# This example demonstrates the uses of the SealHorizon
+# component in a deterministic simulation ('Analysis: forward').
+# Results for specific years (0, 1, 10, 20, 30, 40, and 50)
+# are displayed with the GriddedMetric plot type. This plot type
+# is further described in control file examples 18 and 19.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#  python ../../source/openiam/openiam_cf.py --file ControlFile_ex23.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 50
+    TimeStep: 1.0
+    Analysis: forward
+    Components: [LUTReservoir1, SealLayer1]
+    OutputDirectory: output/output_ex23_{datetime}
+    Logging: Info
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        vary: False
+        value: 525.0
+    shale2Thickness:
+        vary: False
+        value: 475.0
+    shale3Thickness:
+        vary: False
+        value: 11.2
+    aquifer1Thickness:
+        vary: False
+        value: 1.4
+    aquifer2Thickness:
+        vary: False
+        value: 19.2
+    reservoirThickness:
+        vary: False
+        value: 51.2
+#-------------------------------------------------
+LUTReservoir1:
+    Type: LookupTableReservoir
+    FileDirectory: source/components/reservoir/lookuptables/Kimb_54_sims
+    TimeFile: time_points.csv
+    ParameterFilename: parameters_and_filenames.csv
+    Parameters:
+        index: 5
+    Outputs: [pressure,
+              CO2saturation]
+#------------------------------------------------------------------------------
+SealLayer1:
+    Type: SealHorizon
+    Connection: LUTReservoir1
+    Cells:
+        Number: 3
+        Locations:
+            coordx: [38919.0, 40360.3, 39639.9]
+            coordy: [48333.0, 48333.0, 48333.0]
+            # or
+            # file: path to the csv file with locations in column format (x, y)
+        area: 100              # can be value, list or from csv file; not random
+        baseDepth: 1100        # can be value, list or from csv file; not random
+        # if dict for thickness or permeability then generate (not yet implemented)
+        thickness: 500.0       # can be value, list or from csv file; random but from particular distribution (not yet implemented)
+        permeability: [1.0e-18, 1.2e-18, 1.1e-18] # can be value, list or from csv file; random but from particular distribution (not yet implemented)
+        entryPressure: 5000.0  # can be value, list or from csv file; not random
+        influence: 1.0         # can be value, list or from csv file; not random
+    Controls:  # not required part of the setup
+        # available options: correlateApproach, interpolateApproach,
+        # heterogeneityApproach, and varyPressureApproach
+        correlateApproach: False
+        interpolateApproach: False
+        heterogeneityApproach: False
+        varyPressureApproach: False   # True option is not available in control file interface
+    Parameters:
+        influenceModel: 1           # single number 0, 1, or 2; not random
+        salinity: 15000.0           # ppm
+        aveTemperature: 50.0        # oC
+        aveBaseDepth: 1130          # !!! m; Ave. seal base depth, positive below grade
+        aveBasePressure: 3.20e+7    # Pa; Ave. at seal base
+        staticDepth:  1000.0        # m;  Reference Depth, positive below grade
+        staticPressure: 1.00e+7     # Pa; Reference Pressure - at Reference Depth
+        CO2Density: 597.8           # !!! kg/m^3; Ignored if Interpolate = yes
+        CO2Viscosity: 4.52e-5       # !!! Pa*s;   Ignored if Interpolate = yes
+        brineDensity: 1004.00       # kg/m^3; Ignored if Interpolate = yes
+        brineViscosity: 5.634e-4    # Pa*s;   Ignored if Interpolate = yes
+        CO2Solubility: 0.0          # !!! kg/kg ; Ignored if Interpolate = yes
+        brineResSaturation: 0.15    # !!! Residual wetting
+        CO2ResSaturation: 0.00      # !!! Residual nonwetting; typically = 0.0
+        relativeModel: LET          # Model type; options: BC, LET
+        wetting1: 1.0               # Used only if relativeModel = LET
+        wetting2: 10.0              # Used only if relativeModel = LET
+        wetting3: 1.25              # Used only if relativeModel = LET
+        nonwet1: 1.05               # Used only if relativeModel = LET
+        nonwet2: 3.50               # Used only if relativeModel = LET
+        nonwet3: 1.25               # Used only if relativeModel = LET
+        capillary1: 0.20            # Used only if relativeModel = LET
+        capillary2: 2.80            # Used only if relativeModel = LET
+        capillary3: 0.43            # Used only if relativeModel = LET
+        maxCapillary: 1.0E+07       # Pa; Used only if relativeModel = LET
+        permRatio: 0.6              # Ratio of nonwetting/wetting
+        # Parameters rateEffect and totalEffect are used only when parameter
+        # influenceModel is set to 1 or 2. These parameters control the initial time
+        # delay and the maximum extent of effect.
+        rateEffect: 0.1             # Time model -> Rate of effect
+        totalEffect: 0.2            # Time model -> Total effect as ratio
+    Outputs: ['CO2_aquifer_total', 'brine_aquifer_total',
+              'CO2_aquifer', 'brine_aquifer',            # gridded observations
+              'mass_CO2_aquifer', 'mass_brine_aquifer']  # gridded observations
+Plots:
+    Plot1:
+        TimeSeries: ['CO2_aquifer_total']
+    Plot2:
+        TimeSeries: ['brine_aquifer_total']
+    Plot3:
+        TimeSeries: ['pressure']
+    Plot4:
+        TimeSeries: ['CO2saturation']
+    Plot5:
+        TimeSeries: ['CO2_aquifer_cell_1']
+    Plot6:
+        TimeSeries: ['brine_aquifer_cell_2']
+    Plot7:
+        TimeSeries: ['mass_CO2_aquifer_cell_3']
+    Plot8:
+        TimeSeries: ['mass_brine_aquifer_cell_3']
+    Plot9:
+        GriddedMetric:
+            ComponentNameList: [SealLayer1]
+            MetricName: mass_brine_aquifer
+            TimeList: All
+            FigureDPI: 300
+            PlotOverAreas: False
+            TimeList: [0, 1, 10, 20, 30, 40, 50]

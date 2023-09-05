@@ -1,0 +1,136 @@
+# OpenIAM Control File Example 1b
+#
+# This example is similar to control file example 1a. While example 1a separates
+# the results from different locations into differrent subplots, this distinguishes
+# results through the use of different markers and line styles. Specifically, this
+# example demonstrates the use of the 'UseMarkers', 'UseLines', and 'VaryLineStyles'
+# entries for TimeSeries plots. If these entries are not provided, the default
+# settings are UseMarkers: False, UseLines: True, and VaryLineStyles: False.
+# Note that if 'UseLines' is set to False, then 'VaryLineStyles' will automatically
+# be set to False. These entries do not alter the appearance of TimeSeriesStats figures,
+# but they will influence appearances of TimeSeriesAndStats figures (just the results
+# for individual simulations, not the statistics for all simulations).
+#
+# This example also demonstrates how the DPI (dots-per-inch) of TimeSeries plots can
+# be changed with the inclusion of FigureDPI entry. The default DPI is 100. Note that
+# the FigureDPI entry is accepted by all plot types.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#  python ../../source/openiam/openiam_cf.py --file ControlFile_ex1b.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    # Time is in years
+    EndTime: 10    # EndTime and TimeStep - 1st option to enter time
+    TimeStep: 1.0
+    # TimePoints: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] # 2nd option to enter time
+    # TimePoints: 'examples/Control_Files/input_data/ex1/time_points.csv' # 3rd option to enter time
+    Analysis: forward
+    Components: [SimpleReservoir1,
+                 CementedWellbore1]
+    OutputDirectory: output/output_ex1b_{datetime}
+    OutputType: 1  # 0 - row-wise; 1 - column-wise
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    # Thickness is in meters
+    shale1Thickness:
+        vary: False
+        value: 525.0
+    shale2Thickness:
+        vary: False
+        value: 475.0
+    shale3Thickness:
+        vary: False
+        value: 11.2
+    aquifer1Thickness:
+        vary: False
+        value: 22.4
+    aquifer2Thickness:
+        vary: False
+        value: 19.2
+    reservoirThickness:
+        vary: False
+        value: 51.2
+# All coordinates are in meters.
+# With the SimpleReservoir the default injection location is at (0, 0)
+#-------------------------------------------------
+# SimpleReservoir1 is a user defined name for component
+# the type SimpleReservoir is the ROM model name
+#-------------------------------------------------
+SimpleReservoir1:
+    Type: SimpleReservoir
+    InjectionWell:
+        coordx: 10
+        coordy: 20
+    Parameters:
+        injRate: 0.1
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+# Here, 4 leaky wellbores are added using the Cemented wellbore model.
+# Two of the wellbores have predetermined locations; locations of another two
+# wellbores will be generated randomly within the specified domain.
+#-------------------------------------------------
+CementedWellbore1:
+    Type: CementedWellbore
+    Connection: SimpleReservoir1
+    Number: 4
+    Locations:
+        coordx: [100, 540]
+        coordy: [100, 630]
+    RandomLocDomain:
+        xmin: 150
+        xmax: 250
+        ymin: 200
+        ymax: 300
+    Parameters:
+        logWellPerm:
+            vary: False
+            value: -13.0
+    Outputs: [CO2_aquifer1,
+              CO2_aquifer2,
+              CO2_atm,
+              brine_aquifer1,
+              brine_aquifer2]
+#-------------------------------------------------
+# Time-series plots of the output observations are
+# specified in the next section.
+#-------------------------------------------------
+Plots:
+    CO2_Leakage_v1:
+        TimeSeries: [CO2_aquifer1, CO2_aquifer2]
+        UseMarkers: False          # default is False
+        UseLines: True             # default is True
+        VaryLineStyles: True       # default is False
+        FigureDPI: 200
+        Subplot:
+            Use: False             # default is True
+    CO2_Leakage_v2:
+        TimeSeries: [CO2_aquifer1, CO2_aquifer2]
+        UseMarkers: True           # default is False
+        UseLines: True             # default is True
+        VaryLineStyles: False      # default is False
+        FigureDPI: 200
+        Subplot:
+            Use: False             # default is True
+    Pressure_plot_v1:
+        TimeSeries: [pressure]
+        UseMarkers: False          # default is False
+        UseLines: True             # default is True
+        VaryLineStyles: True       # default is False
+        FigureDPI: 200
+        Subplot:
+            Use: False             # default is True
+    Pressure_plot_v2:
+        TimeSeries: [pressure]
+        UseMarkers: True           # default is False
+        UseLines: False            # default is True
+        VaryLineStyles: False      # VaryLineStyle is False if UseLines is False; default is False
+        FigureDPI: 200
+        Subplot:
+            Use: False             # default is True

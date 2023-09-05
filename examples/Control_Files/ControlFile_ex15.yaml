@@ -1,0 +1,126 @@
+# OpenIAM Control File Example 15
+#
+# This example is similar to control file example 14, but it uses
+# a FutureGen2AZMI component to evaluate pH, TDS, and pressure plume
+# volumes in aquifer 1. FutureGen2Aquifer components are designed for
+# aquifers with depths from 100 m to 700 m, while FutureGen2AZMI components
+# are designed for aquifers with depths between 700 m and 1600 m. Aquifer 1
+# has a bottom depth of 1044 m, so it is represented here with
+# a FutureGen2AZMI component. The component is made to represent aquifer 1
+# through the entry 'AquiferName: aquifer1'.
+#
+# This example requires the additional FutureGen 2.0 data set.
+# FutureGen 2.0 data set can be downloaded from the following source:
+# https://edx.netl.doe.gov/dataset/futuregen-2-0-1008-simulation-reservoir-lookup-table
+#
+# The downloaded data set should be placed here:
+#    source/components/reservoir/lookuptables/FutureGen2/1008_sims
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex15.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 20.
+    TimeStep: 0.125
+    Analysis:
+        type: lhs
+        siz: 100
+    Components: [LookupTableReservoir1, MultisegmentedWellbore1, FutureGen2AZMI1]
+    OutputDirectory: output/output_ex15_{datetime}
+    Logging: Info
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers: 5
+    shale1Thickness: 198.7
+    shale2Thickness: 74.4
+    shale3Thickness: 110.3
+    shale4Thickness: 118.9
+    shale5Thickness: 530.4
+    aquifer1Thickness: 33.2
+    aquifer2Thickness: 84.1
+    aquifer3Thickness: 31.1
+    aquifer4Thickness: 61.6
+    reservoirThickness: 7
+#-------------------------------------------------
+LookupTableReservoir1:
+    Type: LookupTableReservoir
+    FileDirectory: source/components/reservoir/lookuptables/FutureGen2/1008_sims
+    TimeFile: time_points.csv
+    ParameterFilename: parameters_and_filenames_trunc.csv
+    Parameters:
+        index: 5
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+MultisegmentedWellbore1:
+    Type: MultisegmentedWellbore
+    Connection: LookupTableReservoir1
+    Number: 2
+    Locations:
+        coordx: [236377.0, 236758.0]
+        coordy: [4409269.5, 4410107.6]
+    Parameters:
+        wellRadius: 0.05715
+        logAqu1Perm:
+            min: -13.89
+            max: -12.89
+            value: -13.39
+        logAqu2Perm:
+            min: -11.55
+            max: -10.55
+            value: -11.05
+        logAqu3Perm:
+            min: -12.98
+            max: -11.98
+            value: -12.48
+        logAqu4Perm:
+            min: -12.42
+            max: -11.42
+            value: -11.92
+        logWellPerm:
+            min: -14.0
+            max: -11.0
+            value: -13.0
+        brineDensity: 1030.9
+        CO2Density: 775.0
+        brineViscosity: 7.5e-4
+        CO2Viscosity: 6.6e-5
+    Outputs: [CO2_aquifer1, CO2_aquifer2, brine_aquifer1, brine_aquifer2]
+#-------------------------------------------------
+FutureGen2AZMI1:
+    Type: FutureGen2AZMI
+    Connection: MultisegmentedWellbore1
+    AquiferName: aquifer1
+    Parameters:
+        por: 0.118
+        log_permh:
+            min: -13.39
+            max: -12.5
+            value: -13.0
+        log_aniso: 0.3
+        rel_vol_frac_calcite: 0.01
+    Outputs: ['pH_volume', 'TDS_volume', 'Pressure_volume']
+#-------------------------------------------------
+Plots:
+    CO2_Leakage:
+        Title: CO$_2$ and Brine Leakage Rates to the AZMI
+        FigureSize: [16, 12]
+        Subplot:
+            Use: True
+            NumCols: 2
+        TimeSeriesStats: [CO2_aquifer1, brine_aquifer1]
+    AZMI_Impact:
+        Title: pH and TDS Impacts Upon the AZMI
+        FigureSize: [16, 12]
+        Subplot:
+            Use: True
+            NumCols: 2
+        TimeSeriesStats: [pH_volume, TDS_volume]
+    Pressure_Plume_Columes:
+        Title: Pressure Impact Upon the AZMI
+        Subplot:
+            Use: True
+            NumCols: 2
+        TimeSeriesStats: [Pressure_volume]

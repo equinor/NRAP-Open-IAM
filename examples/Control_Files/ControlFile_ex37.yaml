@@ -1,0 +1,145 @@
+# OpenIAM Control File Example 37
+#
+# This example demonstrates how to display the injection location(s) when
+# using a Lookup Table Reservoir. Control File example 33 shows how
+# to display the injection location when using a simple reservoir - a simple
+# reservoir has a specified injection location, even if it resorts to
+# the default location of x = 0 m and y = 0 m. Lookup Table Reservoirs do not
+# have specified injection locations attached to them, so one has to manually
+# enter an injection location within the Stratigraphy Plot section of
+# the .yaml file (InjectionCoordx and InjectionCoordy for x and y values
+# in meters, respectively). If you want to enter multiple injection
+# locations, provide lists to InjectionCoordx and InjectionCoordy
+# (e.g., InjectionCoordx = [100, 200] and InjectionCoordy = [500, 600],
+# where the sites are located at (x, y) values of (100, 500) and (200, 600)).
+# This example also demonstrates how you can save the plots as a certain type
+# of image file (here, .tiff). The entries for 'SpecifyXandYLims', 'xLims',
+# and 'yLims' can be used to set the limits for the x and y axes.
+# The entries for 'SpecifyXandYGridLims', 'gridXLims', and 'gridYLims'
+# can be used to set the limits for the three dimensional planes used
+# to represent the tops of each unit. The entries for 'xLims', 'yLims',
+# 'gridXLims', and 'gridYLims' must all have units of meters.
+#
+# This example requires the additional FutureGen 2.0 data set.
+# FutureGen 2.0 data set can be downloaded from the following source:
+# https://edx.netl.doe.gov/dataset/futuregen-2-0-1008-simulation-reservoir-lookup-table
+#
+# The downloaded data set should be placed here:
+#    source/components/reservoir/lookuptables/FutureGen2/1008_sims
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex37.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 50
+    TimeStep: 1.0
+    Analysis: forward
+    Components: [LookupTableReservoir1, MultisegmentedWellbore1]
+    OutputDirectory: output/output_ex37_{datetime}
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers: 5
+    shale1Thickness: 150.0
+    shale2Thickness: 70.0
+    shale3Thickness: 110.3
+    shale4Thickness: 118.9
+    shale5Thickness: 530.4
+    aquifer1Thickness: 33.2
+    aquifer2Thickness: 84.1
+    aquifer3Thickness: 31.1
+    aquifer4Thickness: 61.6
+    reservoirThickness: 7
+#-------------------------------------------------
+LookupTableReservoir1:
+    Type: LookupTableReservoir
+    FileDirectory: source/components/reservoir/lookuptables/FutureGen2/1008_sims
+    TimeFile: time_points.csv
+    ParameterFilename: parameters_and_filenames_trunc.csv
+    Parameters:
+        index: 5
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+MultisegmentedWellbore1:
+    Type: MultisegmentedWellbore
+    Connection: LookupTableReservoir1
+    Locations:
+        coordx: [236377.0, 236758.0]
+        coordy: [4409269.5, 4410107.6]
+    Parameters:
+        wellRadius: 0.05715
+        logAqu1Perm:
+            min: -13.89
+            max: -12.89
+            value: -13.39
+        logAqu2Perm:
+            min: -11.55
+            max: -10.55
+            value: -11.05
+        logAqu3Perm:
+            min: -12.98
+            max: -11.98
+            value: -12.48
+        logAqu4Perm:
+            min: -12.42
+            max: -11.42
+            value: -11.92
+        logWellPerm:
+            min: -14.0
+            max: -11.0
+            value: -13.0
+        brineDensity: 1030.9
+        CO2Density: 775.0
+        brineViscosity: 7.5e-4
+        CO2Viscosity: 6.6e-5
+    Outputs: [CO2_aquifer1, CO2_aquifer2, CO2_aquifer3, CO2_aquifer4, CO2_atm,
+              brine_aquifer1, brine_aquifer2, brine_aquifer3, brine_aquifer4, brine_atm]
+#-------------------------------------------------
+Plots:
+    pressure_plot.tiff:
+        Subplot:
+            Use: True
+            NumCols: 2
+        TimeSeries: [pressure]
+    saturation_plot.tiff:
+        Subplot:
+            Use: True
+            NumCols: 2
+        TimeSeries: [CO2saturation]
+    CO2_leakage_rates_aq4.tiff:
+        Subplot:
+            Use: True
+            NumCols: 2
+        TimeSeries: [CO2_aquifer4]
+    Brine_leakage_rates_aq4.tiff:
+        Subplot:
+            Use: True
+            NumCols: 2
+        TimeSeries: [brine_aquifer4]
+    StratPlot.tiff:
+        Stratigraphy:
+             PlotInjectionSites: True
+             PlotInjectionSiteLabels: True
+             InjectionCoordx: 2.37e5
+             InjectionCoordy: 4.41e6
+             PlotWellbores: True
+             PlotWellLabels: False
+             PlotStratComponents: True
+             SpecifyXandYLims:
+                 xLims: [235500, 238000]
+                 yLims: [4408500, 4411000]
+             SpecifyXandYGridLims:
+                 gridXLims: [236000, 237500]
+                 gridYLims: [4409000, 4410500]
+             xGridSpacing: 75
+             yGridSpacing: 75
+             StrikeAndDipSymbol:
+                 PlotSymbol: False
+             View:
+                 ViewAngleElevation: [10, 30]
+                 ViewAngleAzimuth: [300, 300]
+    StratCol.tiff:
+        StratigraphicColumn:

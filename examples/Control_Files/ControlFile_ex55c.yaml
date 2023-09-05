@@ -1,0 +1,81 @@
+# OpenIAM Control File Example 55c
+#
+# This example demonstrates the use of the Workflow section
+# with minimal user input. While all options are specified in
+# example 55a, here the options are allowed to resort to their
+# default settings. Only the 'Type' entry for the Workflow section
+# is provided here - this entry is required to use a Workflow.
+# The default options are to use a LookupTableReservoir component
+# (.csv files are required, see below), OpenWellbores using the x
+# and y locations from the .csv files (and z locations, if the table
+# includes them), and GenericAquifer components. Note that simulation
+# run times can be especially long when using GenericAquifer components,
+# so the user may need to limit the number of wellbore locations used.
+# The default approach is to do so with the 'thin_point_density: True'
+# setting, with min_x_spacing: 20000 and min_y_spacing: 20000. See
+# Control File example 32a for an example of this approach. If 'AquiferName'
+# is not included under 'Workflow: Options:', the default setting is
+# the shallowest aquifer (here, 'aquifer4'). Because this example does not
+# include 'AquiferName', the wellbores will leak to aquifer 4; the aquifer
+# component will be set up to represent aquifer 4, and the area of
+# review analysis will be conducted for aquifer 4.
+#
+# This example requires the additional FutureGen 2.0 data set.
+# FutureGen 2.0 data set can be downloaded from the following source:
+# https://edx.netl.doe.gov/dataset/futuregen-2-0-1008-simulation-reservoir-lookup-table
+#
+# The downloaded data set should be placed here:
+#    source/components/reservoir/lookuptables/FutureGen2/1008_sims
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex55c.yaml
+#
+# Last Modified: July, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 20
+    TimeStep: 1.0
+    Analysis: forward
+    Components: []
+    OutputDirectory: 'output/output_ex55c_{datetime}'
+    GenerateOutputFiles: False
+    GenerateCombOutputFile: False
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        value: 5
+        vary: False
+    shale1Thickness:
+        value: 198.7
+        vary: False
+    shale2Thickness:
+        value: 74.4
+        vary: False
+    shale3Thickness:
+        value: 110.3
+        vary: False
+    shale4Thickness:
+        value: 118.9
+        vary: False
+    shale5Thickness:
+        value: 418.71
+        vary: False
+    aquifer1Thickness:
+        value: 33.2
+        vary: False
+    aquifer2Thickness:
+        value: 84.1
+        vary: False
+    aquifer3Thickness:
+        value: 31.1
+        vary: False
+    aquifer4Thickness:
+        value: 61.6
+        vary: False
+    reservoirThickness:
+        value: 7.0
+        vary: False
+#-------------------------------------------------
+Workflow:
+    Type: AoR

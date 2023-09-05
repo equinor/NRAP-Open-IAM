@@ -1,0 +1,115 @@
+# OpenIAM Control File Example 21
+#
+# This examples demonstrates the connection of MultisegmentedWellbore
+# components to DeepAlluviumAquiferML components. Wellbore components are
+# provided with dynamic input reservoir data through input files. Based on the CO2
+# and brine leakage rates from the wellbores, the DeepAlluviumAquiferML
+# components calculate the pH and TDS plume volumes in aquifer 1.
+# Note that each aquifer component is setup to represent aquifer 1 through
+# the entry 'AquiferName: aquifer1'.
+#
+# This example produces four plots:
+#   1. CO2 leakage into the intermediate aquifer (aquifer1)
+#   2. Brine leakage into the intermediate aquifer (aquifer1)
+#   3. Volume of the aquifer below the pH threshold.
+#   3. Volume of the aquifer above the TDS threshold.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex21.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 44
+    TimeStep: 1.0
+    Analysis: forward
+    Components: [Wellbore1, Wellbore2, AquiferComp1, AquiferComp2]
+    OutputDirectory: output/output_ex21_{datetime}
+    Logging: Info
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers: 3
+    shale1Thickness: 525.0
+    shale2Thickness: 475.0
+    shale3Thickness: 11.2
+    aquifer1Thickness: 1.4
+    aquifer2Thickness: 19.2
+    reservoirThickness: 51.2
+#-------------------------------------------------
+Wellbore1:
+    Type: MultisegmentedWellbore
+    DynamicParameters:
+        structure: array
+        pressure: 'examples/Control_Files/input_data/ex21/well1_pressure.csv'
+        CO2saturation: 'examples/Control_Files/input_data/ex21/well1_CO2_saturation.csv'
+    Locations:
+        coordx: [300978.0]
+        coordy: [3934330.0]
+    Number: 1
+    Parameters:
+        logWellPerm:
+            value: -13.0
+    Outputs: [mass_CO2_aquifer1,
+              mass_CO2_aquifer2,
+              CO2_aquifer1,
+              CO2_aquifer2,
+              CO2_atm,
+              brine_aquifer1,
+              brine_aquifer2]
+#-------------------------------------------------
+Wellbore2:
+    Type: MultisegmentedWellbore
+    DynamicParameters:
+        structure: array
+        pressure: 'examples/Control_Files/input_data/ex21/well2_pressure.csv'
+        CO2saturation: 'examples/Control_Files/input_data/ex21/well2_CO2_saturation.csv'
+    Locations:
+        coordx: [301155.0]
+        coordy: [3934890.0]
+    Number: 1
+    Parameters:
+        logWellPerm:
+            value: -13.3
+    Outputs: [mass_CO2_aquifer1,
+              mass_CO2_aquifer2,
+              CO2_aquifer1,
+              CO2_aquifer2,
+              CO2_atm,
+              brine_aquifer1,
+              brine_aquifer2]
+#-------------------------------------------------
+AquiferComp1:
+    Type: DeepAlluviumAquiferML
+    Connection: Wellbore1
+    AquiferName: aquifer1
+    Parameters:
+        sandFraction:
+            value: 0.8
+        logK_sand1:
+            value: -11.5
+        correlationLengthX: 360
+        correlationLengthZ: 18
+    Outputs: ['pH_volume', 'TDS_volume']
+#-------------------------------------------------
+AquiferComp2:
+    Type: DeepAlluviumAquiferML
+    Connection: Wellbore2
+    AquiferName: aquifer1
+    Parameters:
+        sandFraction:
+            value: 0.8
+        logK_sand1:
+            value: -11.5
+        correlationLengthX: 360
+        correlationLengthZ: 18
+    Outputs: ['pH_volume', 'TDS_volume']
+#-------------------------------------------------
+Plots:
+    CO2_Leakage:
+        TimeSeries: [CO2_aquifer1]
+    Brine_Leakage:
+        TimeSeries: [brine_aquifer1]
+    pH_plume_volumes:
+        TimeSeries: [pH_volume]
+    TDS_plume_volumes:
+        TimeSeries: [TDS_volume]

@@ -1,0 +1,606 @@
+*************************************************************
+*      Welcome to PSUADE (version 1.4e)
+*************************************************************
+PSUADE - A Problem Solving environment for 
+         Uncertainty Analysis and Design Exploration
+(for help, enter <help>)
+=============================================================
+psuade> psuade printlevel set to 4
+psuade> load complete : nSamples = 10647
+                nInputs  = 22
+                nOutputs = 1
+psuade> -------------------------------------------------------------
+Available response surface tools: 
+-------------------------------------------------------------
+Expert advices: 
+ MARS - may have accuracy problem near domain boundary. Use
+   this option if sample size is sufficiently large (>100).
+ LINEAR, QUADRATIC, CUBIC, QUARTIC - good for small sample
+   sizes; and when the function is sufficiently smooth.
+   For higher than fourth order, use LEGENDRE (option 15) with
+   response surface expert mode turned on to select order.
+ SELECTIVE POLYNOMIAL REGRESSION - for high order polynomials
+   but your sample size is too small. (So you select certain
+   terms, provided you know which ones.)
+ SVM - provides 3 options: turn on rs_expert to select. Also,
+   use svmfind to search for best settings.
+ BOOTSTRAPPED MARS - intended to be used with adaptive sample
+   refinement, which adds more sample points near the boundary
+   of the parameter space.
+ SUM-OF-TREES REGRESSION - usually gives non-smooth response
+   responses. It is provided here for completeness, but is not
+   generally recommended.
+ SPARSE GRID REGRESSION - has to use sparse grid designs. Also,
+   you cannot use cross validation on sparse grid regression.
+   Use a test set (rstest) to validate your response surface.
+-------------------------------------------------------------
+0. MARS 
+1. Linear regression 
+2. Quadratic regression 
+3. Cubic regression 
+4. Quartic regression 
+6. Selective polynomial regression 
+9. SVM-light (Joachims)
+10. Piecewise-linear model
+12. MARS with bootstrap aggregating (bagging)
+14. Sum-of-trees model
+15. Legendre polynomial regression
+16. User-defined (nonpolynomial) regression
+17. Sparse Grid polynomial regression
+Enter your choice ? No transformation (e.g. log) on sample inputs nor outputs.
+RSFuncApprox INFO: some inputs have non-uniform PDFs, but
+                   they will not be relevant in this analysis.
+*************************************************************
+Quadratic regression model
+=============================================================
+RSFA: Output ID = 1
+RSFA: Output Maximum/Minimum =   2.050157e+01  -0.000000e+00
+INFO: Turn on analysis expert mode to perform cross validation.
+INFO: Set printlevel higher (1-4) to display more information.
+INFO: Set print level to 4 for interpolation error graphics file.
+INFO: Set analysis expert mode to perform cross validation.
+*************************************************************
+*             Quadratic Regression Analysis
+* R-squared gives a measure of the goodness of the model.
+* R-squared should be close to 1 if it is a good model.
+* TURN ON rs_expert mode to output regression matrix.
+* TURN ON rs_expert mode to condition covariance matrix.
+* SET print level to 5 to output regression error splot.
+* SET print level to 4 to output data standard deviations.
+-------------------------------------------------------------
+* Suggestion: if your parameter ranges are too high, SCALE
+*             them first using 'irerange' command in PSUADE
+*             command line mode.
+=============================================================
+Running SVD ...
+SVD completed: status = 0 (should be 0).
+* Regression:: LS average error =  2.1838e+00 (Ymax= 2.05e+01)
+* ======== Note: entries with t-value < 1 suppressed ========
+*                  coefficient   std. error   t-value
+* Constant      =  -8.2543e+01   4.0924e+01  -2.0170e+00
+* Input   1     =   2.0613e-03   5.7821e-03   3.5649e-01
+* Input   2     =   8.2814e+01   1.6956e+01   4.8841e+00
+* Input   3     =  -3.1732e-02   5.6578e-02  -5.6086e-01
+* Input   4     =   1.8660e+02   9.8267e+01   1.8989e+00
+* Input   5     =   1.1547e+01   3.9399e+00   2.9307e+00
+* Input   6     =  -2.2072e-01   1.0911e+00  -2.0229e-01
+* Input   7     =   3.3135e+00   1.4740e+00   2.2479e+00
+* Input   8     =  -3.4197e-01   1.5688e+00  -2.1797e-01
+* Input   9     =  -1.0822e+00   1.2241e+00  -8.8408e-01
+* Input  10     =   1.7204e+00   6.2971e-01   2.7321e+00
+* Input  11     =  -5.0461e+00   7.3558e-01  -6.8600e+00
+* Input  12     =  -5.3054e-01   9.8646e-01  -5.3782e-01
+* Input  13     =  -1.2865e+03   4.9173e+02  -2.6162e+00
+* Input  14     =   2.3339e+02   4.5544e+02   5.1245e-01
+* Input  15     =   4.7252e+01   2.3920e+01   1.9754e+00
+* Input  16     =   1.7109e+01   1.5385e+01   1.1120e+00
+* Input  17     =   3.0447e+01   1.9513e+01   1.5603e+00
+* Input  18     =  -9.6269e+00   1.5894e+00  -6.0571e+00
+* Input  19     =  -2.4692e+00   1.4510e+00  -1.7017e+00
+* Input  20     =  -2.4371e+00   1.2704e+00  -1.9184e+00
+* Input  21     =  -8.2518e-02   2.1442e-02  -3.8484e+00
+* Input  22     =   4.9706e-01   1.6659e-01   2.9837e+00
+* Input   1   4 =  -6.2838e-02   3.4623e-02  -1.8149e+00
+* Input   1  13 =  -2.2816e-01   5.3141e-02  -4.2934e+00
+* Input   1  14 =   1.3219e-01   6.6478e-02   1.9885e+00
+* Input   2   2 =  -4.1956e+01   4.4402e+00  -9.4490e+00
+* Input   2   3 =   1.6575e-01   3.3733e-02   4.9137e+00
+* Input   2   4 =  -3.3978e+02   3.9816e+01  -8.5339e+00
+* Input   2   5 =  -4.5605e+00   1.5882e+00  -2.8714e+00
+* Input   2   6 =   6.4033e-01   3.7044e-01   1.7286e+00
+* Input   2   7 =   4.4272e-01   5.6318e-01   7.8610e-01
+* Input   2   8 =  -9.7611e-01   4.9850e-01  -1.9581e+00
+* Input   2   9 =   9.7354e-01   4.7709e-01   2.0406e+00
+* Input   2  10 =   3.8176e-01   2.1639e-01   1.7642e+00
+* Input   2  11 =  -5.9676e-02   2.6374e-01  -2.2627e-01
+* Input   2  12 =   6.8278e+00   4.4369e-01   1.5389e+01
+* Input   2  13 =  -5.8344e+02   1.5212e+02  -3.8355e+00
+* Input   2  14 =  -3.9301e+02   1.9075e+02  -2.0604e+00
+* Input   2  15 =   1.2620e+00   6.6812e+00   1.8889e-01
+* Input   2  16 =   1.4970e+01   3.8887e+00   3.8496e+00
+* Input   2  17 =  -1.6570e+01   5.8546e+00  -2.8302e+00
+* Input   2  18 =  -4.8225e-01   5.1866e-01  -9.2981e-01
+* Input   2  19 =  -4.7864e-02   5.2992e-01  -9.0324e-02
+* Input   2  20 =   1.1410e+00   4.7925e-01   2.3808e+00
+* Input   2  21 =  -7.3936e-02   3.4145e-02  -2.1653e+00
+* Input   2  22 =  -1.0790e+00   1.1736e-01  -9.1934e+00
+* Input   3   4 =  -4.7570e+00   1.8260e-01  -2.6052e+01
+* Input   3  13 =   1.2632e+00   5.1701e-01   2.4433e+00
+* Input   3  14 =   1.1214e+00   5.0878e-01   2.2041e+00
+* Input   3  15 =  -2.5212e-02   1.8474e-02  -1.3647e+00
+* Input   3  17 =   1.3157e-02   1.6823e-02   7.8207e-01
+* Input   4   4 =  -1.6442e+03   1.5127e+02  -1.0869e+01
+* Input   4   5 =   9.5981e+00   8.7417e+00   1.0980e+00
+* Input   4   6 =   6.5622e+00   2.0656e+00   3.1769e+00
+* Input   4   7 =   1.7938e+00   2.9015e+00   6.1822e-01
+* Input   4   8 =  -1.1625e+00   2.8229e+00  -4.1180e-01
+* Input   4   9 =  -2.8353e+00   2.4743e+00  -1.1459e+00
+* Input   4  10 =   2.1437e+00   1.2384e+00   1.7310e+00
+* Input   4  11 =  -4.2457e+00   1.4817e+00  -2.8653e+00
+* Input   4  12 =   6.6806e+00   1.6363e+00   4.0827e+00
+* Input   4  13 =   2.0953e+03   9.4228e+02   2.2236e+00
+* Input   4  14 =  -2.6255e+03   9.2141e+02  -2.8494e+00
+* Input   4  15 =  -8.4701e+01   3.4625e+01  -2.4463e+00
+* Input   4  16 =   3.7929e+00   2.0641e+01   1.8376e-01
+* Input   4  17 =   5.2375e+01   3.0865e+01   1.6969e+00
+* Input   4  18 =   2.9876e+00   2.9753e+00   1.0041e+00
+* Input   4  19 =  -2.4667e-01   2.8962e+00  -8.5170e-02
+* Input   4  20 =   2.1340e+01   2.5641e+00   8.3225e+00
+* Input   4  21 =   6.2324e+00   1.5880e-01   3.9247e+01
+* Input   4  22 =   7.0044e+00   3.0414e-01   2.3030e+01
+* Input   5   5 =  -3.5876e-01   3.6323e-01  -9.8771e-01
+* Input   5   6 =   1.8002e-01   8.5148e-02   2.1142e+00
+* Input   5   7 =  -3.4934e-01   1.1216e-01  -3.1146e+00
+* Input   5   8 =   2.1814e-01   1.1043e-01   1.9754e+00
+* Input   5   9 =  -2.3736e-01   9.1539e-02  -2.5930e+00
+* Input   5  10 =   9.6402e-02   4.9818e-02   1.9351e+00
+* Input   5  11 =  -2.4943e-01   5.7506e-02  -4.3375e+00
+* Input   5  12 =  -1.7463e-01   7.8881e-02  -2.2138e+00
+* Input   5  13 =   1.8887e+01   3.7132e+01   5.0864e-01
+* Input   5  14 =   8.5405e+01   3.8949e+01   2.1927e+00
+* Input   5  15 =  -1.6143e+00   1.2977e+00  -1.2440e+00
+* Input   5  16 =  -4.5503e+00   8.2989e-01  -5.4830e+00
+* Input   5  17 =   1.0718e+00   1.2090e+00   8.8651e-01
+* Input   5  18 =  -8.1234e-02   1.2137e-01  -6.6931e-01
+* Input   5  19 =  -2.3960e-01   1.1320e-01  -2.1167e+00
+* Input   5  20 =  -5.3260e-01   9.7426e-02  -5.4667e+00
+* Input   5  22 =   2.9639e-02   1.3890e-02   2.1338e+00
+* Input   6   6 =   3.8272e-02   2.2774e-02   1.6805e+00
+* Input   6   7 =   5.6427e-02   3.0270e-02   1.8641e+00
+* Input   6   8 =  -8.9704e-02   2.6812e-02  -3.3456e+00
+* Input   6  10 =  -5.0946e-02   1.2102e-02  -4.2098e+00
+* Input   6  11 =  -3.3500e-02   1.3784e-02  -2.4304e+00
+* Input   6  12 =  -2.9721e-02   2.0664e-02  -1.4383e+00
+* Input   6  13 =   3.1195e+01   9.3086e+00   3.3512e+00
+* Input   6  14 =  -7.4686e+00   9.1534e+00  -8.1594e-01
+* Input   6  15 =   8.5884e-02   3.3932e-01   2.5311e-01
+* Input   6  16 =  -1.1025e+00   2.1078e-01  -5.2305e+00
+* Input   6  17 =   1.7881e+00   3.2435e-01   5.5131e+00
+* Input   6  19 =  -6.4479e-02   2.9523e-02  -2.1840e+00
+* Input   6  20 =  -9.1409e-02   2.6318e-02  -3.4733e+00
+* Input   7   7 =   5.4202e-02   4.6618e-02   1.1627e+00
+* Input   7   8 =  -1.2120e-01   4.1809e-02  -2.8990e+00
+* Input   7   9 =  -1.7142e-01   3.3737e-02  -5.0812e+00
+* Input   7  10 =   7.1271e-02   1.7977e-02   3.9646e+00
+* Input   7  11 =  -2.0145e-02   2.0344e-02  -9.9021e-01
+* Input   7  13 =  -1.9875e+00   1.3335e+01  -1.4905e-01
+* Input   7  14 =   3.3069e+01   1.2980e+01   2.5476e+00
+* Input   7  15 =   3.1104e-01   4.9019e-01   6.3453e-01
+* Input   7  16 =  -1.5821e+00   3.1117e-01  -5.0843e+00
+* Input   7  17 =  -1.2780e-01   4.6979e-01  -2.7204e-01
+* Input   7  18 =   7.1013e-02   4.6943e-02   1.5127e+00
+* Input   7  19 =   1.9590e-01   4.0394e-02   4.8497e+00
+* Input   7  20 =  -3.2297e-02   3.4999e-02  -9.2279e-01
+* Input   8   8 =   2.6807e-01   4.1291e-02   6.4922e+00
+* Input   8   9 =  -5.8312e-02   3.1414e-02  -1.8563e+00
+* Input   8  11 =  -5.3348e-02   1.8949e-02  -2.8153e+00
+* Input   8  13 =  -7.6243e+00   1.3016e+01  -5.8578e-01
+* Input   8  14 =   4.2028e+01   1.3268e+01   3.1675e+00
+* Input   8  15 =   5.6442e-01   4.7178e-01   1.1964e+00
+* Input   8  16 =   3.1541e-01   2.9385e-01   1.0734e+00
+* Input   8  17 =   8.0246e-01   4.3582e-01   1.8413e+00
+* Input   8  18 =  -2.0546e-01   4.0271e-02  -5.1019e+00
+* Input   8  19 =  -9.1611e-02   3.9779e-02  -2.3030e+00
+* Input   8  20 =  -9.8878e-02   3.3129e-02  -2.9847e+00
+* Input   9   9 =  -5.0697e-02   2.8032e-02  -1.8086e+00
+* Input   9  10 =  -3.3472e-02   1.4800e-02  -2.2616e+00
+* Input   9  11 =  -2.9913e-02   1.5938e-02  -1.8768e+00
+* Input   9  12 =   4.9024e-02   2.3590e-02   2.0781e+00
+* Input   9  13 =   1.5817e+01   1.0520e+01   1.5035e+00
+* Input   9  14 =   1.2460e+01   1.0506e+01   1.1860e+00
+* Input   9  15 =  -2.2008e-01   3.8016e-01  -5.7892e-01
+* Input   9  16 =  -4.9742e-01   2.4406e-01  -2.0381e+00
+* Input   9  17 =   9.5785e-01   3.5323e-01   2.7117e+00
+* Input   9  18 =  -1.1130e-01   3.5741e-02  -3.1140e+00
+* Input   9  19 =  -6.8242e-02   3.1318e-02  -2.1790e+00
+* Input   9  20 =   5.2331e-02   2.9005e-02   1.8042e+00
+* Input  10  11 =  -3.8174e-02   8.6706e-03  -4.4027e+00
+* Input  10  12 =  -2.2774e-02   1.2120e-02  -1.8790e+00
+* Input  10  13 =   1.2891e+01   5.6278e+00   2.2906e+00
+* Input  10  14 =   1.2142e+01   5.4010e+00   2.2482e+00
+* Input  10  15 =  -6.4925e-01   2.0479e-01  -3.1704e+00
+* Input  10  16 =  -2.9501e-01   1.2604e-01  -2.3405e+00
+* Input  10  17 =  -3.8399e-01   1.8282e-01  -2.1004e+00
+* Input  10  18 =  -8.2682e-02   1.8369e-02  -4.5012e+00
+* Input  10  19 =   2.6519e-02   1.8430e-02   1.4390e+00
+* Input  10  20 =  -1.2443e-02   1.5587e-02  -7.9833e-01
+* Input  11  11 =   2.5269e-02   1.0336e-02   2.4448e+00
+* Input  11  12 =   2.5388e-02   1.3949e-02   1.8201e+00
+* Input  11  13 =  -1.1208e+01   6.2587e+00  -1.7908e+00
+* Input  11  14 =  -1.1931e+01   6.3671e+00  -1.8739e+00
+* Input  11  15 =   8.2730e-01   2.3919e-01   3.4588e+00
+* Input  11  16 =   7.5296e-01   1.4715e-01   5.1171e+00
+* Input  11  17 =   7.0945e-01   2.1211e-01   3.3448e+00
+* Input  11  18 =   1.5337e-01   2.1738e-02   7.0553e+00
+* Input  11  19 =  -9.7114e-02   1.9206e-02  -5.0565e+00
+* Input  12  12 =  -2.0947e-01   1.4771e-02  -1.4181e+01
+* Input  12  13 =  -2.5864e+01   8.7737e+00  -2.9479e+00
+* Input  12  14 =   1.6062e+01   8.7954e+00   1.8262e+00
+* Input  12  15 =  -3.7896e-01   3.2546e-01  -1.1644e+00
+* Input  12  16 =   7.0285e-02   2.0160e-01   3.4864e-01
+* Input  12  17 =  -1.2598e+00   2.8598e-01  -4.4052e+00
+* Input  12  18 =  -4.7848e-02   3.0702e-02  -1.5585e+00
+* Input  12  19 =   1.2324e-01   2.7655e-02   4.4563e+00
+* Input  12  20 =  -8.1057e-02   2.3966e-02  -3.3822e+00
+* Input  12  22 =   6.3654e-02   4.1640e-03   1.5287e+01
+* Input  13  13 =   1.1400e+04   4.3314e+03   2.6319e+00
+* Input  13  14 =   1.8265e+03   4.0567e+03   4.5024e-01
+* Input  13  15 =   5.0533e+02   1.5980e+02   3.1622e+00
+* Input  13  16 =  -1.8954e+01   9.2669e+01  -2.0453e-01
+* Input  13  17 =   2.3997e+02   1.3608e+02   1.7635e+00
+* Input  13  18 =   4.7367e+01   1.4317e+01   3.3085e+00
+* Input  13  19 =  -2.1912e+01   1.2708e+01  -1.7243e+00
+* Input  13  20 =   1.3689e+01   1.0927e+01   1.2528e+00
+* Input  13  21 =   5.4569e-02   1.9375e-01   2.8164e-01
+* Input  13  22 =   1.7488e+00   1.5144e+00   1.1548e+00
+* Input  14  14 =   1.2057e+04   4.4338e+03   2.7193e+00
+* Input  14  15 =   5.1883e+02   1.5729e+02   3.2985e+00
+* Input  14  16 =  -1.6896e+02   8.4636e+01  -1.9963e+00
+* Input  14  17 =  -1.6296e+02   1.3416e+02  -1.2147e+00
+* Input  14  18 =   2.8412e+01   1.4115e+01   2.0129e+00
+* Input  14  19 =  -6.6558e+01   1.2933e+01  -5.1464e+00
+* Input  14  20 =  -2.8087e+01   1.0896e+01  -2.5778e+00
+* Input  14  21 =   3.5045e-01   1.9127e-01   1.8323e+00
+* Input  14  22 =  -1.7367e+00   1.5218e+00  -1.1412e+00
+* Input  15  15 =   1.7754e+00   6.1010e+00   2.9101e-01
+* Input  15  16 =  -2.0038e+01   3.4355e+00  -5.8327e+00
+* Input  15  18 =   2.6553e+00   5.2119e-01   5.0947e+00
+* Input  15  19 =   5.1513e-01   4.4469e-01   1.1584e+00
+* Input  15  20 =   1.5336e+00   4.0409e-01   3.7952e+00
+* Input  15  22 =   9.1029e-02   5.6980e-02   1.5976e+00
+* Input  16  16 =   8.9239e-01   2.2989e+00   3.8818e-01
+* Input  16  17 =   4.7653e-01   2.9463e+00   1.6174e-01
+* Input  16  18 =   2.0500e-01   3.0837e-01   6.6478e-01
+* Input  16  19 =   5.5938e-01   2.9413e-01   1.9018e+00
+* Input  16  20 =   8.0577e-02   2.4992e-01   3.2242e-01
+* Input  16  22 =  -3.3584e-02   3.4420e-02  -9.7571e-01
+* Input  17  17 =  -8.3918e+00   4.9195e+00  -1.7058e+00
+* Input  17  18 =   2.0093e+00   4.6665e-01   4.3058e+00
+* Input  17  19 =   1.2655e-01   4.3161e-01   2.9321e-01
+* Input  17  20 =  -1.4133e+00   3.5329e-01  -4.0005e+00
+* Input  17  22 =   1.1533e-01   4.8577e-02   2.3743e+00
+* Input  18  18 =  -1.0363e-01   4.8523e-02  -2.1357e+00
+* Input  18  19 =  -2.4429e-02   4.4252e-02  -5.5205e-01
+* Input  18  20 =  -6.3906e-02   3.7895e-02  -1.6864e+00
+* Input  19  19 =   9.9886e-02   4.4167e-02   2.2615e+00
+* Input  19  20 =   3.6502e-02   3.5321e-02   1.0334e+00
+* Input  20  20 =   2.5697e-01   3.3649e-02   7.6367e+00
+* Input  20  22 =   2.6916e-02   4.1642e-03   6.4636e+00
+-------------------------------------------------------------
+FILE dataVariance2 contains output data standard errors.
+* Regression R-square =   7.6691e-01
+* adjusted   R-square =   7.6691e-01
+*************************************************************
+*       Standardized Regression Coefficients (SRC)
+* When R-square is acceptable (order assumption holds), the
+* absolute values of SRCs provide variable importance.
+=============================================================
+* based on nSamples = 10647
+* Input   1     =   9.5879e-02
+* Input   2     =   1.2076e+00
+* Input   3     =  -2.0027e-01
+* Input   4     =   4.8413e-01
+* Input   5     =   7.5431e-01
+* Input   6     =  -5.6417e-02
+* Input   7     =   5.9278e-01
+* Input   8     =  -6.5398e-02
+* Input   9     =  -2.4250e-01
+* Input  10     =   7.5014e-01
+* Input  11     =  -1.8933e+00
+* Input  12     =  -2.1338e-01
+* Input  13     =  -7.3936e-01
+* Input  14     =   1.3473e-01
+* Input  15     =   7.2288e-01
+* Input  16     =   4.3810e-01
+* Input  17     =   5.2591e-01
+* Input  18     =  -1.6522e+00
+* Input  19     =  -4.5663e-01
+* Input  20     =  -5.1203e-01
+* Input  21     =  -1.1047e+00
+* Input  22     =   1.3176e+00
+-------------------------------------------------------------
+*    ordered list of SRCs
+-------------------------------------------------------------
+* Input  11     =   1.8933e+00
+* Input  18     =   1.6522e+00
+* Input  22     =   1.3176e+00
+* Input   2     =   1.2076e+00
+* Input  21     =   1.1047e+00
+* Input   5     =   7.5431e-01
+* Input  10     =   7.5014e-01
+* Input  13     =   7.3936e-01
+* Input  15     =   7.2288e-01
+* Input   7     =   5.9278e-01
+* Input  17     =   5.2591e-01
+* Input  20     =   5.1203e-01
+* Input   4     =   4.8413e-01
+* Input  19     =   4.5663e-01
+* Input  16     =   4.3810e-01
+* Input   9     =   2.4250e-01
+* Input  12     =   2.1338e-01
+* Input   3     =   2.0027e-01
+* Input  14     =   1.3473e-01
+* Input   1     =   9.5879e-02
+* Input   8     =   6.5398e-02
+* Input   6     =   5.6417e-02
+* Input   1,  1 =   1.1755e-02
+* Input   1,  2 =   3.5680e-03
+* Input   1,  3 =  -5.8332e-02
+* Input   1,  4 =  -3.4304e-02
+* Input   1,  5 =   1.4346e-02
+* Input   1,  6 =  -2.3384e-02
+* Input   1,  7 =  -2.1881e-02
+* Input   1,  8 =   1.4626e-02
+* Input   1,  9 =  -3.6361e-02
+* Input   1, 10 =  -1.3080e-02
+* Input   1, 11 =  -1.5161e-02
+* Input   1, 12 =   2.1513e-03
+* Input   1, 13 =  -2.7590e-02
+* Input   1, 14 =   1.6057e-02
+* Input   1, 15 =  -2.1597e-02
+* Input   1, 16 =  -1.4461e-02
+* Input   1, 17 =   1.9390e-02
+* Input   1, 18 =  -1.7033e-02
+* Input   1, 19 =   2.7933e-02
+* Input   1, 20 =   2.7725e-02
+* Input   1, 21 =   9.5650e-03
+* Input   1, 22 =   1.8512e-02
+* Input   2,  2 =  -4.0357e-02
+* Input   2,  3 =   6.9004e-02
+* Input   2,  4 =  -5.8151e-02
+* Input   2,  5 =  -1.9652e-02
+* Input   2,  6 =   1.0796e-02
+* Input   2,  7 =   5.2244e-03
+* Input   2,  8 =  -1.2313e-02
+* Input   2,  9 =   1.4390e-02
+* Input   2, 10 =   1.0980e-02
+* Input   2, 11 =  -1.4770e-03
+* Input   2, 12 =   1.8114e-01
+* Input   2, 13 =  -2.2119e-02
+* Input   2, 14 =  -1.4966e-02
+* Input   2, 16 =   2.5285e-02
+* Input   2, 17 =  -1.8879e-02
+* Input   2, 18 =  -5.4594e-03
+* Input   2, 20 =   1.5813e-02
+* Input   2, 21 =  -6.5288e-02
+* Input   2, 22 =  -1.8866e-01
+* Input   3,  3 =  -4.8596e-02
+* Input   3,  4 =  -3.5235e-01
+* Input   3,  5 =   9.4780e-03
+* Input   3,  6 =  -1.4403e-03
+* Input   3,  7 =   9.6427e-03
+* Input   3,  8 =   9.1119e-03
+* Input   3,  9 =  -1.8335e-02
+* Input   3, 10 =  -3.1471e-02
+* Input   3, 11 =  -1.5209e-02
+* Input   3, 12 =  -5.2887e-02
+* Input   3, 13 =   2.0726e-02
+* Input   3, 14 =   1.8482e-02
+* Input   3, 15 =  -1.1011e-02
+* Input   3, 16 =  -8.3103e-03
+* Input   3, 17 =   6.4877e-03
+* Input   3, 18 =  -1.5546e-02
+* Input   3, 19 =  -2.7773e-02
+* Input   3, 20 =  -2.7334e-02
+* Input   3, 21 =   2.0693e-02
+* Input   3, 22 =   1.4290e-01
+* Input   4,  4 =  -5.0065e-02
+* Input   4,  5 =   7.3589e-03
+* Input   4,  6 =   1.9686e-02
+* Input   4,  7 =   3.7663e-03
+* Input   4,  8 =  -2.6091e-03
+* Input   4,  9 =  -7.4564e-03
+* Input   4, 10 =   1.0970e-02
+* Input   4, 11 =  -1.8696e-02
+* Input   4, 12 =   3.1534e-02
+* Input   4, 13 =   1.4133e-02
+* Input   4, 14 =  -1.7788e-02
+* Input   4, 15 =  -1.5208e-02
+* Input   4, 17 =   1.0617e-02
+* Input   4, 18 =   6.0175e-03
+* Input   4, 20 =   5.2618e-02
+* Input   4, 21 =   9.7918e-01
+* Input   4, 22 =   2.1791e-01
+* Input   5,  5 =  -6.9259e-03
+* Input   5,  6 =   1.3598e-02
+* Input   5,  7 =  -1.8469e-02
+* Input   5,  8 =   1.2328e-02
+* Input   5,  9 =  -1.5718e-02
+* Input   5, 10 =   1.2421e-02
+* Input   5, 11 =  -2.7656e-02
+* Input   5, 12 =  -2.0755e-02
+* Input   5, 13 =   3.2077e-03
+* Input   5, 14 =   1.4570e-02
+* Input   5, 15 =  -7.2980e-03
+* Input   5, 16 =  -3.4432e-02
+* Input   5, 17 =   5.4708e-03
+* Input   5, 18 =  -4.1198e-03
+* Input   5, 19 =  -1.3094e-02
+* Input   5, 20 =  -3.3067e-02
+* Input   5, 21 =  -7.6983e-03
+* Input   5, 22 =   2.3217e-02
+* Input   6,  6 =   1.1311e-02
+* Input   6,  7 =   1.1672e-02
+* Input   6,  8 =  -1.9835e-02
+* Input   6, 10 =  -2.5685e-02
+* Input   6, 11 =  -1.4534e-02
+* Input   6, 12 =  -1.3821e-02
+* Input   6, 13 =   2.0730e-02
+* Input   6, 14 =  -4.9853e-03
+* Input   6, 15 =   1.5192e-03
+* Input   6, 16 =  -3.2642e-02
+* Input   6, 17 =   3.5712e-02
+* Input   6, 18 =   1.8519e-03
+* Input   6, 19 =  -1.3787e-02
+* Input   6, 20 =  -2.2205e-02
+* Input   6, 21 =   3.8236e-03
+* Input   6, 22 =   2.0095e-02
+* Input   7,  7 =   7.8472e-03
+* Input   7,  8 =  -1.8758e-02
+* Input   7,  9 =  -3.1086e-02
+* Input   7, 10 =   2.5149e-02
+* Input   7, 11 =  -6.1168e-03
+* Input   7, 14 =   1.5449e-02
+* Input   7, 15 =   3.8508e-03
+* Input   7, 16 =  -3.2785e-02
+* Input   7, 17 =  -1.7864e-03
+* Input   7, 18 =   9.8627e-03
+* Input   7, 19 =   2.9318e-02
+* Input   7, 20 =  -5.4912e-03
+* Input   7, 21 =  -3.7603e-03
+* Input   7, 22 =  -1.6031e-02
+* Input   8,  8 =   4.4348e-02
+* Input   8,  9 =  -1.1304e-02
+* Input   8, 10 =   4.0179e-03
+* Input   8, 11 =  -1.7316e-02
+* Input   8, 12 =   3.1996e-03
+* Input   8, 13 =  -3.7906e-03
+* Input   8, 14 =   2.0989e-02
+* Input   8, 15 =   7.4696e-03
+* Input   8, 16 =   6.9868e-03
+* Input   8, 17 =   1.1990e-02
+* Input   8, 18 =  -3.0503e-02
+* Input   8, 19 =  -1.4656e-02
+* Input   8, 20 =  -1.7971e-02
+* Input   8, 21 =  -5.2784e-03
+* Input   8, 22 =  -1.2262e-02
+* Input   9,  9 =  -1.1515e-02
+* Input   9, 10 =  -1.4793e-02
+* Input   9, 11 =  -1.1377e-02
+* Input   9, 12 =   1.9986e-02
+* Input   9, 13 =   9.2143e-03
+* Input   9, 14 =   7.2913e-03
+* Input   9, 15 =  -3.4128e-03
+* Input   9, 16 =  -1.2911e-02
+* Input   9, 17 =   1.6770e-02
+* Input   9, 18 =  -1.9361e-02
+* Input   9, 19 =  -1.2792e-02
+* Input   9, 20 =   1.1144e-02
+* Input   9, 21 =   5.2285e-03
+* Input   9, 22 =   5.6332e-03
+* Input  10, 11 =  -2.8250e-02
+* Input  10, 12 =  -1.8067e-02
+* Input  10, 13 =   1.4613e-02
+* Input  10, 14 =   1.3826e-02
+* Input  10, 15 =  -1.9590e-02
+* Input  10, 16 =  -1.4899e-02
+* Input  10, 17 =  -1.3082e-02
+* Input  10, 18 =  -2.7988e-02
+* Input  10, 19 =   9.6731e-03
+* Input  10, 20 =  -5.1564e-03
+* Input  10, 21 =  -4.8771e-03
+* Input  10, 22 =   3.0792e-02
+* Input  11, 11 =   1.6092e-02
+* Input  11, 12 =   1.7330e-02
+* Input  11, 13 =  -1.0933e-02
+* Input  11, 14 =  -1.1690e-02
+* Input  11, 15 =   2.1481e-02
+* Input  11, 16 =   3.2724e-02
+* Input  11, 17 =   2.0798e-02
+* Input  11, 18 =   4.4673e-02
+* Input  11, 19 =  -3.0482e-02
+* Input  11, 21 =  -3.7992e-03
+* Input  11, 22 =  -5.6679e-03
+* Input  12, 12 =  -1.5328e-01
+* Input  12, 13 =  -2.7044e-02
+* Input  12, 14 =   1.6870e-02
+* Input  12, 15 =  -1.0548e-02
+* Input  12, 16 =   3.2744e-03
+* Input  12, 17 =  -3.9588e-02
+* Input  12, 18 =  -1.4940e-02
+* Input  12, 19 =   4.1465e-02
+* Input  12, 20 =  -3.0983e-02
+* Input  12, 21 =  -1.0661e-01
+* Input  12, 22 =   3.0699e-01
+* Input  13, 13 =   1.7033e-02
+* Input  13, 14 =   2.7413e-03
+* Input  13, 15 =   2.0098e-02
+* Input  13, 17 =   1.0776e-02
+* Input  13, 18 =   2.1134e-02
+* Input  13, 19 =  -1.0535e-02
+* Input  13, 20 =   7.4770e-03
+* Input  13, 21 =   1.8992e-03
+* Input  13, 22 =   1.2052e-02
+* Input  14, 14 =   1.8176e-02
+* Input  14, 15 =   2.0727e-02
+* Input  14, 16 =  -1.1298e-02
+* Input  14, 17 =  -7.3505e-03
+* Input  14, 18 =   1.2734e-02
+* Input  14, 19 =  -3.2143e-02
+* Input  14, 20 =  -1.5410e-02
+* Input  14, 21 =   1.2251e-02
+* Input  14, 22 =  -1.2022e-02
+* Input  15, 15 =   1.8796e-03
+* Input  15, 16 =  -3.5509e-02
+* Input  15, 18 =   3.1536e-02
+* Input  15, 19 =   6.5925e-03
+* Input  15, 20 =   2.2297e-02
+* Input  15, 21 =  -4.5272e-03
+* Input  15, 22 =   1.6699e-02
+* Input  16, 16 =   2.6468e-03
+* Input  16, 18 =   4.0752e-03
+* Input  16, 19 =   1.1982e-02
+* Input  16, 20 =   1.9609e-03
+* Input  16, 21 =   1.4325e-02
+* Input  16, 22 =  -1.0312e-02
+* Input  17, 17 =  -1.1325e-02
+* Input  17, 18 =   2.6943e-02
+* Input  17, 19 =   1.8286e-03
+* Input  17, 20 =  -2.3200e-02
+* Input  17, 21 =   4.2414e-03
+* Input  17, 22 =   2.3888e-02
+* Input  18, 18 =  -1.3807e-02
+* Input  18, 19 =  -3.5072e-03
+* Input  18, 20 =  -1.0423e-02
+* Input  18, 21 =   3.3599e-03
+* Input  18, 22 =   2.0685e-02
+* Input  19, 19 =   1.5453e-02
+* Input  19, 20 =   6.4154e-03
+* Input  19, 21 =  -2.2869e-03
+* Input  19, 22 =  -1.4144e-02
+* Input  20, 20 =   5.1309e-02
+* Input  20, 21 =  -3.2642e-02
+* Input  20, 22 =   6.7808e-02
+* Input  21, 21 =   5.9313e-02
+* Input  21, 22 =  -7.0438e-02
+* Input  22, 22 =  -1.9625e-01
+*************************************************************
+RSFA: L  0: interpolation error on training set 
+             avg error far from 0 ==> systematic bias.
+             rms error large      ==> average   error large.
+             max error large      ==> pointwise error large.
+             R-square may not always be a reliable measure.
+  avg error   =  -4.616e-09 (unscaled)
+  avg error   =   4.039e-01 (scaled)
+  rms error   =   2.184e+00 (unscaled)
+  rms error   =   1.356e+00 (scaled)
+  max error   =   1.177e+01 (unscaled, BASE=1.293e+01)
+  max error   =   9.328e+00 (  scaled, BASE=-0.000e+00)
+  R-square    =   9.99989975e-01
+Based on 10647 training points (total=10647).
+Interpolation error info are in psuade_rsfa_err.m
+*************************************************************
+AnalysisManager: analysis error = 7.88e-02 <? 1.00e+00
+psuade> command 1 not recognized
+psuade> command 0 not recognized
+psuade> 

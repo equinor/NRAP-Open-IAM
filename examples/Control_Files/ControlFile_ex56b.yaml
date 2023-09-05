@@ -1,0 +1,176 @@
+# OpenIAM Control File Example 56b
+#
+# This example is similar to example 56a, the stratigraphy is different and
+# it uses more options. This example is meant to demonstrate how one can choose
+# to set up certain sections of a control file using the area of review (AoR)
+# Workflow while leaving other sections to be automatically set up by
+# the Workflow. Here, the aquifer component is entered manually and
+# 'AutomateAqCompSetup' (under Workflow: Options) is set to False. Although
+# the OpenWellbore component has not been set up manually, the aquifer component
+# needs to have input for the Connection entry. Components that are set up
+# automatically through a Workflow will always have a name combining
+# the component type name and  "1". As a result, the aquifer component
+# is set up to connect with "OpenWellbore1."
+# For the AoR Workflow, users only need entries for one reservoir component,
+# one wellbore component, and one aquifer component, so the names will never
+# need additional indices ("2" or "3"). Additionally, the aquifer component is
+# included in the Components entry under ModelParams. Components that are set
+# up by the Workflow will be added automatically to the 'Components' list under
+# ModelParams, but any components set up manually need to be included in the
+# 'Components' list. Because the default setting for the AoR Workflow assumes
+# that a GenericAquifer component is being used, users must also specify
+# 'AquiferComponentType: FutureGen2Aquifer' under 'Workflow: Options'.
+# The aquifer component type dictates what kinds of metrics the AoR Workflow
+# looks for (pH_volume and TDS_volume for FutureGen2Aquifer vs.
+# Dissolved_CO2_volume and Dissolved_salt_volume for GenericAquifer),
+# so failing to specify the aquifer component type here will result in an error.
+#
+# The Plots section is also set up manually. The creation of an overall AoR
+# (i.e., one that reflects all metrics) through the AoR Workflow requires
+# the .csv files that are saved by the AoR plot type. If users set up the Plots
+# section manually, they must include one plot for each of the required
+# metrics (here, pressure, CO2saturation, pH_volume, and TDS_volume),
+# and they must have 'SaveCSVFiles' set to True for each of the AoR plots.
+# The pressure AoR plot (Plot1) does not include a critical pressure entry,
+# so the .csv file saved will not have critical pressures values.
+# If the critical pressures are in that .csv file, they will be read
+# from there during the AoR Workflow. Otherwise, the AoR Workflow itself
+# will calculate the critical pressure values (the default setting is
+# 'CriticalPressureMPa: Calculated' under 'Workflow: Options') and consider
+# the critical pressures when delineating the overall AoR.
+#
+# Note that the results of this example are identical to example 31a.
+# This approach is meant to show how the AoR Workflow can replicate results
+# from a standard control file. Additionally, that example does not produce
+# an overall AoR that reflects all metrics.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex56b.yaml
+#
+# Last Modified: July, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 10
+    TimeStep: 1.0
+    Analysis: forward
+    Components: [FutureGen2Aquifer1]
+    OutputDirectory: 'output/output_ex56b_{datetime}'
+    GenerateOutputFiles: False
+    GenerateCombOutputFile: False
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        value: 750.0
+        vary: False
+    shale2Thickness:
+        value: 950.0
+        vary: False
+    shale3Thickness:
+        value: 365
+        vary: False
+    aquifer1Thickness:
+        vary: False
+        value: 85
+    aquifer2Thickness:
+        vary: False
+        value: 85
+    reservoirThickness:
+        vary: False
+        value: 150
+#-------------------------------------------------
+FutureGen2Aquifer1:
+    Type: FutureGen2Aquifer
+    Connection: OpenWellbore1
+    AquiferName: aquifer2
+    Parameters:
+        # Parameters aqu_thick (85 m) and depth (450 m) are linked
+        # to stratigraphy and don't require to be setup explicitily unless
+        # different value of the parameter is required.
+        por:
+            value: 0.18
+            vary: False
+        log_permh:
+            value: -11.92
+            vary: False
+        log_aniso:
+            value: 0.3
+            vary: False
+        rel_vol_frac_calcite:
+            value: 0.01
+            vary: False
+    Outputs: [pH_volume, TDS_volume]
+#-------------------------------------------------
+Workflow:
+    Type: AoR
+    Options:
+        PlotInjectionSites: True
+        FigureDPI: 300
+        CriticalPressureMPa: Calculated
+        AutomateAqCompSetup: False
+        AutomatePlotsSetup: False
+        ReservoirComponentType: SimpleReservoir
+        ReservoirOptions:
+            InjectionWell:
+                coordx: 0
+                coordy: 0
+            Parameters:
+                injRate: 0.33
+                logResPerm: -10.15
+        AquiferName: aquifer2     # the wellbores will leak to this aquifer
+        WellboreOptions:
+            Locations:
+                grid:
+                    xmin: -7500
+                    xmax: 7500
+                    xsize: 14
+                    ymin: -7500
+                    ymax: 7500
+                    ysize: 14
+            Controls:
+                critPressureApproach: True
+                enforceCritPressure: False
+            Parameters:
+                wellRadius:
+                    value: 0.05
+                    vary: False
+                logReservoirTransmissivity:
+                    value: -10.97
+                    vary: False
+                logAquiferTransmissivity:
+                    value: -10.0
+                    vary: False
+                brineSalinity:
+                    value: 0.2
+                    vary: False
+                brineDensity:
+                    value: 1050
+                    vary: False
+        AquiferComponentType: FutureGen2Aquifer     # default is GenericAquifer - here, it has to be specified so it matches the aquifer component set up manually
+#-------------------------------------------------
+Plots:
+    Plot1:
+        AoR: [pressure]
+        PlotInjectionSites: True
+        FigureDPI: 200
+        SaveCSVFiles: True
+        Title: 'AoR: Pressure'
+        # CriticalPressureMPa: Calculated     # This is silenced to show that the AoR Workflow can handle the critical pressures
+    Plot2:
+        AoR: [CO2saturation]
+        PlotInjectionSites: True
+        FigureDPI: 200
+        SaveCSVFiles: True
+    Plot3:
+        AoR: [pH_volume]
+        PlotInjectionSites: True
+        FigureDPI: 200
+        SaveCSVFiles: True
+    Plot4:
+        AoR: [TDS_volume]
+        PlotInjectionSites: True
+        FigureDPI: 200
+        SaveCSVFiles: True

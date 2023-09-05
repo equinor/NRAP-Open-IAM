@@ -1,0 +1,84 @@
+# OpenIAM Control File Example 2
+#
+# This example computes the leakage from a leaky well (MultisegmentedWellbore
+# component) connected to a SimpleReservoir component. Uncertainty is represented
+# through parameter variations (between the min and max values) with Latin
+# Hypercube Sampling (lhs) across 30 realizations (siz: 30).
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#  python ../../source/openiam/openiam_cf.py --file ControlFile_ex2.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 10
+    TimeStep: 1.0
+    Analysis:
+        type: lhs
+        siz: 30
+        #seed: 721
+    Components: [msw1, SimpleReservoir1]
+    OutputDirectory: output/output_ex2_{datetime}
+    OutputType: 1  # 0 - row-wise; 1 - column-wise
+    GenerateOutputFiles: True
+    GenerateCombOutputFile: False
+    GenerateStatFiles: True
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        min: 30.0
+        max: 50.0
+        value: 40.0
+    aquifer1Thickness:
+        min: 20.0
+        max: 60.0
+        value: 45.0
+    aquifer2Thickness:
+        min: 30.0
+        max: 50.0
+        value: 45.0
+    shale2Thickness:
+        vary: False
+        value: 250.0
+    shale3Thickness: 250
+#-------------------------------------------------
+# SimpleReservoir1 is a user defined name for component
+# the type SimpleReservoir is the ROM model name
+#-------------------------------------------------
+SimpleReservoir1:
+    Type: SimpleReservoir
+    Parameters:
+        injRate:
+            value: 3
+            vary: False
+        logResPerm:
+            min: -13.0
+            max: -11.0
+            value: -12.0
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+msw1:
+    Type: MultisegmentedWellbore
+    Locations:
+        coordx: [100]
+        coordy: [100]
+    Connection: SimpleReservoir1
+    Parameters:
+        logWellPerm:
+            min: -14.0
+            max: -11.0
+            value: -13.5
+    Outputs: [CO2_aquifer1,
+              brine_aquifer1]
+#-------------------------------------------------
+Plots:
+    pressure:
+        TimeSeries: [pressure]
+    CO2saturation:
+        TimeSeries: [CO2saturation]
+    CO2_Leakage:
+        TimeSeries: [CO2_aquifer1]

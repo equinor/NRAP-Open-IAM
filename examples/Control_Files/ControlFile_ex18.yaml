@@ -1,0 +1,184 @@
+# OpenIAM Control File Example 18
+#
+# This example demonstrates the use of a FaultFlow component
+# linked to a LookupTableReservoir component. It also demonstrates
+# the use of the GriddedMetric plot type. This plot type creates
+# map-view images of gridded output. Separate figures are made for
+# different model times. Specific times (in years) can be provided
+# as a list through the TimeList entry (e.g., 'TimeList: [1, 5, 10, 25, 50]').
+# Otherwise, the word 'All' can be provided for TimeList, causing
+# one figure to be created for each model time. If TimeList is not
+# provided, the default value is All. If SaveCSVFilesis set to True
+# (the default setting), a .csv file containing the results used
+# in the plots will be created for each figure made. Here, SaveCSVFiles
+# is set to False because of the large number of figures made.
+#
+# The name(s) of the component(s) that produce the gridded output
+# must be entered under ComponentNameList. Here, the name for the
+# FaultFlow component is Fault1, so the plot entry includes
+# 'ComponentNameList: [Fault1].' The name of the gridded output to
+# plot must be given under the entry 'MetricName.' Here, the output used
+# is 'mass_CO2_aquifer.' Note that the components in ComponentNameList
+# must produce the metric used. Both ComponentNameList and MetricName
+# are required entries for the GriddedMetric plot type.
+#
+# Note that because this simulation uses Latin Hypercube Sampling (lhs),
+# there are 10 realizations of the simulation (siz: 10). The GriddedMetric
+# plot type can only display the results for a single realization. The
+# realization used can be specified with the 'Realization' entry. This entry
+# uses the indexing rules in python, so it can range from 0 for the first
+# realization to N-1 for the last realization (where N is the total number
+# of realizations - here, 10). If Realization entry is not provided, the
+# default setting of 'Realization: 0' will be used.
+#
+# Note that the GriddedMetric plots will show the CO2_aquifer results from
+# all of the faults used (in one of the ten model realizations). In contrast,
+# Plot6, Plot7, and Plot8 each show the CO2_aquifer results for one of the
+# separate segments (with results from all ten model realizations).
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#  python ../../source/openiam/openiam_cf.py --file ControlFile_ex18.yaml
+#-------------------------------------------------
+ModelParams:
+    EndTime: 50
+    TimeStep: 1.0
+    Analysis:
+        type: lhs
+        siz: 10
+    Components: [LUTReservoir1, Fault1]
+    OutputDirectory: output/output_ex18_{datetime}
+    Logging: Debug
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        vary: False
+        value: 525.0
+    shale2Thickness:
+        vary: False
+        value: 475.0
+    shale3Thickness:
+        vary: False
+        value: 11.2
+    aquifer1Thickness:
+        vary: False
+        value: 1.4
+    aquifer2Thickness:
+        vary: False
+        value: 19.2
+    reservoirThickness:
+        vary: False
+        value: 51.2
+#-------------------------------------------------
+LUTReservoir1:
+    Type: LookupTableReservoir
+    FileDirectory: source/components/reservoir/lookuptables/Kimb_54_sims
+    TimeFile: time_points.csv
+    ParameterFilename: parameters_and_filenames.csv
+    Parameters:
+        index:
+            Values: [1, 2, 3, 4, 5, 10, 11, 12, 20, 21]
+            Weights: [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+    Outputs: [pressure,
+              CO2saturation]
+#------------------------------------------------------------------------------
+Fault1:
+    Type: FaultFlow
+    Connection: LUTReservoir1
+    Segments:
+        Number: 3   # number of fault segments
+        Locations:
+            coordx: [38919.0, 39639.9, 40360.3]   # x-coordinate of the center of each segment
+            coordy: [48333.0, 48333.0, 48333.0]   # y-coordinate of the center of each segment
+    Controls:
+        # the only 4 available options: considerNearApproach, profileType,
+        # pressureApproach, interpolateApproach
+        considerNearApproach: False
+        profileType: 0
+        pressureApproach: False
+        interpolateApproach: False
+    Parameters:
+        # Fault core parameters
+        strike: 95.4
+        dip: 90.0                   # deg; right hand rule from strike
+        length: 100.0               # m; length at surface from start point; can only be deterministic
+        xStart: 38919.00            # m; X-coordinate, fault start point
+        yStart: 48333.0             # m; Y-coordinate, fault start point
+        SGR: 0.0                    # %; SGR = shale gouge ratio
+        stateVariable: 1.0          # -; Non-isothermal correction factor
+        # Aperture
+        aperture: [1.0e-4, 2.0e-4, 1.5e-4]            # in meters; can be list
+        # Field parameters
+        aquiferDepth: 500.0         # m; Depth to the base of deepest aquifer
+        injectDepth: 2884.31        # m; Depth to the top of injection horizon
+        aquiferPressure: 4.9e+06    # Pa; Pressure at aquifer base depth
+        fieldPressure: 2.85e+7      # Pa; Initial Pressure at injection depth
+        injectPressure: 3.0778e+7   # Pa; Ave. pressure at depth during injection
+        finalPressure: 3.90e+7      # Pa; Ave. pressure at depth after injection
+        aquiferTemperature: 30.0    # oC; Temperature at aquifer depth
+        injectTemperature: 98.9     # oC; Temperature at injection depth
+        injectX: 388505.9           # m; X coordinate of injection well
+        injectY: 3434629.9          # m; Y coordinate of injection well
+        # Conditions
+        salinity: 50000.0           # ppm; at injection horizon
+        CO2Density:                 # kg/m^3; average
+            min: 400.0
+            max: 450.0
+            value: 430.0
+        CO2Viscosity: 3.72e-5       # Pa*s
+        brineDensity: 988.00        # kg/m^3
+        brineViscosity: 4.36e-4     # Pa*s
+        CO2Solubility: 2.0e-3       # mol/kg
+        # Relative flow parameters
+        brineResSaturation: 0.15    # -; Residual wetting saturation
+        CO2ResSaturation: 0.00      # -; Residual nonwetting saturation
+        relativeModel: BC           # -; Model type; options: BC
+        permRatio: 0.6              # -; Ratio of nonwetting/wetting
+        entryPressure: 1.0e+05      # Pa; Threshold value
+        lambda:  2.5                # -; Brooks Corey Model lamda parameter
+        # Stress parameters
+        maxHorizontal: 3.0e+07      # Pa; max. secondary stress at injection depth
+        minHorizontal: 2.0e+07      # Pa; min. secondary stress at injection depth
+        maxTrend: 55.0              # deg; strike of max. stress from North
+
+    Outputs: ['CO2_aquifer_total', 'brine_aquifer_total',
+              'CO2_aquifer', 'brine_aquifer',  # gridded observations
+              'mass_CO2_aquifer_total', 'mass_brine_aquifer_total']
+Plots:
+    Plot1:
+        TimeSeries: ['CO2_aquifer_total']
+    Plot2:
+        TimeSeries: ['brine_aquifer_total']
+    Plot3:
+        TimeSeries: ['brine_aquifer_segm_1']  # individual, segment 1
+    Plot4:
+        TimeSeries: ['brine_aquifer_segm_2']  # individual, segment 2
+    Plot5:
+        TimeSeries: ['brine_aquifer_segm_3']  # individual, segment 3
+    Plot6:
+        TimeSeries: ['CO2_aquifer_segm_1']  # individual, segment 1
+    Plot7:
+        TimeSeries: ['CO2_aquifer_segm_2']  # individual, segment 2
+    Plot8:
+        TimeSeries: ['CO2_aquifer_segm_3']  # individual, segment 3
+    Plot9:
+        TimeSeries: ['mass_CO2_aquifer_total']
+    Plot10:
+        TimeSeries: ['mass_brine_aquifer_total']
+    Plot11:
+        GriddedMetric:
+            ComponentNameList: [Fault1]
+            MetricName: CO2_aquifer
+            Realization: 0
+            FigureDPI: 300
+            TimeList:  [1, 5, 10, 25, 50] # All
+            SaveCSVFiles: False
+            PlotInjectionSites: False
+            # InjectionCoordx: 4.68e+04      # Remove the '#' symbols in front of these
+            # InjectionCoordy: 5.11e+04      # if you set PlotInjectionSites to True
+            SpecifyXandYLims:
+                xLims: [38750, 40500]
+                yLims: [46583, 50083]
+            EqualAxes: False     # If EqualAxes is set to the default of True, the
+                                 # limits specified with xLims and yLims will not be used

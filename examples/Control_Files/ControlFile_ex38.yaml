@@ -1,0 +1,129 @@
+# OpenIAM Control File Example 38
+#
+# This example demonstrates the use of the LookupTableStratigraphy option.
+# The name and location of the table containing unit thicknesses and other
+# Stratigraphy component parameters (e.g., datumPressure) must be setup with
+# FileName and FileDirectory, respectively. The parameters entered can be
+# the values (e.g., reservoirThickness) as well as minimum and maximum values
+# (e.g., aquifer2Thickness_min or reservoirThickness_max). The table is
+# expected to have columns with x and y values representing distances east
+# and north in the domain. A parameter that varies over space should be
+# entered in the same row containing the corresponding x and y values.
+# If a parameter does not vary over space, it can be entered in a column
+# with a single row containing the value. If a parameter is missing from the
+# table, it will be assigned the default value for that parameter. In this
+# example, the wellTop and reservoirDepth parameters of the OpenWellbore
+# are set using string inputs to match the bottom depths of aquifer 4 and shale 1,
+# respectively. Similarly, the aqu_thick and depth parameters of the
+# FutureGen2Aquifer are set aquifer4Thickness and aquifer4Depth. Note that
+# the x and y values used by wellbore components must be within a certain distance
+# (MaxPointDistance) of a point within the LookupTable Stratigraphy file. If
+# MaxPointDistance is not entered, it takes on the default value of 100 m. To use
+# the LookupTableStratigraphy option, one must prepare table(s) with the x and y
+# values for wells and the unit thicknesses at those locations. They do not need
+# to be the same table if, for example, you want a certain reservoir depth to be
+# displayed in a stratigraphy plot but you do not need a well at that location.
+# Note that the same number of units must be present at each location (i.e., you
+# can't vary numberOfShaleLayers). If you want a unit to pinch out, however, you
+# could reduce the unit's thickness to the minimum of 1 m. Note that the maximum
+# limits for stratigraphy parameters also apply when using LookupTableStratigraphy.
+#
+# The simulation's stratigraphy is also demonstrated with the StratigraphicColumn
+# plot type. Note that the x and y values provided for the plot type
+# (XValue and YValue) must also be within MaxPointDistance of a location in the
+# .csv file containing the data for the LookupTableStratigraphy option.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex38.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 5
+    TimeStep: 0.1
+    Analysis: forward
+    Components: [SimpleReservoir1, OpenWellbore1]
+    OutputDirectory: 'output/output_ex38_{datetime}'
+    GenerateOutputFiles: False
+    GenerateCombOutputFile: False
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    spatiallyVariable:
+        LookupTableStratigraphy:
+            FileName: 'stratigraphy.csv'
+            FileDirectory: 'examples/Control_Files/input_data/ex38'
+            MaxPointDistance: 100
+#-------------------------------------------------
+SimpleReservoir1:
+    Type: SimpleReservoir
+    InjectionWell:
+        coordx: 3500
+        coordy: 3500
+    Parameters:
+        injRate:
+            value: 1
+            vary: False
+        logResPerm:
+            value: -11.0
+            vary: False
+    Outputs: [pressure, CO2saturation]
+#-------------------------------------------------
+OpenWellbore1:
+    Type: OpenWellbore
+    Connection: SimpleReservoir1
+    Number: 36
+    Locations:
+        file: 'examples/Control_Files/input_data/ex38/wells.csv'
+        read_z_values: True
+        thin_point_density: False
+    LeakTo: aquifer2
+    Controls:
+        critPressureApproach: True
+    Parameters:
+        wellRadius:
+            value: 0.05
+            vary: False
+        logReservoirTransmissivity:
+            value: -10.0
+            vary: False
+        logAquiferTransmissivity:
+            value: -10.0
+            vary: False
+        brineSalinity:
+            value: 0.0475
+            vary: False
+        wellTop:
+            value: aquifer2Depth
+            vary: False
+        reservoirDepth:
+            value: shale1Depth
+            vary: False
+        brineDensity:
+            value: 1025
+            vary: False
+    Outputs: [CO2_aquifer, brine_aquifer]
+#-------------------------------------------------
+Plots:
+    Plot1:
+        TimeSeries: [CO2_aquifer]
+    Plot2:
+        TimeSeries: [brine_aquifer]
+    Strat_Plot:
+        Stratigraphy:
+            PlotWellbores: True
+            PlotWellLabels: False
+            PlotInjectionSites: True
+            PlotInjectionSiteLabels: True
+            PlotStratComponents: True
+            View:
+                ViewAngleElevation: [5, 5, 5, 5, 5, 5, 5]
+                ViewAngleAzimuth: [285, 290, 295, 300, 305, 310, 315]
+    StratCol1:
+        StratigraphicColumn:
+            XValue: 3500
+            YValue: 1500
+    StratCol2:
+        StratigraphicColumn:
+            XValue: 6100
+            YValue: 2000

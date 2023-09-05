@@ -1,0 +1,136 @@
+# OpenIAM Control File Example 54c
+#
+# This example is similar to Control File example 54a, but it uses multiple
+# well locations, a LookupTableReservoir (linked to the FutureGen2 data set;
+# e.g., Control File example 24), and a MultisegmentedWellbore.
+# For each GriddedRadialMetric entry, one figure is made for each combination
+# of time (TimeList), depth (ZList), and component location. Note that
+# this example is also similar to Control File example 24, but the wells are much
+# closer to the injection site, the permeabilities are much higher, and
+# the well radius is much higher (all set to the maximum value allowed).
+
+# This example demonstrates the use of the SaveCSVFiles entry within
+# the GriddedRadialMetric plot type. The default SaveCSVFiles setting
+# for the GriddedRadialMetric plot type is True. The output .csv files
+# saved by the GenericAquifer for the radial metrics (r_coordinate, z_coordinate,
+# Dissolved_CO2_mass_fraction, and Dissolved_salt_mass_fraction) each represent
+# one coordinate.
+#
+# To evaluate spatial variations in the gridded results from GenericAquifer
+# components, one would need to compile results from many .csv files. The .csv
+# files saved by the GriddedRadialMetric plot are meant to be more convenient
+# than that approach. The output values (Dissolved_CO2_mass_fraction or
+# Dissolved_salt_mass_fraction) are saved in relation to x and y values across
+# the domain. In other words, the radial grid (defined by radius and depth)
+# is automatically translated into positions characterized by easting distance,
+# northing distance, and depth.
+#
+# Note that the .csv file will only include values above the MinValue
+# provided by user. If one only wants to save .csv files with
+# the GriddedRadialMetric plot type, one can prevent the creation
+# of other output .csv files by setting GenerateOutputFiles and
+# GenerateCombOutputFile to False in the ModelParams section of the .yaml file.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex54c.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 10.
+    TimeStep: 1.
+    Analysis: forward
+    Components: [LookupTableReservoir1, MultisegmentedWellbore1,
+                 GenericAquifer1]
+    OutputDirectory: output/output_ex54c_{datetime}
+    GenerateOutputFiles: False
+    GenerateCombOutputFile: False
+    Logging: Info
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers: 5
+    shale1Thickness: 198.7
+    shale2Thickness: 74.4
+    shale3Thickness: 110.3
+    shale4Thickness: 118.9
+    shale5Thickness: 530.4
+    aquifer1Thickness: 33.2
+    aquifer2Thickness: 84.1
+    aquifer3Thickness: 31.1
+    aquifer4Thickness: 61.6
+    reservoirThickness: 7
+#-------------------------------------------------
+LookupTableReservoir1:
+    Type: LookupTableReservoir
+    FileDirectory: source/components/reservoir/lookuptables/FutureGen2/1008_sims
+    TimeFile: time_points.csv
+    ParameterFilename: parameters_and_filenames_trunc.csv
+    Parameters:
+        index: 5
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+MultisegmentedWellbore1:
+    Type: MultisegmentedWellbore
+    Connection: LookupTableReservoir1
+    Locations:
+        coordx: [237100.0, 236990.0]
+        coordy: [4410000.0, 4410000.0]
+    Parameters:
+        wellRadius: 0.5
+        logWellPerm: -9.0
+        logAquPerm: -9.0
+        brineDensity: 1030.9
+        CO2Density: 775.0
+        brineViscosity: 7.5e-4
+        CO2Viscosity: 6.6e-5
+    Outputs: [CO2_aquifer1, CO2_aquifer2, CO2_aquifer3, CO2_aquifer4, CO2_atm,
+              brine_aquifer1, brine_aquifer2, brine_aquifer3, brine_aquifer4, brine_atm]
+#-------------------------------------------------
+GenericAquifer1:
+    Type: GenericAquifer
+    Connection: MultisegmentedWellbore1
+    AquiferName: aquifer4
+    Parameters:
+        por: 0.2
+        log_permh: -12.0
+        log_aniso: 0.6
+    Outputs: [Dissolved_salt_volume, Dissolved_CO2_volume,
+              r_coordinate, z_coordinate,                                 # gridded coordinates
+              Dissolved_CO2_mass_fraction, Dissolved_salt_mass_fraction]  # gridded observations
+#-------------------------------------------------
+Plots:
+    Gridded_salt_Mass_Frac:
+        GriddedRadialMetric:
+            ComponentNameList: [GenericAquifer1]
+            MetricName: Dissolved_salt_mass_fraction
+            ZList: [aquifer2Depth, shale3Depth]
+            TimeList: All
+            MinValue: 0.002
+            FigureDPI: 300
+            PlotInjectionSites: True
+            InjectionCoordx: 2.37e5
+            InjectionCoordy: 4.41e6
+            DegreeInterval: 1
+            SaveCSVFiles: True
+    Gridded_CO2_Mass_Frac:
+        GriddedRadialMetric:
+            ComponentNameList: [GenericAquifer1]
+            MetricName: Dissolved_CO2_mass_fraction
+            ZList: [aquifer2Depth, shale3Depth]
+            MinValue: 0.01
+            TimeList: All
+            FigureDPI: 300
+            PlotInjectionSites: True
+            InjectionCoordx: 2.37e5
+            InjectionCoordy: 4.41e6
+            DegreeInterval: 1
+            SaveCSVFiles: True
+    pressure_plot:
+        TimeSeries: [pressure]
+    saturation_plot:
+        TimeSeries: [CO2saturation]
+    salt_volume:
+        TimeSeries: [Dissolved_salt_volume]
+    CO2_volume:
+        TimeSeries: [Dissolved_CO2_volume]

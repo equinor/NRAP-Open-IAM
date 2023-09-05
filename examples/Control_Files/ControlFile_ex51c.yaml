@@ -1,0 +1,159 @@
+# OpenIAM Control File Example 51c
+#
+# This example illustrates a system model with an analytical reservoir
+# component providing pressure and CO2 saturation inputs for cemented
+# wellbore (wr) components. In the setup the stratigraphy has 4 shale layers
+# and 3 aquifer layers. To distinguish between the aquifers two options
+# are available for user in the setup of the cemented wellbore components.
+# The option 'LeakTo' allows to specify which of the aquifers is considered
+# a shallow aquifer. The option 'ThiefZone' allows to specify which
+# of the aquifers is considered a thief zone. Here, the cemented wellbore
+# components both have 'LeakTo: aquifer3.' One of the component entries
+# has 'ThiefZone: aquifer1' while the other has 'ThiefZone: aquifer2,'
+# however.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#  python ../../source/openiam/openiam_cf.py --file ControlFile_ex51c.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 25
+    TimeStep: 1.0
+    Analysis: forward
+    Components: [Reservoir, Wellbore1, Wellbore2]
+    OutputDirectory: output/output_ex51c_{datetime}
+    Logging: Error
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness: 550.0
+    shale2Thickness: 250.0
+    shale3Thickness: 200.0
+    shale4Thickness: 9.6
+    aquifer1Thickness: 25.0
+    aquifer2Thickness: 45.0
+    aquifer3Thickness: 30.0
+    reservoirThickness: 75.0
+#-------------------------------------------------
+Reservoir:
+    Type: AnalyticalReservoir
+    InjectionWell:
+        coordx: 0
+        coordy: 0
+    Parameters:
+        injRate: 1.5
+        logResPerm: -12.5
+        reservoirRadius: 1000
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+Wellbore1:
+    Type: CementedWellboreWR
+    Connection: Reservoir
+    LeakTo: aquifer3     # the option available for systems with more than 2 aquifers
+    ThiefZone: aquifer1  # the option available for systems with more than 2 aquifers
+    Number: 2
+    Locations:  # wells 1 and 2
+        coordx: [440, 550]
+        coordy: [330, 480]
+    Parameters:
+        logWellPerm: -13.0
+        logThiefPerm: -13.0
+        wellRadius: 0.04
+    Outputs: [CO2_aquifer1, CO2_aquifer2, CO2_aquifer3,
+              brine_aquifer1, brine_aquifer2, brine_aquifer3]
+#-------------------------------------------------
+Wellbore2:
+    Type: CementedWellboreWR
+    Connection: Reservoir
+    LeakTo: aquifer3     # the option available for systems with more than 2 aquifers
+    ThiefZone: aquifer2  # the option available for systems with more than 2 aquifers
+    Number: 2
+    Locations:  # wells 3 and 4
+        coordx: [330, 480]
+        coordy: [440, 550]
+    Parameters:
+        logWellPerm: -13.0
+        logThiefPerm: -13.0
+        wellRadius: 0.04
+    Outputs: [CO2_aquifer1, CO2_aquifer2, CO2_aquifer3,
+              brine_aquifer1, brine_aquifer2, brine_aquifer3]
+#-------------------------------------------------
+Plots:
+    PressurePlot:
+        TimeSeries: [pressure]
+        Subplot:
+            NumCols: 2
+            Use: True
+            Reservoir_000.pressure: 'Pressure at location 1'
+            Reservoir_001.pressure: 'Pressure at location 2'
+            Reservoir_002.pressure: 'Pressure at location 3'
+            Reservoir_003.pressure: 'Pressure at location 4'
+        Title: Reservoir Pressure
+    SaturationPlot:
+        TimeSeries: [CO2saturation]
+        Subplot:
+            NumCols: 2
+            Use: True
+            Reservoir_000.CO2saturation: 'CO$_2$ saturation at location 1'
+            Reservoir_001.CO2saturation: 'CO$_2$ saturation at location 2'
+            Reservoir_002.CO2saturation: 'CO$_2$ saturation at location 3'
+            Reservoir_003.CO2saturation: 'CO$_2$ saturation at location 4'
+        Title: Reservoir CO2 saturation
+    CO2Leakage1:
+        TimeSeries: [CO2_aquifer1]
+        Subplot:
+            NumCols: 2
+            Use: True
+            Wellbore1_000.CO2_aquifer1: 'Leakage to aquifer 1, well 1'
+            Wellbore1_001.CO2_aquifer1: 'Leakage to aquifer 1, well 2'
+            Wellbore2_000.CO2_aquifer1: 'Leakage to aquifer 1, well 3'
+            Wellbore2_001.CO2_aquifer1: 'Leakage to aquifer 1, well 4'
+    BrineLeakage1:
+        TimeSeries: [brine_aquifer1]
+        Subplot:
+            NumCols: 2
+            Use: True
+            Wellbore1_000.brine_aquifer1: 'Leakage to aquifer 1, well 1'
+            Wellbore1_001.brine_aquifer1: 'Leakage to aquifer 1, well 2'
+            Wellbore2_000.brine_aquifer1: 'Leakage to aquifer 1, well 3'
+            Wellbore2_001.brine_aquifer1: 'Leakage to aquifer 1, well 4'
+    CO2Leakage2:
+        TimeSeries: [CO2_aquifer2]
+        Subplot:
+            NumCols: 2
+            Use: True
+            Wellbore1_000.CO2_aquifer2: 'Leakage to aquifer 2, well 1'
+            Wellbore1_001.CO2_aquifer2: 'Leakage to aquifer 2, well 2'
+            Wellbore2_000.CO2_aquifer2: 'Leakage to aquifer 2, well 3'
+            Wellbore2_001.CO2_aquifer2: 'Leakage to aquifer 2, well 4'
+    BrineLeakage2:
+        TimeSeries: [brine_aquifer2]
+        Subplot:
+            NumCols: 2
+            Use: True
+            Wellbore1_000.brine_aquifer2: 'Leakage to aquifer 2, well 1'
+            Wellbore1_001.brine_aquifer2: 'Leakage to aquifer 2, well 2'
+            Wellbore2_000.brine_aquifer2: 'Leakage to aquifer 2, well 3'
+            Wellbore2_001.brine_aquifer2: 'Leakage to aquifer 2, well 4'
+    CO2Leakage3:
+        TimeSeries: [CO2_aquifer3]
+        Subplot:
+            NumCols: 2
+            Use: True
+            Wellbore1_000.CO2_aquifer3: 'Leakage to shallow aquifer 3, well 1'
+            Wellbore1_001.CO2_aquifer3: 'Leakage to shallow aquifer 3, well 2'
+            Wellbore2_000.CO2_aquifer3: 'Leakage to shallow aquifer 3, well 3'
+            Wellbore2_001.CO2_aquifer3: 'Leakage to shallow aquifer 3, well 4'
+    BrineLeakage3:
+        TimeSeries: [brine_aquifer3]
+        Subplot:
+            NumCols: 2
+            Use: True
+            Wellbore1_000.brine_aquifer3: 'Leakage to shallow aquifer 3, well 1'
+            Wellbore1_001.brine_aquifer3: 'Leakage to shallow aquifer 3, well 2'
+            Wellbore2_000.brine_aquifer3: 'Leakage to shallow aquifer 3, well 3'
+            Wellbore2_001.brine_aquifer3: 'Leakage to shallow aquifer 3, well 4'

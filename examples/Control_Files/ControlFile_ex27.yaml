@@ -1,0 +1,108 @@
+# OpenIAM Control File Example 27
+#
+# This example demonstrates reading temperature data with a LookupTableReservoir.
+#
+# This example uses a modified version of the file Reservoir_data_sim01.csv from the
+# Kimberlina data set (https://gitlab.com/NRAP/Kimberlina_data). The file
+# was placed in the following location:
+#     source/components/reservoir/lookuptables/Test_metrics
+#
+# The file from the Kimberlina data set was modified to include columns
+# for the fields temperature_1 through temperature_10 (corresponding to
+# the times in columns 1 through 10 of the time_points.csv file in the same
+# folder). These temperature columns all have a constant value of 50 (degrees
+# Celcius). This example also uses a modified version of
+# the parameters_and_filenames.csv file. This edited version
+# (parameters_and_filenames_read_temperature.csv) was also placed in the
+# Test_metrics folder. The file has only one entry corresponding to the file
+# Reservoir_data_sim01_read_temperature.csv. The parameters are unchanged
+# from the Kimberlina data set, however (logResPerm: -13.3,
+# reservoirPorosity: 0.215, logShalePerm: -18.7).
+# If the above files are not present, this example will produce an error.
+# Although the temperature data are constant, this approach would also work
+# on any metrics that vary over space and time. Note that to incorporate
+# the temperature data from the .csv files into the system model, 'temperature'
+# must be included in the Outputs section of the LookupTableReservoir component.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex27.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 30
+    TimeStep: 1.0
+    Analysis: forward
+    Components: [LookupTableReservoir1,
+                 MultisegmentedWellbore1]
+    OutputDirectory: output/output_ex27_{datetime}
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 4
+    shale1Thickness:
+        value: 200.0
+        vary: False
+    shale2Thickness:
+        value: 550.0
+        vary: False
+    shale3Thickness:
+        value: 400.0
+        vary: False
+    shale4Thickness:
+        value: 400.0
+        vary: False
+    aquifer1Thickness:
+        value: 150.0
+        vary: False
+    aquifer2Thickness:
+        value: 720.0
+        vary: False
+    aquifer3Thickness:
+        value: 400.0
+        vary: False
+    reservoirThickness:
+        value: 400.0
+        vary: False
+#-------------------------------------------------
+LookupTableReservoir1:
+    Type: LookupTableReservoir
+    FileDirectory: source/components/reservoir/lookuptables/Test_metrics
+    TimeFile: time_points.csv
+    # This is one of the modified files mentioned above
+    ParameterFilename: parameters_and_filenames_read_temperature.csv
+    Parameters:
+        index: 1
+    Outputs: [pressure,
+              CO2saturation,
+              temperature]
+#-------------------------------------------------
+MultisegmentedWellbore1:
+    Type: MultisegmentedWellbore
+    Connection: LookupTableReservoir1
+    Locations:
+        coordx: [37478.0]
+        coordy: [48333.0]
+    Parameters:
+        logWellPerm:
+            value: -13.0
+            vary: False
+    Outputs: [CO2_aquifer1,
+              CO2_aquifer2,
+              brine_aquifer1,
+              brine_aquifer2]
+#-------------------------------------------------
+Plots:
+    pressure_plot:
+        TimeSeries: [pressure]
+    saturation_plot:
+        TimeSeries: [CO2saturation]
+    temperature_plot:
+        TimeSeries: [temperature]
+    CO2_leakage_plot:
+        TimeSeries: [CO2_aquifer1, CO2_aquifer2]
+        Subplot:
+            NumCols: 2
+            Use: True

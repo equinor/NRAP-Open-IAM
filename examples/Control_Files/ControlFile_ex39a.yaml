@@ -1,0 +1,153 @@
+# OpenIAM Control File Example 39a
+#
+# This example demonstrates the use of the time to first detection (TTFD) plot
+# type for a simulation with a simple reservoir, multisegmented wellbores,
+# and aquifer components. If monitoring locations are provided (see below), the TTFD
+# plot type specifically represents the use of a monitoring well to detect a
+# contaminant plume in (an) aquifer(s). If no monitoring locations are given, then
+# this plot type shows the spread of contaminant plumes in (an) aquifer(s).
+#
+# Using this plot type requires aquifer component(s) producing the plume dimension
+# metrics for the type of plume specified with PlumeType. For example,
+# each of the aquifer components used here produces results for TDS_dx, TDS_dy,
+# and TDS_dz. Note that plume output varies with the type of component used.
+# The entries for PlumeType and ComponentNameList are required for the TTFD plot.
+# All other entries are optional.
+#
+# The "SpecifyXandYLims" option allows one to set the x and y (easting and northing)
+# axis limits for the TTFD plots by entering the lower and upper limits in
+# xLims and yLims. If the MonitoringLocations section is present, as shown here,
+# then separate graphs and .csv files will be made with the TTFD at the monitor locations.
+# The coordx, coordy, and coordz values provided for the monitoring
+# locations will be included in the x, y, and z grids used to evaluate results.
+# The depths represented by coordz must be entered as negative.
+# Additionally, the HorizontalWindow and VerticalWindow are the horizontal
+# and vertical distances (in meters) used to search for plume timings
+# from grid points near the provided monitoring locations.
+# If a monitoring location is close enough to another grid point (i.e.,
+# within the HorizontalWindow and VerticalWindow), then the results at that grid
+# point will be included for the monitoring location. If not entered,
+# the HorizontalWindow and VerticalWindow will both resort to the default value of 1 m.
+# One might want to use the VerticalWindow, for example, to represent a length
+# along a monitoring well with sensor equipment. The sensors would cover the distance
+# from (coordz - VerticalWindow) to (coordz + VerticalWindow). Even if
+# the VerticalWindow and HorizontalWindows are left at 1 m, there would still
+# be grid points located at the monitoring locations provided (at a distance
+# of 0 m horizontally and vertically). Note that one can control the x- and y-spacings
+# of grid points with the xGridSpacing and yGridSpacing entries (in meters)
+# under SpecifyXandYGridLims. The z values are set by unit depths, but the z-spacing
+# can be altered with the NumZPointsWithinAquifers and NumZPointsWithinShales entries.
+# These parameters are the number of grid points extending from the bottom
+# to the top of each aquifer and shale, respectively. These values must be entered
+# as integers. The x, y, and z grid values used for the TTFD results are saved
+# in .csv files. Also, if the analysis type is lhs (for Latin Hypercube Sampling), an
+# additional graph and .csv file will be made for the probability that a plume
+# occurs at each grid location. This probability is calculated as the number
+# of realizations in which a plume occured at that location divided by the total
+# number of realizations (i.e., the LHS samples set by 'siz' under analysis).
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex39a.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 50
+    TimeStep: 1
+    Analysis:
+        type: lhs
+        siz: 30
+    Components: [SimpleReservoir1, MultisegmentedWellbore1,
+                 FutureGen2AZMI1]
+    OutputDirectory: output/output_ex39a_{datetime}
+    Logging: Info
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers: 3
+    shale3Thickness: 365.0
+    shale2Thickness: 950.0
+    shale1Thickness: 750.0
+    aquifer2Thickness: 85
+    aquifer1Thickness: 85
+    reservoirThickness: 150
+#-------------------------------------------------
+SimpleReservoir1:
+    Type: SimpleReservoir
+    Parameters:
+        injRate: 10
+        logResPerm: -12
+        brineDensity: 1030.9
+        CO2Density: 775.0
+        brineViscosity: 7.5e-4
+        CO2Viscosity: 6.6e-5
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+MultisegmentedWellbore1:
+    Type: MultisegmentedWellbore
+    Connection: SimpleReservoir1
+    Number: 5
+    Locations:
+        coordx: [100, 200, 300, 400, 500]
+        coordy: [100, 200, 300, 400, 500]
+    Parameters:
+        wellRadius: 0.1
+        logAqu1Perm:
+            min: -15.89
+            max: -14.89
+            value: -15.39
+        logAqu2Perm:
+            vary: False
+            value: -13.05
+        logWellPerm:
+            min: -14.0
+            max: -11.0
+            value: -13.0
+        brineDensity: 1030.9
+        CO2Density: 775.0
+        brineViscosity: 7.5e-4
+        CO2Viscosity: 6.6e-5
+    Outputs: [CO2_aquifer1, CO2_aquifer2, CO2_atm,
+              brine_aquifer1, brine_aquifer2, brine_atm]
+#-------------------------------------------------
+FutureGen2AZMI1:
+    Type: FutureGen2AZMI
+    Connection: MultisegmentedWellbore1
+    AquiferName: aquifer1
+    Parameters:
+        # aqu_thick (85 m for aquifer 1) and depth (1485 m) parameter do not need
+        # to be set up as they are linked to stratigraphy
+        por: 0.18
+        log_permh: -13.0
+        log_aniso: 0.3
+        rel_vol_frac_calcite: 0.1
+    Outputs: [pH_volume, pH_dx, pH_dy, pH_dz]
+#-------------------------------------------------
+Plots:
+    CO2_leakage_aq1:
+        TimeSeriesStats: [CO2_aquifer1]
+    pH_plume_volumes:
+        TimeSeriesStats: [pH_volume]
+    TTFD_Plot:
+        TTFD:
+            PlumeType: pH
+            MonitoringLocations:
+                coordx: [50, 75, 150]
+                coordy: [50, 75, 150]
+                coordz: [-1405, -1405, -1405]   # 5 m below the top of aquifer 1 (-1400 m)
+                HorizontalWindow: 1
+                VerticalWindow: 5               # Will detect plumes at z grid points from 5 m above to 5 m below the coordz, from -1410 m to -1400 m. There is still a grid point at -1405 m though, so any plume there will be detected.
+            PlotInjectionSites: True
+            SpecifyXandYLims:
+                xLims: [-75, 675]
+                yLims: [-75, 675]
+            NumZPointsWithinAquifers: 10
+            NumZPointsWithinShales: 3
+            xGridSpacing: 10
+            yGridSpacing: 10
+            SpecifyXandYGridLims:
+                gridXLims: [0, 650]
+                gridYLims: [0, 650]
+            WriteDreamOutput: False
+            SaveCSVFiles: True
+            ComponentNameList: [FutureGen2AZMI1]

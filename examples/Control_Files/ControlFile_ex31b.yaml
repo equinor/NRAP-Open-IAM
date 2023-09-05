@@ -1,0 +1,154 @@
+# OpenIAM Control File Example 31b
+#
+# This example is similar to example 31a, but it includes a
+# GenericAquifer instead of a FutureGen2Aquifer. The AoR plot
+# type can be used with: pressure and CO2saturation results from reservoir
+# components; pH_volume and TDS_volume results from aquifer components like
+# FutureGen2Aquifer, FutureGen2AZMI, and DeepAlluviumAquifer; and
+# Dissolved_CO2_volume and Dissolved_salt_volume results from GenericAquifer
+# components. Model run times can be longer when using GenericAquifers
+# instead of FutureGen2Aquifers, so the number of hypothetical OpenWellbores
+# (wellbores used to consider the leakage that could happen if a pathway was present
+# - and what the Area of Review should be) has been decreased here from 196
+# (14 by 14) to 49 (7 by 7).
+#
+# A GenericAquifer component is made for each OpenWellbore location. With
+# this arrangement (7 by 7, an odd number of rows and columns but with the
+# maximum distances on either side of the injection well being equal), however, an
+# OpenWellbore will be placed on the injection site itself. These conditions
+# cause the pressure results at that OpenWellbore to go to infinity. Regardless,
+# the OpenWellbore is hypothetical and the AoR plot code is set up to exclude
+# such a result.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex31b.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 10
+    TimeStep: 1.0
+    Analysis: forward
+    Components: [SimpleReservoir1, OpenWellbore1,
+                 GenericAquifer1]
+    OutputDirectory: 'output/output_ex31b_{datetime}'
+    GenerateOutputFiles: False
+    GenerateCombOutputFile: False
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        value: 750.0
+        vary: False
+    shale2Thickness:
+        value: 950.0
+        vary: False
+    shale3Thickness:
+        value: 365
+        vary: False
+    aquifer1Thickness:
+        vary: False
+        value: 85
+    aquifer2Thickness:
+        vary: False
+        value: 85
+    reservoirThickness:
+        vary: False
+        value: 150
+#-------------------------------------------------
+SimpleReservoir1:
+    Type: SimpleReservoir
+    Parameters:
+        injRate:
+            value: 0.33
+            vary: False
+        logResPerm:
+            value: -10.15
+            vary: False
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+OpenWellbore1:
+    Type: OpenWellbore
+    Connection: SimpleReservoir1
+    Number: 49   # (7*7)
+    LeakTo: aquifer2
+    Locations:
+        grid:
+            xmin: -7500
+            xmax: 7500
+            xsize: 7
+            ymin: -7500
+            ymax: 7500
+            ysize: 7
+    Controls:
+        critPressureApproach: True
+    Parameters:
+        wellRadius:
+            value: 0.05
+            vary: False
+        logReservoirTransmissivity:
+            value: -10.97
+            vary: False
+        logAquiferTransmissivity:
+            value: -10.0
+            vary: False
+        brineSalinity:
+            value: 0.2
+            vary: False
+        brineDensity:
+            value: 1015
+            vary: False
+        # Parameters wellTop (450 m) and reservoirDepth (2235 m) are linked
+        # to stratigraphy (if the LeakTo parameter is set up to the right aquifer)
+        # and don't need to be set explicitly unless different values
+        # are required. The parameters wellTop, reservoirDepth, and brineDensity
+        # are used to calculate critical pressure (if the parameter criticalPressure
+        # is not provided).
+    Outputs: [CO2_aquifer,
+              brine_aquifer]
+#-------------------------------------------------
+GenericAquifer1:
+    Type: GenericAquifer
+    Connection: OpenWellbore1
+    AquiferName: aquifer2
+    Parameters:
+        # Parameters aqu_thick (85 m) and top_depth (365 m) are linked
+        # to stratigraphy and don't require to be setup explicitily unless
+        # different value of the parameter is required.
+        por:
+            value: 0.18
+            vary: False
+        log_permh:
+            value: -11.92
+            vary: False
+        log_aniso:
+            value: 0.3
+            vary: False
+    Outputs: [Dissolved_CO2_volume, Dissolved_salt_volume]
+#-------------------------------------------------
+Plots:
+    Plot1:
+        AoR: [pressure]
+        PlotInjectionSites: True
+        FigureDPI: 200
+        SaveCSVFiles: True
+        CriticalPressureMPa: Calculated
+    Plot2:
+        AoR: [CO2saturation]
+        PlotInjectionSites: True
+        FigureDPI: 200
+        SaveCSVFiles: False
+    Plot3:
+        AoR: [Dissolved_CO2_volume]
+        PlotInjectionSites: True
+        FigureDPI: 200
+        SaveCSVFiles: True
+    Plot4:
+        AoR: [Dissolved_salt_volume]
+        PlotInjectionSites: True
+        FigureDPI: 200
+        SaveCSVFiles: True

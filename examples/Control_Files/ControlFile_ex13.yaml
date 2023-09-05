@@ -1,0 +1,159 @@
+# OpenIAM Control File Example 13
+#
+# This example computes the flow rates of brine and CO2 to aquifers 1 and 2
+# utilizing the generalized flow rate component (heuristic model). The two
+# generalized flow rate components used have different parameters, like
+# logPeakCO2Rate, timePeakCO2Rate, durationPeakCO2Rate, and mitigationTime.
+# The carbonate aquifer component is then used to calculate the pH and TDS plume
+# volumes in aquifers 1 and 2 resulting from CO2 and brine leakage, respectively.
+#
+# To run this file, use the command (\ for Windows and / for Mac or Linux)
+#   python ../source/openiam/openiam_cf.py --file ControlFile_ex13.yaml
+# in the folder examples/Control_Files,
+# or command
+#   python openiam_cf.py --file ../../examples/Control_Files/ControlFile_ex13.yaml
+# in the folder source/openiam.
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 50
+    TimeStep: 1.0
+    Analysis: forward
+    Components: [ca1, ca2, gfr1, gfr2]
+    OutputDirectory: output/output_ex13_{datetime}
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        min: 10.0
+        max: 25.0
+        value: 15.0
+    shale2Thickness:
+        min: 10.0
+        max: 25.0
+        value: 25.0
+    shale3Thickness:
+        min: 300.0
+        max: 500.0
+        value: 350.0
+    aquifer1Thickness:
+        min: 100.0
+        max: 150.0
+        value: 120.0
+    aquifer2Thickness:
+        min: 100.0
+        max: 140.0
+        value: 110.0
+    reservoirThickness:
+        min: 30.0
+        max: 50.0
+        value: 40.0
+#-------------------------------------------------
+# Generalized flow rate component 1
+#-------------------------------------------------
+gfr1:
+    Type: GeneralizedFlowRate
+    LeakTo: aquifer1
+    Locations:
+        coordx: [120.0]
+        coordy: [245.0]
+    Parameters:
+        logPeakCO2Rate:
+            value: -4.0
+            vary: False
+        timePeakCO2Rate:
+            value: 10.0
+            vary: False
+        durationPeakCO2Rate:
+            value: 15.0
+            vary: False
+        durationPeakZeroCO2Rate:
+            value: 100.0
+            vary: False
+        logInitBrineRate:
+            value: -5.0
+            vary: False
+        logFinalBrineRate:
+            value: -6.5
+            vary: False
+        durationInitBrineRate:
+            value: 5.0
+            vary: False
+        durationInitFinalBrineRate:
+            value: 10.0
+            vary: False
+        mitigationTime:
+            value: 75.0
+            vary: False
+    Outputs: [CO2_aquifer1, brine_aquifer1,
+              mass_CO2_aquifer1, mass_brine_aquifer1]
+#-------------------------------------------------
+# Generalized flow rate component 2
+#-------------------------------------------------
+gfr2:
+    Type: GeneralizedFlowRate
+    LeakTo: aquifer2
+    Locations:
+        coordx: [230.0]
+        coordy: [150.0]
+    Parameters:
+        logPeakCO2Rate:
+            value: -3.8
+            vary: False
+        timePeakCO2Rate:
+            value: 12.0
+            vary: False
+        durationPeakCO2Rate:
+            value: 10.0
+            vary: False
+        durationPeakZeroCO2Rate:
+            value: 80.0
+            vary: False
+        logInitBrineRate:
+            value: -2.1
+            vary: False
+        logFinalBrineRate:
+            value: -6.2
+            vary: False
+        durationInitBrineRate:
+            value: 4.0
+            vary: False
+        durationInitFinalBrineRate:
+            value: 12.0
+            vary: False
+        mitigationTime:
+            value: 60.0
+            vary: False
+    Outputs: [CO2_aquifer2, brine_aquifer2,
+              mass_CO2_aquifer2, mass_brine_aquifer2]
+#-------------------------------------------------
+ca1:
+    Type: CarbonateAquifer
+    Connection: gfr1
+    AquiferName: aquifer1
+    Outputs: [pH_volume, TDS_volume]
+
+ca2:
+    Type: CarbonateAquifer
+    Connection: gfr2
+    AquiferName: aquifer2
+    Outputs: [pH_volume, TDS_volume]
+
+#-------------------------------------------------
+Plots:
+    CO2_Leakage1:
+        TimeSeries: [CO2_aquifer1]
+    CO2_Leakage2:
+        TimeSeries: [CO2_aquifer2]
+    Brine_Leakage1:
+        TimeSeries: [brine_aquifer1]
+    Brine_Leakage2:
+        TimeSeries: [brine_aquifer2]
+    pH_plume_volumes:
+        TimeSeries: [pH_volume]
+    TDS_plume_volumes:
+        TimeSeries: [TDS_volume]

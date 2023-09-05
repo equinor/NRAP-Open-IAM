@@ -1,0 +1,208 @@
+# OpenIAM Control File Example 31a
+#
+# This example demonstrates the use of the AoR plot type. To use the AoR plot,
+# you must have OpenWellbores distributed across the area of interest.
+# There are multiple ways of doing that, and this example uses the 'range' option.
+# The OpenWellbore component illustrates setup of the 'range' option, which
+# contains 'xmin', 'xmax', 'dx', 'ymin', 'ymax', and 'dy'. Number of wellbores is
+# calculated from the number of points made with the 'range' option.
+# The placed OpenWellbores are hypothetical and only used to assess the aquifer
+# contamination that could happen if a leakage pathway was present. The spatial
+# extent of such impacts is meant to inform the definition of an Area of
+# Review (AoR). Note that while pressure and CO2saturation results from reservoirs
+# can be displayed in an AoR plot, these results show the conditions within
+# the reservoir rather than aquifer impacts. The OpenWellbore components are
+# placed with the 'grid' option, which contains 'xmin', 'xmax', 'xsize',
+# 'ymin', 'ymax', and 'ysize'.
+#
+# Note that having 'GenerateOutputFiles': False and 'GenerateCombOutputFile': False
+# within the ModelParams section will prevent the creation of individual output
+# and combined outputs files. The combined outputs files can be large
+# due to the number of components used. In this example there is one
+# SimpleReservoir, OpenWellbore, and FutureGen2Aquifer created for each
+# x and y value specified with the 'grid' option, and an output file
+# would be created for each conmponent. Additionally, the AoR plot type creates
+# a csv file with the data used for the plot, and this csv file is much smaller
+# than the combined and individual output files.
+#
+# Both wellTop (in the OpenWellbore component) and depth (within
+# the FutureGen2Aquifer component) should reflect the depth to the
+# bottom of the aquifer being examined for the AoR (here, aquifer 2).
+#
+# Note that the PlotInjectionSites, FigureDPI, and SaveCSVFiles entires for
+# the AoR plots are optional. If those entries are left out, the figure
+# will use the default settings where injection sites are not plotted
+# (PlotInjectionSites: False), the figure dots-per-inch (dpi) is 100
+# (FigureDPI: 100), and .csv files are saved (SaveCSVFiles: True). To
+# demonstrate that these entries are optional, they have all been excluded
+# from the AoR plot of CO2saturation. When using a LookupTableReservoir,
+# the injection site will only be plotted if InjectionCoordx and InjectionCoordy
+# entries are also provided. See Control File example 32a.
+#
+# Note that because the entry for the OpenWellbore component includes a
+# Control section containing critPressureApproach: True, leakage through
+# the OpenWellbore can only happen if the reservoir pressures exceed the
+# critical pressure of the aquifer receiving leakage. The critical pressure (Pcrit)
+# is calculated as Pcrit = (rho_w * g * d_aq) + (rho_br * g * (d_res - d_aq)).
+# Here, rho_w is the density of water (1000 km/m^3), g is 9.81 m/s^2, d_aq is
+# the bottom depth of the aquifer (m), rho_br is the brine density (kg/m^3),
+# and d_res is the depth to the top of the reservoir (m). The critical pressure
+# is therefore sensitive to the brineDensity value used - higher brine densities
+# generally lead to higher critical pressures and lower leaked masses of brine
+# and CO2. Note that flow through an OpenWellbore can happen beneath the critical
+# pressure if a CO2 plume is present in the reservoir at the base of the well
+# (i.e., buoyancy effects from the CO2). If you include 'enforceCritPressure: True'
+# in the 'Controls' section and also provide a value for the critPressure parameter
+# (in Pa), the critical pressure will be taken as the critPressure parameter.
+# Otherwise, the default approach is to calculate critical pressure.
+#
+# A critical pressure can be shown in a pressure AoR figure by including
+# 'CriticalPressureMPa: Calculated' or 'CriticalPressureMPa: X' (where X is a
+# value in MPa). If that entry is included, the figure specifies whether
+# the pressures exceeded the critical pressure and highlights the locations with
+# pressure equal to the critical pressure with a red contour (if that value
+# is within the domain - e.g., there is no contour if all pressures exceed
+# the critical pressure). When using the 'Calculated' option, the code
+# calculates the critical pressure for all OpenWellbore components and uses
+# the lowest value. This approach is used because critical pressures can vary
+# if spatially variable stratigraphy is used, but the AoR plot is only set up
+# to display one critical pressure value. The pressure results saved
+# to .csv files can be used to make figures incorporating a spatially variable
+# critical pressure, however. Additionally, there are additional considerations
+# for the use of the 'CriticalPressureMPa: Calculated' option in lhs or
+# parstudy simulations (see Control File example 31d).
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex31a.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 10
+    TimeStep: 1.0
+    Analysis: forward
+    Components: [SimpleReservoir1, OpenWellbore1, FutureGen2Aquifer1]
+    OutputDirectory: 'output/output_ex31a_{datetime}'
+    GenerateOutputFiles: False
+    GenerateCombOutputFile: False
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        value: 750.0
+        vary: False
+    shale2Thickness:
+        value: 950.0
+        vary: False
+    shale3Thickness:
+        value: 365
+        vary: False
+    aquifer1Thickness:
+        vary: False
+        value: 85
+    aquifer2Thickness:
+        vary: False
+        value: 85
+    reservoirThickness:
+        vary: False
+        value: 150
+#-------------------------------------------------
+SimpleReservoir1:
+    Type: SimpleReservoir
+    Parameters:
+        injRate:
+            value: 0.33
+            vary: False
+        logResPerm:
+            value: -10.15
+            vary: False
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+OpenWellbore1:
+    Type: OpenWellbore
+    Connection: SimpleReservoir1
+    Number: 196   # 14*14
+    LeakTo: aquifer2
+    Locations:
+        grid:
+            xmin: -7500
+            xmax: 7500
+            xsize: 14
+            ymin: -7500
+            ymax: 7500
+            ysize: 14
+    Controls:
+        critPressureApproach: True
+        enforceCritPressure: False
+    Parameters:
+        wellRadius:
+            value: 0.05
+            vary: False
+        logReservoirTransmissivity:
+            value: -10.97
+            vary: False
+        logAquiferTransmissivity:
+            value: -10.0
+            vary: False
+        brineSalinity:
+            value: 0.2
+            vary: False
+        brineDensity:
+            value: 1050
+            vary: False
+        # Parameters wellTop (450 m) and reservoirDepth (2235 m) are linked
+        # to stratigraphy (if the LeakTo parameter is set up to the right aquifer)
+        # and don't need to be set explicitly unless different values
+        # are required. Because critPressureApproach is True, the parameters
+        # wellTop, reservoirDepth, and brineDensity are used to calculate critical
+        # pressure. If enforceCritPressure was also set to True and the critPressure
+        # parameter was provided, that parameter value would be used instead of a
+        # calculated critical pressure.
+    Outputs: [CO2_aquifer, brine_aquifer]
+#-------------------------------------------------
+FutureGen2Aquifer1:
+    Type: FutureGen2Aquifer
+    Connection: OpenWellbore1
+    AquiferName: aquifer2
+    Parameters:
+        # Parameters aqu_thick (85 m) and depth (450 m) are linked
+        # to stratigraphy and don't require to be setup explicitily unless
+        # different value of the parameter is required.
+        por:
+            value: 0.18
+            vary: False
+        log_permh:
+            value: -11.92
+            vary: False
+        log_aniso:
+            value: 0.3
+            vary: False
+        rel_vol_frac_calcite:
+            value: 0.01
+            vary: False
+    Outputs: [pH_volume, TDS_volume]
+#-------------------------------------------------
+Plots:
+    Plot1:
+        AoR: [pressure]
+        PlotInjectionSites: True
+        FigureDPI: 200
+        SaveCSVFiles: True
+        Title: 'AoR: Pressure'
+        CriticalPressureMPa: Calculated
+    Plot2:
+        AoR: [CO2saturation]
+    Plot3:
+        AoR: [pH_volume]
+        PlotInjectionSites: True
+        FigureDPI: 200
+        SaveCSVFiles: True
+    Plot4:
+        AoR: [TDS_volume]
+        PlotInjectionSites: True
+        FigureDPI: 200
+        SaveCSVFiles: True

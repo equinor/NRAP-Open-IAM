@@ -1,0 +1,129 @@
+# OpenIAM Control File Example 39b
+#
+# This example is similar to Control File example 39a, but it uses
+# spatially variable stratigraphy (the strikeAndDip option). The TTFD
+# plot type does not work with LookupTableStratigraphy.
+#
+# Because the units dip to the southwest here, the plume timing figures
+# will show an assymetry. Plumes will spread more easily to the northeast.
+# The depths of monitoring wells were chosen to decrease to the northeast.
+# To figure out the setup of monitoring well depths, one can first create a Stratigraphy
+# plot that exports .csv files (through the entry 'SaveCSVFiles: True') to
+# see how unit depths vary across the domain. Additionally, one can examine the
+# .csv files with plume timings and the x, y, and z grids - these files are
+# created by the TTFD plot entry if 'SaveCSVFiles' is set to True. When using
+# spatially uniform stratigraphy, separate .csv files are created for the x, y,
+# and z grid - results are evaluated at all combinations of the grid point values.
+# When using dipping stratigraphy, the z grid values vary with x and y, so
+# one file with all grid point combinations is created. Because it contains all
+# combinations of x, y, and z points, this file can be rather large (here, several Mb).
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex39b.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 50
+    TimeStep: 1
+    Analysis: forward
+    Components: [SimpleReservoir1, MultisegmentedWellbore1,
+                 FutureGen2AZMI1]
+    OutputDirectory: output/output_ex39b_{datetime}
+    Logging: Info
+#-------------------------------------------------
+Stratigraphy:
+    spatiallyVariable:
+        strikeAndDip:
+            strike: 135
+            dip: 30
+            dipDirection: SW
+            coordxRefPoint: 0
+            coordyRefPoint: 0
+    numberOfShaleLayers: 3
+    shale3Thickness: 365.0
+    shale2Thickness: 950.0
+    shale1Thickness: 750.0
+    aquifer2Thickness: 85
+    aquifer1Thickness: 85
+    reservoirThickness: 150
+#-------------------------------------------------
+SimpleReservoir1:
+    Type: SimpleReservoir
+    Parameters:
+        injRate: 10
+        logResPerm: -12
+        brineDensity: 1030.9
+        CO2Density: 775.0
+        brineViscosity: 7.5e-4
+        CO2Viscosity: 6.6e-5
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+MultisegmentedWellbore1:
+    Type: MultisegmentedWellbore
+    Connection: SimpleReservoir1
+    Number: 5
+    Locations:
+        coordx: [100, 200, 300, 400, 500]
+        coordy: [100, 200, 300, 400, 500]
+    Parameters:
+        wellRadius: 0.1
+        logAqu1Perm:
+            min: -15.89
+            max: -14.89
+            value: -15.39
+        logAqu2Perm:
+            vary: False
+            value: -13.05
+        logWellPerm:
+            min: -14.0
+            max: -11.0
+            value: -13.0
+        brineDensity: 1030.9
+        CO2Density: 775.0
+        brineViscosity: 7.5e-4
+        CO2Viscosity: 6.6e-5
+    Outputs: [CO2_aquifer1, CO2_aquifer2, CO2_atm,
+              brine_aquifer1, brine_aquifer2, brine_atm]
+#-------------------------------------------------
+FutureGen2AZMI1:
+    Type: FutureGen2AZMI
+    Connection: MultisegmentedWellbore1
+    AquiferName: aquifer1
+    Parameters:
+        aqu_thick: aquifer1Thickness
+        depth: shale2Depth
+        por: 0.18
+        log_permh: -13.0
+        log_aniso: 0.3
+        rel_vol_frac_calcite: 0.1
+    Outputs: [pH_volume, pH_dx, pH_dy, pH_dz]
+#-------------------------------------------------
+Plots:
+    Strat_Plot:
+        Stratigraphy:
+    TTFD_Plot:
+        TTFD:
+            FigureDPI: 300
+            PlumeType: pH
+            MonitoringLocations:
+                coordx: [125, 225, 325, 425]
+                coordy: [125, 225, 325, 425]
+                coordz: [-1325, -1250, -1170, -1080]
+                HorizontalWindow: 1
+                VerticalWindow: 5
+            PlotInjectionSites: True
+            SpecifyXandYLims:
+                xLims: [-75, 675]
+                yLims: [-75, 675]
+            NumZPointsWithinAquifers: 10
+            NumZPointsWithinShales: 3
+            xGridSpacing: 10
+            yGridSpacing: 10
+            SpecifyXandYGridLims:
+                gridXLims: [0, 650]
+                gridYLims: [0, 650]
+            WriteDreamOutput: False
+            SaveCSVFiles: True
+            ComponentNameList: [FutureGen2AZMI1]

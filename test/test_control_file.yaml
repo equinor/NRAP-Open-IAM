@@ -1,0 +1,123 @@
+#OpenIAM Test Control File
+#File used for testing. Do not modify this file!
+#Last Modified: March 7, 2018
+#-------------------------------------------------
+ModelParams:
+    EndTime: 5
+    TimeStep: 1.0
+    Analysis: forward
+    Components: [SimpleReservoir1,
+                 CementedWellbore1,
+                 CarbonateAquifer1,
+                 msw1,
+                 atmRom1]
+    OutputDirectory: test/test_output
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        min: 400.0
+        max: 550.0
+        value: 405.0
+    shale2Thickness:
+        min: 450.0
+        max: 500.0
+        value: 475.0
+    shale3Thickness:
+        vary: False
+        value: 11.2
+    aquifer1Thickness:
+        vary: False
+        value: 142.4
+    aquifer2Thickness:
+        vary: False
+        value: 19.2
+    reservoirThickness:
+        vary: False
+        value: 51.2
+    datumPressure:
+        vary: False
+        value: 101325.0
+#-------------------------------------------------
+# SimpleReservoir1 is a user defined name for component
+# the type SimpleReservoir is the ROM model name
+#-------------------------------------------------
+SimpleReservoir1:
+    Type: SimpleReservoir
+    Parameters:
+    Outputs: [pressure,
+              CO2saturation]
+CementedWellbore1:
+    Type: CementedWellbore
+    Connection: SimpleReservoir1
+    Locations:
+        coordx: [100]
+        coordy: [100]
+    Parameters:
+        logWellPerm:
+            min: -14.0
+            max: -12.0
+            value: -13.0
+    Outputs: [CO2_aquifer1,
+              CO2_aquifer2,
+              CO2_atm,
+              brine_aquifer1,
+              brine_aquifer2]
+# Setup of Carbonate Aquifer component
+CarbonateAquifer1:
+    Type: CarbonateAquifer
+    Connection: CementedWellbore1
+    AquiferName: aquifer1
+    Outputs: [TDS_volume]
+msw1:
+    Type: MultisegmentedWellbore
+    Locations:
+        coordx: [200]
+        coordy: [200]
+    Parameters:
+        logWellPerm:
+            min: -14.0
+            max: -11.0
+            value: -13.5
+    DynamicParameters:
+        pressure: [27119928.57,
+                   33166857.14,
+                   34104428.57,
+                   34160928.57,
+                   34088642.86,
+                   33982357.14]
+        CO2saturation: [0.,
+                        0.34310857,
+                        0.45430571,
+                        0.47404286,
+                        0.48760786,
+                        0.50069071]
+    Outputs: [CO2_aquifer1,
+              brine_aquifer1]
+atmRom1:
+    Type: AtmosphericROM
+    Locations:
+        coordx: [100, 200]
+        coordy: [100, 200]
+    x_receptor: [100, 120]
+    y_receptor: [100, 100]
+    Parameters:
+        T_amb: 25.0
+        P_amb:
+            min: 0.9
+            max: 1.08
+            value: 0.9869233
+        V_wind:
+            min: 3.3
+            max: 15.5
+            value: 5.0
+        C0_critical: 0.02
+        T_source: 25.0
+    DynamicParameters:
+        co2_leakrate: [[5.0, 5.5], [6.0, 6.0], [7.0, 7.5], [7.0, 7.5],
+                        [7.5, 8.0], [8.0, 8.0]]
+    Outputs: ['critical_distance']
+Plots:
+    Plot1:
+        TimeSeries: [CO2_aquifer1, CO2_aquifer2]

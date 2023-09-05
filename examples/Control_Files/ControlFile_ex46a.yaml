@@ -1,0 +1,113 @@
+# OpenIAM Control File Example 46a
+#
+# This example demonstrates the use of the TheisReservoir component
+# with multiple injection and extraction wells (i.e., positive vs. negative
+# injRates). Note that this control file was created to be somewhat equivalent
+# to the script example iam_sys_theis_4inj.py: one the locations of interest
+# (500, 500) is setup the same as in the mentioned script.
+#
+# The injRates and injTimes are presented here as a lists containing lists.
+# Each injRates and injTimes list corresponds to the well in the same position
+# as in the InjectionWell list. For example, the first injRate list represents
+# the rates for the well at the first InjectionWell coordx and coordy entry
+# (x = 739 m, y = 423 m). Although in this example each injTimes list
+# is the same, each well still needs its own injTimes list.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex46a.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 0.03011635   # 11 days as a fraction of a year
+    TimeStep: 0.00273785  # 1 day as a fraction of a year
+    Analysis: forward
+    Components: [TheisReservoir1]
+    OutputDirectory: output/output_ex46a_{datetime}
+    OutputType: 1  # 0 - row-wise; 1 - column-wise
+    GenerateOutputFiles: True
+    GenerateCombOutputFile: False
+    GenerateStatFiles: True
+    GenerateSystemPrintFile: True        # mainly for debugging and information purposes
+    GenerateComponentsPrintFiles: True   # mainly for debugging and information purposes
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        vary: False
+        value: 250.0
+    shale2Thickness:
+        vary: False
+        value: 250.0
+    shale3Thickness:
+        vary: False
+        value: 250.0
+    aquifer1Thickness:
+        vary: False
+        value: 100.0
+    aquifer2Thickness:
+        vary: False
+        value: 100.0
+    reservoirThickness:
+        vary: False
+        value: 30.0
+#-------------------------------------------------
+TheisReservoir1:
+    Type: TheisReservoir
+    InjectionWell:
+        coordx: [739, 584, 287, 519]
+        coordy: [423, 822, 333, 856]
+    Locations:
+        coordx: [500, 300]
+        coordy: [500, 200]
+    # injRates is given in m^3/s
+    injRates: [[5.0e-3, 6.0e-3, 7.0e-3, 8.0e-3, 0, 0, 0, 0, 0, 0, 0, 0],     # This list is for the injection well at x = 739 m, y = 423 m
+               [-5.0e-3, -6.0e-3, -7.0e-3, -8.0e-3, 0, 0, 0, 0, 0, 0, 0, 0], # This list is for the injection well at x = 584 m, y = 822 m
+               [1.0e-2, 1.2e-2, 1.4e-2, 1.6e-2, 0, 0, 0, 0, 0, 0, 0, 0],     # This list is for the injection well at x = 287 m, y = 333 m
+               [-1.0e-2, -1.2e-2, -1.4e-2, -1.6e-2, 0, 0, 0, 0, 0, 0, 0, 0]] # This list is for the injection well at x = 519 m, y = 856 m
+    # injTimes are given in years. Here, the times range from 0 to 11 days
+    # in increments of 1 day = 1 / 365.25 years
+    injTimes: [[0, 0.002737851, 0.005475702, 0.008213552, 0.010951403,
+                0.013689254, 0.016427105, 0.019164956, 0.021902806, 0.024640657,
+                0.027378508, 0.030116359],
+               [0, 0.002737851, 0.005475702, 0.008213552, 0.010951403,
+                0.013689254, 0.016427105, 0.019164956, 0.021902806, 0.024640657,
+                0.027378508, 0.030116359],
+               [0, 0.002737851, 0.005475702, 0.008213552, 0.010951403,
+                0.013689254, 0.016427105, 0.019164956, 0.021902806, 0.024640657,
+                0.027378508, 0.030116359],
+               [0, 0.002737851, 0.005475702, 0.008213552, 0.010951403,
+               0.013689254, 0.016427105, 0.019164956, 0.021902806, 0.024640657,
+               0.027378508, 0.030116359]]
+    Parameters:
+        # reservoirThickness parameter of reservoir component is linked to stratigraphy
+        initialPressure:
+            value: 1.0e+6
+            vary: False
+        logResPerm:
+            value: -10.69897
+            vary: False
+        reservoirPorosity:
+            value: 0.2
+            vary: False
+        brineDensity:
+            value: 1000
+            vary: False
+        brineViscosity:
+            value: 2.535e-3
+            vary: False
+        CO2Density:
+            value: 800
+            vary: False
+        compressibility:
+            value: 2.46e-9
+            vary: False
+    Outputs: [pressure]
+#-------------------------------------------------
+Plots:
+    Figure1:
+        TimeSeries: [pressure]
+        UseMarkers: True
+        FigureDPI: 150

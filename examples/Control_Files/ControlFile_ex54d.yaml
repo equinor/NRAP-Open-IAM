@@ -1,0 +1,166 @@
+# OpenIAM Control File Example 54d
+#
+# This example is similar to Control File example 54a, but it uses
+# Latin Hypercube Sampling (lhs). Each GriddedRadialMetric entry can only handle
+# one realization at a time, however, and one can specify the realization
+# with the Realization entry. Note that the Realization entry follows
+# the indexing rules used by Python, so index 0 corresponds to the first
+# realization. Here, the three GriddedRadialMetric plot entries have 'Realization'
+# values of 0, 1, and 2, so the results for the 1st, 2nd, and 3rd realizations
+# (out of 30) will be displayed.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex54d.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 10.
+    TimeStep: 1.
+    Analysis:
+        type: lhs
+        siz: 30
+    Components: [SimpleReservoir1, OpenWellbore1, GenericAquifer1]
+    OutputDirectory: output/output_ex54d_{datetime}
+    GenerateOutputFiles: False
+    GenerateCombOutputFile: False
+    Logging: Info
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        value: 750.0
+        vary: False
+    shale2Thickness:
+        value: 950.0
+        vary: False
+    shale3Thickness:
+        value: 200
+        vary: False
+    aquifer1Thickness:
+        vary: False
+        value: 200
+    aquifer2Thickness:
+        vary: False
+        value: 200
+    reservoirThickness:
+        vary: False
+        value: 150
+#-------------------------------------------------
+SimpleReservoir1:
+    Type: SimpleReservoir
+    Parameters:
+        injRate:
+            value: 0.1
+            vary: False
+        logResPerm:
+            value: -12.0
+            vary: False
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+OpenWellbore1:
+    Type: OpenWellbore
+    Connection: SimpleReservoir1
+    Locations:
+        coordx: [100]
+        coordy: [100]
+    LeakTo: aquifer2
+    Controls:
+        critPressureApproach: True
+    Parameters:
+        wellRadius:
+            value: 0.05
+            vary: False
+        logReservoirTransmissivity:
+            value: -10.97
+            vary: False
+        logAquiferTransmissivity:
+            value: -10
+            min: -10.5
+            max: -9.5
+        brineSalinity:
+            value: 0.2
+            vary: False
+        wellTop:
+            value: aquifer2Depth
+            vary: False
+        reservoirDepth:
+            value: shale1Depth
+            vary: False
+        brineDensity:
+            value: 1025
+            vary: False
+    Outputs: [CO2_aquifer,
+              brine_aquifer]
+#-------------------------------------------------
+GenericAquifer1:
+    Type: GenericAquifer
+    Connection: OpenWellbore1
+    AquiferName: aquifer2
+    Parameters:
+        por:
+            value: 0.1875
+            min: 0.125
+            max: 0.25
+        log_permh:
+            value: -12.30
+            min: -12.80
+            max: -11.80
+        log_aniso: 0.3
+        aqu_thick: aquifer2Thickness
+        top_depth: shale3Depth
+    Outputs: [Dissolved_salt_volume, Dissolved_CO2_volume,
+              r_coordinate, z_coordinate,                                 # gridded coordinates
+              Dissolved_CO2_mass_fraction, Dissolved_salt_mass_fraction]  # gridded observations
+#-------------------------------------------------
+Plots:
+    Gridded_salt_Mass_Frac_Sim1:
+        GriddedRadialMetric:
+            ComponentNameList: [GenericAquifer1]
+            MetricName: Dissolved_salt_mass_fraction
+            ZList: [-300] # middle of aquifer 2
+            TimeList: All
+            MinValue: 0.002
+            FigureDPI: 300
+            PlotInjectionSites: True
+            EqualAxes: True
+            DegreeInterval: 1
+            Realization: 0
+            SaveCSVFiles: True
+    Gridded_salt_Mass_Frac_Sim2:
+        GriddedRadialMetric:
+            ComponentNameList: [GenericAquifer1]
+            MetricName: Dissolved_salt_mass_fraction
+            ZList: [-300] # middle of aquifer 2
+            TimeList: All
+            MinValue: 0.002
+            FigureDPI: 300
+            PlotInjectionSites: True
+            EqualAxes: True
+            DegreeInterval: 1
+            Realization: 1
+            SaveCSVFiles: True
+    Gridded_salt_Mass_Frac_Sim3:
+        GriddedRadialMetric:
+            ComponentNameList: [GenericAquifer1]
+            MetricName: Dissolved_salt_mass_fraction
+            ZList: [-300] # middle of aquifer 2
+            TimeList: All
+            MinValue: 0.002
+            FigureDPI: 300
+            PlotInjectionSites: True
+            EqualAxes: True
+            DegreeInterval: 1
+            Realization: 2
+            SaveCSVFiles: True
+    pressure_plot:
+        TimeSeries: [pressure]
+    saturation_plot:
+        TimeSeries: [CO2saturation]
+    salt_volume:
+        TimeSeries: [Dissolved_salt_volume]
+    CO2_volume:
+        TimeSeries: [Dissolved_CO2_volume]

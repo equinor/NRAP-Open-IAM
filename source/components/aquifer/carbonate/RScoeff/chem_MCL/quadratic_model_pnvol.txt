@@ -1,0 +1,178 @@
+*************************************************************
+*      Welcome to PSUADE (version 1.4e)
+*************************************************************
+PSUADE - A Problem Solving environment for 
+         Uncertainty Analysis and Design Exploration
+(for help, enter <help>)
+=============================================================
+psuade> psuade printlevel set to 4
+psuade> load complete : nSamples = 10647
+                nInputs  = 22
+                nOutputs = 1
+psuade> -------------------------------------------------------------
+Available response surface tools: 
+-------------------------------------------------------------
+Expert advices: 
+ MARS - may have accuracy problem near domain boundary. Use
+   this option if sample size is sufficiently large (>100).
+ LINEAR, QUADRATIC, CUBIC, QUARTIC - good for small sample
+   sizes; and when the function is sufficiently smooth.
+   For higher than fourth order, use LEGENDRE (option 15) with
+   response surface expert mode turned on to select order.
+ SELECTIVE POLYNOMIAL REGRESSION - for high order polynomials
+   but your sample size is too small. (So you select certain
+   terms, provided you know which ones.)
+ SVM - provides 3 options: turn on rs_expert to select. Also,
+   use svmfind to search for best settings.
+ BOOTSTRAPPED MARS - intended to be used with adaptive sample
+   refinement, which adds more sample points near the boundary
+   of the parameter space.
+ SUM-OF-TREES REGRESSION - usually gives non-smooth response
+   responses. It is provided here for completeness, but is not
+   generally recommended.
+ SPARSE GRID REGRESSION - has to use sparse grid designs. Also,
+   you cannot use cross validation on sparse grid regression.
+   Use a test set (rstest) to validate your response surface.
+-------------------------------------------------------------
+0. MARS 
+1. Linear regression 
+2. Quadratic regression 
+3. Cubic regression 
+4. Quartic regression 
+6. Selective polynomial regression 
+9. SVM-light (Joachims)
+10. Piecewise-linear model
+12. MARS with bootstrap aggregating (bagging)
+14. Sum-of-trees model
+15. Legendre polynomial regression
+16. User-defined (nonpolynomial) regression
+17. Sparse Grid polynomial regression
+Enter your choice ? No transformation (e.g. log) on sample inputs nor outputs.
+RSFuncApprox INFO: some inputs have non-uniform PDFs, but
+                   they will not be relevant in this analysis.
+*************************************************************
+Quadratic regression model
+=============================================================
+RSFA: Output ID = 1
+RSFA: Output Maximum/Minimum =   0.000000e+00  -0.000000e+00
+INFO: Turn on analysis expert mode to perform cross validation.
+INFO: Set printlevel higher (1-4) to display more information.
+INFO: Set print level to 4 for interpolation error graphics file.
+INFO: Set analysis expert mode to perform cross validation.
+*************************************************************
+*             Quadratic Regression Analysis
+* R-squared gives a measure of the goodness of the model.
+* R-squared should be close to 1 if it is a good model.
+* TURN ON rs_expert mode to output regression matrix.
+* TURN ON rs_expert mode to condition covariance matrix.
+* SET print level to 5 to output regression error splot.
+* SET print level to 4 to output data standard deviations.
+-------------------------------------------------------------
+* Suggestion: if your parameter ranges are too high, SCALE
+*             them first using 'irerange' command in PSUADE
+*             command line mode.
+=============================================================
+Running SVD ...
+SVD completed: status = 0 (should be 0).
+* Regression:: LS average error =  0.0000e+00 (Ymax= 0.00e+00)
+* ======== Note: entries with t-value < 1 suppressed ========
+*                  coefficient   std. error   t-value
+* Input   1     =   0.0000e+00   0.0000e+00   0.0000e+00
+* Input   2     =   0.0000e+00   0.0000e+00   0.0000e+00
+* Input   3     =   0.0000e+00   0.0000e+00   0.0000e+00
+* Input   4     =   0.0000e+00   0.0000e+00   0.0000e+00
+* Input   5     =   0.0000e+00   0.0000e+00   0.0000e+00
+* Input   6     =   0.0000e+00   0.0000e+00   0.0000e+00
+* Input   7     =   0.0000e+00   0.0000e+00   0.0000e+00
+* Input   8     =   0.0000e+00   0.0000e+00   0.0000e+00
+* Input   9     =   0.0000e+00   0.0000e+00   0.0000e+00
+* Input  10     =   0.0000e+00   0.0000e+00   0.0000e+00
+* Input  11     =   0.0000e+00   0.0000e+00   0.0000e+00
+* Input  12     =   0.0000e+00   0.0000e+00   0.0000e+00
+* Input  13     =   0.0000e+00   0.0000e+00   0.0000e+00
+* Input  14     =   0.0000e+00   0.0000e+00   0.0000e+00
+* Input  15     =   0.0000e+00   0.0000e+00   0.0000e+00
+* Input  16     =   0.0000e+00   0.0000e+00   0.0000e+00
+* Input  17     =   0.0000e+00   0.0000e+00   0.0000e+00
+* Input  18     =   0.0000e+00   0.0000e+00   0.0000e+00
+* Input  19     =   0.0000e+00   0.0000e+00   0.0000e+00
+* Input  20     =   0.0000e+00   0.0000e+00   0.0000e+00
+* Input  21     =   0.0000e+00   0.0000e+00   0.0000e+00
+* Input  22     =   0.0000e+00   0.0000e+00   0.0000e+00
+-------------------------------------------------------------
+FILE dataVariance2 contains output data standard errors.
+* Regression R-square =          nan
+* adjusted   R-square =          nan
+*************************************************************
+*       Standardized Regression Coefficients (SRC)
+* When R-square is acceptable (order assumption holds), the
+* absolute values of SRCs provide variable importance.
+=============================================================
+* based on nSamples = 10647
+* Input   1     =          nan
+* Input   2     =          nan
+* Input   3     =          nan
+* Input   4     =          nan
+* Input   5     =          nan
+* Input   6     =          nan
+* Input   7     =          nan
+* Input   8     =          nan
+* Input   9     =          nan
+* Input  10     =          nan
+* Input  11     =          nan
+* Input  12     =          nan
+* Input  13     =          nan
+* Input  14     =          nan
+* Input  15     =          nan
+* Input  16     =          nan
+* Input  17     =          nan
+* Input  18     =          nan
+* Input  19     =          nan
+* Input  20     =          nan
+* Input  21     =          nan
+* Input  22     =          nan
+-------------------------------------------------------------
+*    ordered list of SRCs
+-------------------------------------------------------------
+* Input  22     =          nan
+* Input   5     =          nan
+* Input  21     =          nan
+* Input   9     =          nan
+* Input  20     =          nan
+* Input   1     =          nan
+* Input  19     =          nan
+* Input   7     =          nan
+* Input  18     =          nan
+* Input   3     =          nan
+* Input  17     =          nan
+* Input  10     =          nan
+* Input  16     =          nan
+* Input   8     =          nan
+* Input  15     =          nan
+* Input   6     =          nan
+* Input  14     =          nan
+* Input   4     =          nan
+* Input  13     =          nan
+* Input   2     =          nan
+* Input  12     =          nan
+* Input  11     =          nan
+*************************************************************
+RSFA: L  0: interpolation error on training set 
+             avg error far from 0 ==> systematic bias.
+             rms error large      ==> average   error large.
+             max error large      ==> pointwise error large.
+             R-square may not always be a reliable measure.
+  avg error   =   0.000e+00 (unscaled)
+  avg error   =   0.000e+00 (scaled)
+  rms error   =   0.000e+00 (unscaled)
+  rms error   =   0.000e+00 (scaled)
+  max error   =   0.000e+00 (unscaled, BASE=0.000e+00)
+  max error   =   0.000e+00 (  scaled, BASE=0.000e+00)
+  R-square    =              nan
+Based on 10647 training points (total=10647).
+Interpolation error info are in psuade_rsfa_err.m
+*************************************************************
+AnalysisManager: analysis error =      nan <? 1.00e+00
+psuade> command 1 not recognized
+psuade> command 0 not recognized
+psuade> 

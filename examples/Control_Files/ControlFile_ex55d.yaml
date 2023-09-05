@@ -1,0 +1,86 @@
+# OpenIAM Control File Example 55d
+#
+# This example is similar to control file example 55b, but it uses the TimeList
+# option (under 'Workflow: Options:') for the area of review (AoR) Workflow.
+# Here, TimeList is given as 'All', specifying the use of all model times.
+# TimeList could be given as a list of specific years, however
+# (e.g., 'TimeList: [0, 1, 5, 10, 15 20]'). The TimeList provided will be used
+# by each of the four AoR plots made as well as the overall AoR Workflow plot
+# (i.e., the plot that reflects all metrics).
+#
+# This example requires the additional FutureGen 2.0 data set.
+# FutureGen 2.0 data set can be downloaded from the following source:
+# https://edx.netl.doe.gov/dataset/futuregen-2-0-1008-simulation-reservoir-lookup-table
+#
+# The downloaded data set should be placed here:
+#    source/components/reservoir/lookuptables/FutureGen2/1008_sims
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex55d.yaml
+#
+# Last Modified: July, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 20
+    TimeStep: 1.0
+    Analysis: forward
+    Components: []
+    OutputDirectory: 'output/output_ex55d_{datetime}'
+    GenerateOutputFiles: False
+    GenerateCombOutputFile: False
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    spatiallyVariable:
+        LookupTableStratigraphy:
+            FileName: 'stratigraphy.csv'
+            FileDirectory: 'examples/Control_Files/input_data/ex32b'
+            MaxPointDistance: 100
+#-------------------------------------------------
+Workflow:
+    Type: AoR
+    Options:
+        AoRFigureName: Overall_AoR_Plot.png
+        FigureDPI: 300
+        TimeList: All            # [0, 1, 5, 10, 15 20]
+        PlotInjectionSites: True
+        InjectionCoordx: 2.37e5
+        InjectionCoordy: 4.41e6
+        CriticalPressureMPa: Calculated
+        AutomateResCompSetup: True
+        AutomateWellCompSetup: True
+        AutomateAqCompSetup: True
+        AutomatePlotsSetup: True
+        ReservoirComponentType: LookupTableReservoir
+        ReservoirOptions:
+            FileDirectory: source/components/reservoir/lookuptables/FutureGen2/1008_sims
+            TimeFile: time_points.csv
+            ParameterFilename: parameters_and_filenames_trunc.csv
+            Interpolation2D: False
+            Parameters:
+                index: 1
+        WellboreComponentType: OpenWellbore
+        WellboreOptions:
+            Locations:
+                file: source/components/reservoir/lookuptables/FutureGen2/1008_sims/fg1.csv
+                read_z_values: True
+                thin_point_density: True
+                min_x_spacing: 10000
+                min_y_spacing: 10000
+            Controls:
+                critPressureApproach: True
+                enforceCritPressure: False
+            Parameters:
+                wellRadius: 0.05
+                logReservoirTransmissivity: -10.0
+                logAquiferTransmissivity: -10.0
+                brineSalinity: 0.0475
+                brineDensity: 1075
+        AquiferName: aquifer4
+        AquiferComponentType: FutureGen2Aquifer
+        AquiferOptions:
+            Parameters:
+                por: 0.18
+                log_permh: -11.92
+                log_aniso: 0.3
+                rel_vol_frac_calcite: 0.01

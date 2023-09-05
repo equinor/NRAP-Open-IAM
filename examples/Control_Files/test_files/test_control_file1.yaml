@@ -1,0 +1,75 @@
+# Control File for the script test_file1_script_vs_controlfile.py.py
+# from the folder examples/scripts/test_files
+#-------------------------------------------------
+ModelParams:
+    EndTime: 100
+    TimeStep: 1.0
+    Analysis: forward
+    Components: [msw1,
+                 SimpleReservoir1]
+    OutputDirectory: output/CF_Output
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        vary: False
+        value: 200.0
+    aquifer1Thickness:
+        vary: False
+        value: 200.0
+    aquifer2Thickness:
+        vary: False
+        value: 200.0
+    shale2Thickness:
+        vary: False
+        value: 200.0
+    shale3Thickness:
+        vary: False
+        value: 200.0
+    reservoirThickness:
+        vary: False
+        value: 200.0
+#-------------------------------------------------
+# SimpleReservoir1 is a user defined name for component
+# the type SimpleReservoir is the ROM model name
+#-------------------------------------------------
+SimpleReservoir1:
+    Type: SimpleReservoir
+    Parameters:
+        injRate:
+            value: 1.0
+            vary: False
+        logResPerm:
+            value: -12.0
+            vary: False
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+msw1:
+    Type: MultisegmentedWellbore
+    Locations:
+        coordx: [100]
+        coordy: [100]
+    Connection: SimpleReservoir1
+    Parameters:
+        wellRadius:
+            value: 0.05
+            vary: False
+        logWellPerm:
+            value: -13.0
+            vary: False
+    Outputs: [CO2_aquifer1,
+              CO2_aquifer2,
+              brine_aquifer1,
+              brine_aquifer2]
+#-------------------------------------------------
+Plots:
+    Pressure:
+        TimeSeries: [pressure]
+    CO2saturation:
+        TimeSeries: [CO2saturation]
+    CO2_Leakage:
+        TimeSeries: [CO2_aquifer1, CO2_aquifer2]
+    Brine_Leakage:
+        TimeSeries: [brine_aquifer1, brine_aquifer2]

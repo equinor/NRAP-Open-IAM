@@ -1,0 +1,186 @@
+# OpenIAM Control File Example 32a
+#
+# This example demonstrates the use of the AoR plot type for 3-dimensional
+# LookupTableReservoir data.
+#
+# To use the AoR plot, you must have OpenWellbores distributed across
+# the area of interest. There are multiple ways of doing that, and this example uses
+# the file and lutr_points option. This option uses the x-, y-, and z-values
+# from the lookup table for LookupTableReservoir. To use the z-values in the table,
+# 'Interpolation2D' within the LookupTableReservoir should not be set to False.
+# It does not need to be set to True, however, it just needs to be ommitted.
+# One might want to use the points from the tables if the reservoir's dip
+# causes variations in the z-values. It might be difficult to correctly capture
+# the variation in z-values with the range option for the locations of OpenWellbores.
+#
+# Note that having 'GenerateOutputFiles: False' and 'GenerateCombOutputFile: False'
+# within the ModelParams section will prevent the creation of individual output
+# and combined outputs files. The combined outputs files can be large
+# due to the large number of components used. In this example there is
+# one LookupTableReservoir, OpenWellbore, and FutureGen2Aquifer
+# created for each x and y value specified with the 'file' option,
+# and an output file would be created for each OpenWellbore and FutureGen2Aquifer.
+# Additionally, if SaveCSVFiles is set to True the AoR plot type creates a .csv
+# file with the data used for the plot, and this csv file is much smaller than
+# the combined and individual output files. If SaveCSVFiles is not entered, the
+# default setting is True.
+#
+# Both wellTop (in the OpenWellbore component) and depth (within
+# the FutureGen2Aquifer component) should reflect the depth to the
+# bottom of the aquifer being examined for the AoR (here, aquifer 2).
+#
+# Note that when a LookupTableReservoir component is used and an AoR plot is
+# set up with PlotInjectionSites: True, both InjectionCoordx and InjectionCoordy
+# must be included for the injection site to be plotted. InjectionCoordx
+# and InjectionCoordy are not required for AoR plots when using another type
+# of reservoir component (e.g., SimpleReservoir) because those components
+# have injX and injY values tied to them.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex32a.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 20
+    TimeStep: 1.0
+    Analysis: forward
+    Components: [LookupTableReservoir1, OpenWellbore1, FutureGen2Aquifer1]
+    OutputDirectory: 'output/output_ex32a_{datetime}'
+    GenerateOutputFiles: False
+    GenerateCombOutputFile: True
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        value: 5
+        vary: False
+    shale1Thickness:
+        value: 198.7
+        vary: False
+    shale2Thickness:
+        value: 74.4
+        vary: False
+    shale3Thickness:
+        value: 110.3
+        vary: False
+    shale4Thickness:
+        value: 118.9
+        vary: False
+    shale5Thickness:
+        value: 418.71
+        vary: False
+    aquifer1Thickness:
+        value: 33.2
+        vary: False
+    aquifer2Thickness:
+        value: 84.1
+        vary: False
+    aquifer3Thickness:
+        value: 31.1
+        vary: False
+    aquifer4Thickness:
+        value: 61.6
+        vary: False
+    reservoirThickness:
+        value: 7.0
+        vary: False
+#-------------------------------------------------
+LookupTableReservoir1:
+    Type: LookupTableReservoir
+    FileDirectory: source/components/reservoir/lookuptables/FutureGen2/1008_sims
+    TimeFile: time_points.csv
+    ParameterFilename: parameters_and_filenames_trunc.csv
+    Interpolation2D: False
+    Parameters:
+        index: 1
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+OpenWellbore1:
+    Type: OpenWellbore
+    Connection: LookupTableReservoir1
+    Locations:
+        file: source/components/reservoir/lookuptables/FutureGen2/1008_sims/fg1.csv
+        read_z_values: True
+        thin_point_density: True
+        min_x_spacing: 10000
+        min_y_spacing: 10000
+    LeakTo: aquifer4
+    Controls:
+        critPressureApproach: True
+    Parameters:
+        wellRadius:
+            value: 0.05
+            vary: False
+        logReservoirTransmissivity:
+            value: -10.0
+            vary: False
+        logAquiferTransmissivity:
+            value: -10.0
+            vary: False
+        brineSalinity:
+            value: 0.0475
+            vary: False
+        brineDensity:
+            value: 1075
+            vary: False
+        # Parameters wellTop (480.31 m) and reservoirDepth (1131.01 m) are linked
+        # to stratigraphy (if the LeakTo parameter is set up to the right aquifer)
+        # and don't need to be set explicitly in a forward model unless different
+        # values are required.
+    Outputs: [CO2_aquifer,
+              brine_aquifer]
+#-------------------------------------------------
+FutureGen2Aquifer1:
+    Type: FutureGen2Aquifer
+    Connection: OpenWellbore1
+    AquiferName: aquifer4
+    Parameters:
+        # Parameters aqu_thick (61.6 m) and depth (418.71 m) are linked
+        # to stratigraphy and don't require to be setup explicitily unless
+        # different value of the parameter is required.
+        por:
+            value: 0.18
+            vary: False
+        log_permh:
+            value: -11.92
+            vary: False
+        log_aniso:
+            value: 0.3
+            vary: False
+        rel_vol_frac_calcite:
+            value: 0.01
+            vary: False
+    Outputs: [pH_volume, TDS_volume]
+#-------------------------------------------------
+Plots:
+    Plot1:
+        AoR: [pressure]
+        PlotInjectionSites: True
+        InjectionCoordx: 2.37e5
+        InjectionCoordy: 4.41e6
+        FigureDPI: 200
+        SaveCSVFiles: True
+        CriticalPressureMPa: Calculated
+    Plot2:
+        AoR: [CO2saturation]
+        PlotInjectionSites: True
+        InjectionCoordx: 2.37e5
+        InjectionCoordy: 4.41e6
+        FigureDPI: 200
+        SaveCSVFiles: False
+    Plot3:
+        AoR: [pH_volume]
+        PlotInjectionSites: True
+        InjectionCoordx: 2.37e5
+        InjectionCoordy: 4.41e6
+        FigureDPI: 200
+        SaveCSVFiles: True
+    Plot4:
+        AoR: [TDS_volume]
+        PlotInjectionSites: True
+        InjectionCoordx: 2.37e5
+        InjectionCoordy: 4.41e6
+        FigureDPI: 200
+        SaveCSVFiles: True

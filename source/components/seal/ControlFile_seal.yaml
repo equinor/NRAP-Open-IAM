@@ -1,0 +1,98 @@
+---
+# Seal_Model Input - Simple Example  #1 - w. Re-ordered parameters.
+# Last Modified: 29 June 2022  (97 lines)
+# Author: E.N. Lindner
+# -----------------------------------------------------------------------------
+ModelParams:
+    runTitle: Seal Model - Simple Model >1   # analysis title
+    useSI: Metric                            # Metric/English for output
+    startTime: {valu: 0.0, unit: yrs}        # start sequence
+    endTime: {valu: 50.0, unit: yrs}         # end sequence
+    timePoints: 5                            # (int) time points
+    realizations: 5                          # Simulation cycles
+    timeInput: Yes                           # Yes/No; Yes = from File
+    totalInject: {valu: 5.0e+05, unit: tonne}
+OutputDirectory: seal_output                 # Output directory
+Description:
+    numCells: 1                                   # number of cells
+    area: {valu: 10000.0, unit: m^2}              # average area of cell
+    salinity: {valu: 0.0, unit: ppm}              # parts per million
+    aveTemperature: {valu: 47.25, unit: oC}       # temperature at depth
+    aveBaseDepth: { valu: 1100.0, unit: m }       # Seal base depth
+    aveBasePressure: { valu: 3.30e+7, unit: Pa }  # During injection
+    staticDepth: {valu: 900.0, unit: m}           # Reference depth below grade
+    staticPressure: {valu: 9.477e+6, unit: Pa}    # Reference pressure
+Grid:
+    gridApproach: No                         # Yes/No; Yes = cells use grid
+    gridRows: 1                              # Y-axis divisions for grid
+    gridColumns: 1                           # X-axis divisions for grid
+    cellHeight: {valu: 100, unit: m}          # Ave. N-S (Y-axis)
+    cellWidth: {valu: 100, unit: m}           # Ave. E-W (X-axis)
+Conditions:
+    CO2Density: {valu: 687.59, unit: kg/m^3}          # CO2 density
+    CO2Viscosity: {valu: 5.5074e-05, unit: Pa*s}      # CO2 viscosity
+    brineDensity: {valu: 994.24, unit: kg/m^3}        # Brine density
+    brineViscosity: {valu: 5.4949e-4, unit: Pa*s}     # Brine viscosity
+    CO2Solubility: {valu: 0.0, unit: mol/kg}          # CO2 Solubility
+FileInput:
+    depthApproach: No           # Yes/No; Yes = Depths to cell base from file
+    layoutApproach: No          # Yes/No; Yes = Coordinates from file
+    areaApproach: No            # Yes/No: Yes = Area from file
+    upperBoundApproach: No      # Yes/No; Yes = Upper-bound pressure from file
+    activeCellsApproach: No     # Yes/No; Yes = Status from file
+    entryApproach: No           # Yes/No; Yes = Entry pressure from file
+    permApproach: No            # Yes/No; Yes = Permeability from file
+    thicknessApproach: No       # Yes/No; Yes = Input from File
+Controls:
+    fractureApproach: No        # Yes/No; Yes = Use fractures
+    correlateApproach: No       # Yes/No; Yes = Correlate entry press. w. perm.
+    interpolateApproach: No     # Yes/No; Yes = Interpolate fluid constants
+    initializeApproach: No      # Yes/No; Yes = initialize Model from file
+Thickness:
+    aveThickness: {valu: 100.0, unit: m}               # Thickness of Seal
+    stdDevThickness: {valu: 0.0, unit: m}              # Std Dev. of Thickness
+    minThickness: {valu: 99.0, unit: m}                # Minimum Seal Thickness
+    maxThickness: {valu: 101.0, unit: m}               # Maximum Seal Thickness
+Permeability:
+    avePermeability: {valu: 0.100007775, unit: mD}     # Perm. in microdarcy
+    stdDevPermeability: {valu: 0.0, unit: mD}          # Std Dev. of Perm.
+    minPermeability: {valu: 0.1, unit: mD}             # Min. Seal Permeability
+    maxPermeability: {valu: 0.101, unit: mD}           # Max. Seal Perm.
+    heterogeneityApproach: No                          # Yes/No; Yes = include
+    heterFactor: 1.0                                   # Heterogeneity factor
+RelativeFlowLimits:
+    relativeModel: BC                                  # Models: BC, LET
+    brineResSaturation: 0.15                           # Residual wetting
+    CO2ResSaturation: 0.0                              # Residual nonwetting
+    permRatio: 0.6                                     # Nonwetting/wetting
+CapillaryPressure:
+    entryPressure: {valu: 5000.0, unit: Pa}            # Threshold value
+BrooksCoreyModel:
+    lambda:  2.5                                       # relativeModel = BC
+LETModel:
+    wetting1: 1.0                                      # relativeModel = LET
+    wetting2: 10.0                                     # relativeModel = LET
+    wetting3: 1.25                                     # relativeModel = LET
+    nonwet1: 1.05                                      # relativeModel = LET
+    nonwet2: 3.50                                      # relativeModel = LET
+    nonwet3: 1.25                                      # relativeModel = LET
+LETCapillaryModel:
+    capillary1: 0.20                                   # relativeModel = LET
+    capillary2: 2.80                                   # relativeModel = LET
+    capillary3: 0.43                                   # relativeModel = LET
+    maxCapillary: {valu: 1.0e+07, unit: Pa}            # relativeModel = LET
+TimeModel:
+    influenceModel: 0           # Options: 0/1/2
+    influence: 1.0              # Initial influence factor 0 to 1
+    rateEffect: 0.1             # Time model -> Rate of effect
+    totalEffect: 0.1            # Time model -> Total effect as ratio
+    reactivity: 8.0             # Value 1 to 10
+    clayContent: 60.0           # percent
+    carbonateContent: 8.0       # percent (both contents add to 100%)
+    clayType: smectite          # Clay type; types: smectite/illite/chlorite
+SealPlots:
+    permeabilityPlot: No       # Yes/No; Yes = plot permeabilities
+    timeSeriesPlot: Yes        # Yes/No; Yes = plot time history
+    CO2ContourPlot: No         # Yes/No; Yes = contour CO2 release
+    maxDrawTime: {valu: 50.0, unit: yrs}    # Limit of plotted time axis
+### End

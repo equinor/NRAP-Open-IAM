@@ -1,0 +1,5 @@
+.. _benchmarks:
+
+***************
+Benchmark Tests
+***************

@@ -1,0 +1,18 @@
+clean:
+    cmd: [rm -f *.o *.mod atmdisrom.dll atmdisrom.dylib atmdisrom.so]
+objects: [AtmDisROM]
+windows: 
+    flags: 
+    comp_flags:
+    link_flags: -shared -static
+    library: atmdisrom.dll
+mac:
+    flags: 
+    comp_flags: 
+    link_flags: -dynamiclib
+    library: atmdisrom.dylib
+linux:
+    flags: -fpic
+    comp_flags:
+    link_flags: -shared
+    library: atmdisrom.so

@@ -1,0 +1,138 @@
+# OpenIAM Control File Example 8c
+#
+# This example applies the sensitivity analysis in the Analysis section
+# to dissolved salt and CO2 plumes from a FutureGen2Aquifer.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#  python ../../source/openiam/openiam_cf.py --file ControlFile_ex8c.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 50
+    TimeStep: 1.0
+    Analysis:
+        type: lhs
+        siz: 100
+    Components: [Reservoir1, Wellbore1, Aquifer1]
+    OutputDirectory: output/output_ex8c_{datetime}
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        value: 525.0
+        vary: False
+    shale2Thickness:
+        value: 750.0
+        vary: False
+    shale3Thickness:
+        value: 300.0
+        vary: False
+    aquifer1Thickness:
+        vary: False
+        value: 50.0
+    aquifer2Thickness:
+        vary: False
+        value: 75.0
+    reservoirThickness:
+        vary: False
+        value: 100.0
+#-------------------------------------------------
+Reservoir1:
+    Type: SimpleReservoir
+    Parameters:
+        injRate:
+            value: 0.1
+            vary: False
+        logResPerm:
+            value: -12
+            min: -12.5
+            max: -11.5
+    Outputs: [pressure, CO2saturation]
+#-------------------------------------------------
+Wellbore1:
+    Type: OpenWellbore
+    Connection: Reservoir1
+    Locations:
+        coordx: [500, 1000]
+        coordy: [500, 1000]
+    LeakTo: aquifer2
+    Parameters:
+        wellRadius:
+            value: 0.05
+            vary: False
+        logReservoirTransmissivity:
+            value: -9.83
+            min: -10.33
+            max: -9.33
+        logAquiferTransmissivity:
+            value: -9.83
+            min: -10.33
+            max: -9.33
+        brineSalinity:
+            value: 0.2
+            vary: False
+        wellTop:
+            value: 250
+            vary: False
+        reservoirDepth:
+            value: 2150
+            vary: False
+    Outputs: [CO2_aquifer, brine_aquifer]
+#-------------------------------------------------
+Aquifer1:
+    Type: FutureGen2Aquifer
+    Connection: Wellbore1
+    AquiferName: aquifer2
+    Parameters:
+        aqu_thick: 75
+        depth: 375
+        por:
+            value: 0.118
+            min: 0.093
+            max: 0.143
+        log_permh:
+            value: -13.39
+            min: -13.89
+            max: -12.89
+        log_aniso: 0.3
+        rel_vol_frac_calcite: 0.025
+    Outputs: [TDS_volume, pH_volume]
+#-------------------------------------------------
+Analysis:
+    CorrelationCoeff:
+        CorrelationType: pearson # (options: pearson or spearman)
+        # (default is the index for EndTime, can be a single value or a list)
+        OutputTimeIndex: 10      # Time Index to use for calculations
+        FigureDPI: 300
+        SaveCSVFiles: True
+        Excludes: [Reservoir1_000.CO2saturation,
+                   Reservoir1_001.CO2saturation]
+    SensitivityCoeff:
+        Outputs: [TDS_volume, pH_volume]
+        FigureDPI: 300
+        SaveCSVFiles: True
+        OutputTimeIndex: 10
+    StackedSensitivityBars:
+        Outputs: [TDS_volume, pH_volume]
+        FigureDPI: 300
+        SaveCSVFiles: True
+        OutputTimeIndex: 10
+    MultiSensitivities:
+        Outputs: [TDS_volume, pH_volume]
+        OutputTimeIndex: 10
+        FigureDPI: 300
+        SaveCSVFiles: True
+    TimeSeriesSensitivity:
+        Outputs: TDS_volume
+        FigureDPI: 300
+        SaveCSVFiles: True
+        NumberIncluded: 10   # default is 5
+Plots:
+    TDS_Plume_Stats:
+        TimeSeriesStats: [TDS_volume]
+    pH_Plume_Stats:
+        TimeSeriesStats: [pH_volume]

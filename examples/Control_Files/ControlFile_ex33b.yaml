@@ -1,0 +1,220 @@
+# OpenIAM Control File Example 33b
+#
+# This example is similar to Control File example 33a, but it includes optional
+# entries for the Stratigraphy and StratigraphicColumn plots.
+#
+# Plot1 includes entries that specify the colors to be
+# used for the reservoir, shales, and aquifers ('ReservoirColor',
+# 'ShaleColor', and 'AquiferColor', respecively). Colors can be provided
+# as a string (e.g., 'teal') or as a list of length three (e.g.,
+# [0.33, 0.33, 0.33], where the three values represent fractions of
+# red, green, and blue, respectively. Plot1 also includes entries
+# that specify the alpha value for the reservoir, shales, and aquifers
+# ('ReservoirAlpha', 'ShaleAlpha', and 'AquiferAlpha', respectively). Alpha
+# values control how translucent each three-dimensional surface will be
+# (1 is completely opaque, with values approaching 0 becoming more
+# translucent). The color for the wellbores is setup with the
+# 'WellColor' entry.
+#
+# Plot2 is similar, but instead it provides specific colors and alpha values
+# to each shale and aquifer. For example, the entries 'Aquifer2Color' and
+# 'Aquifer2Alpha' control the color and alpha values for aquifer 2. The entries
+# for a specific unit will always override entries that are more general in nature.
+# For example, if you provided 'ShaleColor: teal' and 'Shale2Color: red' then
+# shales 1 and 3 would be shown in teal, while shale 2 would be shown in red.
+# Plot 2 also includes labels for specific units. The label for the reservoir is
+# setup with the ReservoirLabel entry. The label for each shale and aquifer is
+# setup with 'Shale#Label' and 'Aquifer#Label' entries, respectively,
+# where # is the corresponding unit number. The label for each wellbore can be
+# enforced with the 'WellLabel' entry. If the 'WellLabel' entry is setup with
+# brackets ({}), then the location index of each well will be shown where the
+# brackets are located (e.g., 'WellLabel: Well {}' leads to labels like 'Well 0',
+# 'Well 1', 'Well 2', etc.). If no brackets are included, then whatever is given
+# for WellLabel will be shown besides each wellbore (unless 'PlotWellLabels' is
+# set to False - then no labels will be shown).
+#
+# The color, alpha, and label entries for reservoirs, shales, and aquifers are
+# also accepted by the StratigraphicColumn plot type. Plot3 and Plot4 demonstrate
+# the use of these entries with the StratigraphicColumn plot type. The default
+# labels for each unit include the unit thickness (in meters), but the labels
+# provided could also include unit thicknesses. Unit depths are also shown with
+# text in StratigraphicColumn figures - the text for depths can be disabled by
+# setting the optional entry DepthText to False (shown in Plot4).
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex33b.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 50
+    TimeStep: 1.0
+    Analysis: forward
+    Components: [SimpleReservoir1, OpenWellbore1]
+    OutputDirectory: output/output_ex33b_{datetime}
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    spatiallyVariable:
+        strikeAndDip:
+            strike: 315
+            dip: 5
+            dipDirection: NE
+            coordxRefPoint: 1200
+            coordyRefPoint: 1200
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        value: 750.0
+        vary: False
+    shale2Thickness:
+        value: 950.0
+        vary: False
+    shale3Thickness:
+        value: 200
+        vary: False
+    aquifer1Thickness:
+        vary: False
+        value: 200
+    aquifer2Thickness:
+        vary: False
+        value: 200
+    reservoirThickness:
+        vary: False
+        value: 150
+#-------------------------------------------------
+SimpleReservoir1:
+    Type: SimpleReservoir
+    Parameters:
+        injRate:
+            value: 1
+            vary: False
+        logResPerm:
+            value: -10.15
+            vary: False
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+OpenWellbore1:
+    Type: OpenWellbore
+    Connection: SimpleReservoir1
+    Locations:
+        coordx: [500, 1000, 1500, 2000]
+        coordy: [500, 1000, 1500, 2000]
+    LeakTo: aquifer2
+    Parameters:
+        wellRadius:
+            value: 0.05
+            vary: False
+        logReservoirTransmissivity:
+            value: -10.97
+            vary: False
+        logAquiferTransmissivity:
+            value: -10.0
+            vary: False
+        brineSalinity:
+            value: 0.2
+            vary: False
+        wellTop:
+            value: aquifer2Depth
+            vary: False
+        reservoirDepth:
+            value: shale1Depth
+            vary: False
+    Outputs: [CO2_aquifer,
+              brine_aquifer]
+#-------------------------------------------------
+Plots:
+    Plot1:
+        Stratigraphy:
+            ReservoirColor: darkmagenta
+            ShaleColor: olive
+            AquiferColor: mediumturquoise
+            WellColor: springgreen
+            ShaleAlpha: 0.45
+            AquiferAlpha: 0.4
+            ReservoirAlpha: 0.45
+            FigureDPI: 300
+            PlotWellbores: True
+            PlotWellLabels: True
+            PlotStratComponents: True
+            SaveCSVFiles: True
+            StrikeAndDipSymbol:
+                PlotSymbol: True
+                coordx: 1250
+                coordy: 1250
+                length: 150
+            View:
+                ViewAngleElevation: [10, 30]
+                ViewAngleAzimuth: [300, 300]
+    Plot2:
+        Stratigraphy:
+            Shale1Label: Lower Aquitard
+            Shale2Label: Middle Aquitard
+            Shale3Label: Upper Aquitard
+            Aquifer1Label: AZMI
+            Aquifer2Label: Freshwater Aquifer
+            ReservoirLabel: Storage Reservoir
+            WellLabel: Well {}
+            ReservoirColor: darkmagenta
+            Shale1Color: [0.33, 0.33, 0.33]
+            Shale2Color: olive
+            Shale3Color: rosybrown
+            Aquifer1Color: deeppink
+            Aquifer2Color: mediumturquoise
+            WellColor: orange
+            Shale1Alpha: 0.3
+            Shale2Alpha: 0.3
+            Shale3Alpha: 0.45
+            Aquifer1Alpha: 0.3
+            Aquifer2Alpha: 0.4
+            ReservoirAlpha: 0.45
+            FigureDPI: 300
+            PlotWellbores: True
+            PlotWellLabels: True
+            PlotStratComponents: True
+            SaveCSVFiles: True
+            StrikeAndDipSymbol:
+                PlotSymbol: True
+                coordx: 1250
+                coordy: 1250
+                length: 150
+            View:
+                ViewAngleElevation: [10, 30]
+                ViewAngleAzimuth: [300, 300]
+    Plot3:
+        StratigraphicColumn:
+            ReservoirColor: darkmagenta
+            ShaleColor: olive
+            AquiferColor: mediumturquoise
+            ShaleAlpha: 0.55
+            AquiferAlpha: 0.45
+            ReservoirAlpha: 0.45
+            FigureDPI: 300
+            XValue: 1000
+            YValue: 1000
+    Plot4:
+        StratigraphicColumn:
+            Shale1Label: Lower Aquitard
+            Shale2Label: Middle Aquitard
+            Shale3Label: Upper Aquitard
+            Aquifer1Label: AZMI
+            Aquifer2Label: Freshwater Aquifer
+            ReservoirLabel: Storage Reservoir
+            ReservoirColor: darkmagenta
+            Shale1Color: [0.33, 0.33, 0.33]
+            Shale2Color: olive
+            Shale3Color: rosybrown
+            Aquifer1Color: deeppink
+            Aquifer2Color: mediumturquoise
+            Shale1Alpha: 0.3
+            Shale2Alpha: 0.3
+            Shale3Alpha: 0.45
+            Aquifer1Alpha: 0.3
+            Aquifer2Alpha: 0.45
+            ReservoirAlpha: 0.45
+            FigureDPI: 300
+            XValue: 2000
+            YValue: 2000
+            DepthText: False

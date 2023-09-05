@@ -1,0 +1,73 @@
+ModelParams:
+  Analysis: forward
+  Components: []
+  EndTime: 20
+  GenerateCombOutputFile: false
+  GenerateOutputFiles: false
+  OutputDirectory: output/JupyterNotebook_AoR_Workflow_LUTR_example
+  TimeStep: 1.0
+Stratigraphy:
+  spatiallyVariable:
+    LookupTableStratigraphy:
+      FileDirectory: examples/Control_Files/input_data/ex32b
+      FileName: stratigraphy.csv
+      MaxPointDistance: 1000
+Workflow:
+  Options:
+    AoRFigureName: Overall_AoR_Plot.tiff
+    AquiferComponentType: FutureGen2Aquifer
+    AquiferName: aquifer4
+    AquiferOptions:
+      Parameters:
+        depth: aquifer4Depth
+        log_aniso: 0.3
+        log_permh: -11.92
+        por: 0.18
+        rel_vol_frac_calcite: 0.01
+    CriticalPressureMPa: Calculated
+    FigureDPI: 300
+    InjectionCoordx: 2.37e5
+    InjectionCoordy: 4.41e6
+    PlotInjectionSites: true
+    ReservoirComponentType: LookupTableReservoir
+    ReservoirOptions:
+      FileDirectory: source/components/reservoir/lookuptables/FutureGen2/1008_sims
+      Interpolation2D: true
+      ParameterFilename: parameters_and_filenames_trunc.csv
+      Parameters:
+        index: 1
+      TimeFile: time_points.csv
+    TimeList:
+    - 0
+    - 1
+    - 5
+    - 10
+    - 15
+    - 20
+    WellboreComponentType: OpenWellbore
+    WellboreOptions:
+      Controls:
+        critPressureApproach: true
+        enforceCritPressure: false
+      Locations:
+        grid:
+          x:
+          - 207222.852
+          - 217720.8147
+          - 228689.9084
+          - 238815.372
+          - 250862.3802
+          y:
+          - 4380572.494
+          - 4391070.415
+          - 4402039.405
+          - 4412165.014
+          - 4424212.081
+          - 4439642.734
+      Parameters:
+        brineDensity: 1150
+        brineSalinity: 0.0475
+        logAquiferTransmissivity: -10.0
+        logReservoirTransmissivity: -10.0
+        wellRadius: 0.05
+  Type: AoR

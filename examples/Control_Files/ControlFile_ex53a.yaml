@@ -1,0 +1,104 @@
+# OpenIAM Control File Example 53a
+#
+# This example demonstrates setup of the Fault Leakage component
+# in a forward model.
+#
+# Note that FaultLeakage components cannot be linked to any other components.
+# In this example Stratigraphy is setup only for reference.
+# None of Stratigraphy parameters are used as input for the FaultLeakage
+# component.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex53a.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    # Time is in years
+    EndTime: 30
+    TimeStep: 1.5
+    Analysis: forward
+    Components: [FaultLeakage1]
+    OutputDirectory: output/output_ex53a_{datetime}
+    OutputType: 1  # 0 - row-wise; 1 - column-wise
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        vary: False
+        value: 100.0
+    shale2Thickness:
+        vary: False
+        value: 100.0
+    shale3Thickness:
+        vary: False
+        value: 100.0
+    aquifer1Thickness:
+        vary: False
+        value: 100.0
+    aquifer2Thickness:
+        vary: False
+        value: 200.0
+    reservoirThickness:
+        vary: False
+        value: 200.0
+#-------------------------------------------------
+FaultLeakage1:
+    Type: FaultLeakage
+    Parameters:
+        damage_zone_perm:
+            value: -13.0
+            vary: False
+        damage_zone_por:
+            value: 0.05
+            vary: False
+        shallow_aquifer_perm:
+            value: -13.0
+            vary: False
+        deep_aquifer_perm:
+            value: -12.0
+            vary: False
+        shallow_aquifer_por:
+            value: 0.3
+            vary: False
+        deep_aquifer_por:
+            value: 0.2
+            vary: False
+        well_index:
+            value: 0.0
+            vary: False
+        well_rate:
+            value: 20.0
+            vary: False
+        dip_angle:
+            value: 40.0
+            vary: False
+        injection_time:
+            value: 20.0
+            vary: False
+        geothermal_gradient:
+            value: 35.0
+            vary: False
+    Outputs: [CO2_aquifer, brine_aquifer, mass_CO2_aquifer, mass_brine_aquifer]
+#-------------------------------------------------
+Plots:
+    CO2_leakage:
+        TimeSeries: [CO2_aquifer]
+        FigureDPI: 100
+    brine_leakage:
+        TimeSeries: [brine_aquifer]
+        FigureDPI: 100
+    leakage_rates:
+        TimeSeries: [CO2_aquifer, brine_aquifer]
+        FigureDPI: 100
+        subplot:
+            use: True
+            ncols: 2
+    mass_leaked:
+        TimeSeries: [mass_CO2_aquifer, mass_brine_aquifer]
+        subplot:
+            use: True
+            ncols: 2

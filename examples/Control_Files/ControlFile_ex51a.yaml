@@ -1,0 +1,140 @@
+# OpenIAM Control File Example 51a
+#
+# This example illustrates a system model with an analytical reservoir component
+# providing pressure and CO2 saturation inputs for cemented wellbore (wr) components.
+# The setup is standard in a sense that aquifer 1 (deeper one) is a thief zone;
+# while aquifer 2 (under shale 3) is a shallow aquifer.
+# The example also illustrates the setup for a random placement of wells within
+# a specified domain (inputs under the 'RandomLocDomain' entry').
+#
+# The CementedWellboreWR component accepts a wider range (wr) of parameter values
+# in comparison with the CementedWellbore component - CementedWellboreWR is an updated
+# version of the CementedWellbore component.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#  python ../../source/openiam/openiam_cf.py --file ControlFile_ex51a.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 25
+    TimeStep: 1.0
+    Analysis: forward
+    Components: [Reservoir, Wellbore]
+    OutputDirectory: output/output_ex51a_{datetime}
+    Logging: Error
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness: 500.0
+    shale2Thickness: 450.0
+    shale3Thickness: 9.6
+    aquifer1Thickness: 55.0
+    aquifer2Thickness: 45.0
+    reservoirThickness: 75.0
+#-------------------------------------------------
+Reservoir:
+    Type: AnalyticalReservoir
+    InjectionWell:
+        coordx: 0
+        coordy: 0
+    Parameters:
+        injRate: 1.5
+        logResPerm: -12.5
+        reservoirRadius: 1000
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+Wellbore:
+    Type: CementedWellboreWR
+    Connection: Reservoir
+    Number: 6
+    Locations:
+        coordx: [440, 550]
+        coordy: [330, 480]
+    RandomLocDomain:
+        xmin: 350
+        xmax: 650
+        ymin: 200
+        ymax: 700
+    Parameters:
+        logWellPerm: -13.0
+        logThiefPerm: -13.0
+        wellRadius: 0.04
+    Outputs: [CO2_aquifer1,
+              CO2_aquifer2,
+              CO2_atm,
+              brine_aquifer1,
+              brine_aquifer2]
+#-------------------------------------------------
+Plots:
+    PressurePlot:
+        TimeSeries: [pressure]
+        Subplot:
+            NumCols: 2
+            Use: True
+            Reservoir_000.pressure: 'Pressure at location 1'
+            Reservoir_001.pressure: 'Pressure at location 2'
+            Reservoir_002.pressure: 'Pressure at location 3'
+            Reservoir_003.pressure: 'Pressure at location 4'
+            Reservoir_004.pressure: 'Pressure at location 5'
+            Reservoir_005.pressure: 'Pressure at location 6'
+        Title: Reservoir Pressure
+    SaturationPlot:
+        TimeSeries: [CO2saturation]
+        Subplot:
+            NumCols: 2
+            Use: True
+            Reservoir_000.CO2saturation: 'CO$_2$ saturation at location 1'
+            Reservoir_001.CO2saturation: 'CO$_2$ saturation at location 2'
+            Reservoir_002.CO2saturation: 'CO$_2$ saturation at location 3'
+            Reservoir_003.CO2saturation: 'CO$_2$ saturation at location 4'
+            Reservoir_004.CO2saturation: 'CO$_2$ saturation at location 5'
+            Reservoir_005.CO2saturation: 'CO$_2$ saturation at location 6'
+        Title: Reservoir CO2 saturation
+    CO2Leakage1:
+        TimeSeries: [CO2_aquifer1]
+        Subplot:
+            NumCols: 2
+            Use: True
+            Wellbore_000.CO2_aquifer1: 'Leakage to thief zone, known well 1'
+            Wellbore_001.CO2_aquifer1: 'Leakage to thief zone, known well 2'
+            Wellbore_002.CO2_aquifer1: 'Leakage to thief zone, random well 1'
+            Wellbore_003.CO2_aquifer1: 'Leakage to thief zone, random well 2'
+            Wellbore_004.CO2_aquifer1: 'Leakage to thief zone, random well 3'
+            Wellbore_005.CO2_aquifer1: 'Leakage to thief zone, random well 4'
+    BrineLeakage1:
+        TimeSeries: [brine_aquifer1]
+        Subplot:
+            NumCols: 2
+            Use: True
+            Wellbore_000.brine_aquifer1: 'Leakage to thief zone, known well 1'
+            Wellbore_001.brine_aquifer1: 'Leakage to thief zone, known well 2'
+            Wellbore_002.brine_aquifer1: 'Leakage to thief zone, random well 1'
+            Wellbore_003.brine_aquifer1: 'Leakage to thief zone, random well 2'
+            Wellbore_004.brine_aquifer1: 'Leakage to thief zone, random well 3'
+            Wellbore_005.brine_aquifer1: 'Leakage to thief zone, random well 4'
+    CO2Leakage2:
+        TimeSeries: [CO2_aquifer2]
+        Subplot:
+            NumCols: 2
+            Use: True
+            Wellbore_000.CO2_aquifer2: 'Leakage to aquifer, known well 1'
+            Wellbore_001.CO2_aquifer2: 'Leakage to aquifer, known well 2'
+            Wellbore_002.CO2_aquifer2: 'Leakage to aquifer, random well 1'
+            Wellbore_003.CO2_aquifer2: 'Leakage to aquifer, random well 2'
+            Wellbore_004.CO2_aquifer2: 'Leakage to aquifer, random well 3'
+            Wellbore_005.CO2_aquifer2: 'Leakage to aquifer, random well 4'
+    BrineLeakage2:
+        TimeSeries: [brine_aquifer2]
+        Subplot:
+            NumCols: 2
+            Use: True
+            Wellbore_000.brine_aquifer2: 'Leakage to aquifer, known well 1'
+            Wellbore_001.brine_aquifer2: 'Leakage to aquifer, known well 2'
+            Wellbore_002.brine_aquifer2: 'Leakage to aquifer, random well 1'
+            Wellbore_003.brine_aquifer2: 'Leakage to aquifer, random well 2'
+            Wellbore_004.brine_aquifer2: 'Leakage to aquifer, random well 3'
+            Wellbore_005.brine_aquifer2: 'Leakage to aquifer, random well 4'

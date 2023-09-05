@@ -1,0 +1,99 @@
+# OpenIAM Control File Example 12
+#
+# This example computes the flow rates of brine and CO2 to aquifer 1 utilizing
+# the generalized flow rate component (heuristic model). This component allows
+# the user to specify a mitigation time. After this time, the leakage is remediated
+# and both CO2 and brine leakage rates go to zero. Here, the parameter mitigationTime
+# is set to 45 years.
+#
+# To run this file, use the command (\ for Windows and / for Mac or Linux)
+#   python ../source/openiam/openiam_cf.py --file ControlFile_ex12.yaml
+# in the folder examples/Control_Files,
+# or command
+#   python openiam_cf.py --file ../../examples/Control_Files/ControlFile_ex12.yaml
+# in the folder source/openiam.
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 50
+    TimeStep: 1.0
+    Analysis: forward
+    Components: [FlowComponent1]
+    OutputDirectory: output/output_ex12_{datetime}
+    Logging: Info
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        vary: False
+        value: 525.0
+    shale2Thickness:
+        vary: False
+        value: 475.0
+    shale3Thickness:
+        vary: False
+        value: 11.2
+    aquifer1Thickness:
+        vary: False
+        value: 1.4
+    aquifer2Thickness:
+        vary: False
+        value: 19.2
+    reservoirThickness:
+        vary: False
+        value: 51.2
+#-------------------------------------------------
+# FlowComponent1 is a user defined name for component
+# of the type GeneralizedFlowRate
+#-------------------------------------------------
+FlowComponent1:
+    Type: GeneralizedFlowRate
+    LeakTo: aquifer1
+    Locations:
+        coordx: [120.0]
+        coordy: [245.0]
+    Parameters:
+        logPeakCO2Rate:
+            value: -4.0
+            vary: False
+        timePeakCO2Rate:
+            value: 10.0
+            vary: False
+        durationPeakCO2Rate:
+            value: 15.0
+            vary: False
+        durationPeakZeroCO2Rate:
+            value: 100.0
+            vary: False
+        logInitBrineRate:
+            value: -10.0
+            vary: False
+        logFinalBrineRate:
+            value: -11.5
+            vary: False
+        durationInitBrineRate:
+            value: 2.0
+            vary: False
+        durationInitFinalBrineRate:
+            value: 10.0
+            vary: False
+        mitigationTime:
+            value: 45.0
+            vary: False
+    Outputs: [CO2_aquifer1, brine_aquifer1,
+              mass_CO2_aquifer1, mass_brine_aquifer1]
+#-------------------------------------------------
+Plots:
+    fluid_masses:
+        TimeSeries: [mass_CO2_aquifer1, mass_brine_aquifer1]
+        Subplot:
+            Use: True
+            NumCols: 2
+    fluid_rates:
+        TimeSeries: [CO2_aquifer1, brine_aquifer1]
+        Subplot:
+            Use: True
+            NumCols: 2

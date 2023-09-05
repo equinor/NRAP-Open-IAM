@@ -1,0 +1,123 @@
+============================
+Installing Python on Windows
+============================
+
+These are the installation instructions for 64-bit Windows 10 operating system.
+
+Anaconda distribution of Python for Windows can be found here:
+https://www.anaconda.com/products/individual
+The general installation instructions for Windows are provided here:
+https://docs.anaconda.com/anaconda/install/windows/
+
+Note:
+If your computer has an already installed Python distribution/environment that
+is used for work with other tools, we recommend installing Anaconda to help
+with managing different environments.
+
+Note:
+In case you plan to use Python distribution only for working with NRAP-Open-IAM
+we suggest to uninstall any previously installed versions of Python and start
+from scratch.
+
+======================================
+Installation Instructions for Anaconda
+======================================
+
+Anaconda provides easily accessible functionality to have different versions
+of Python and its packages installed on the same computer within multiple conda
+environments.
+For all new and preexisting Anaconda distributions we recommend to create
+a separate conda environment to be used only for work with NRAP-Open-IAM.
+
+This
+ -- ensures that the existing environment will not be broken;
+ -- creates a possibility to test other Python tools without breaking
+ the environment created for NRAP-Open-IAM;
+ -- ensures that any future updates of the packages needed for the proper work
+ of the tools will be properly addressed.
+
+Steps 1 and 2 below can be skipped if you already have Anaconda installed on your computer.
+
+1. Download Anaconda installer file "Anaconda3-2021.11-Windows-x86_64.exe"
+from here: https://repo.anaconda.com/archive/
+
+2. Run Anaconda installer file "Anaconda3-2021.11-Windows-x86_64.exe" and
+choose the installation location in the folder for which you have writing
+permissions.
+ -- DO NOT install Anaconda to a directory path that contains spaces or
+ unicode characters.
+ -- DO NOT add Anaconda to your Path environment variable (unless you know that
+ you need it). Once the installation is done, you can start working on creating
+ an environment for NRAP-Open-IAM. (Official documentation for Anaconda
+ installation can be found here: https://docs.anaconda.com/anaconda/install/windows/)
+ -- You can register Anaconda3 as your default Python 3.9 if you are going
+ to use Python only for work with NRAP-Open-IAM.
+
+3. Find "Anaconda3 (64-bit)" submenu in Windows menu and choose "Anaconda Prompt"
+(or type "Anaconda Prompt" in the seach field in the lower left part of the
+screen). Anaconda prompt is similar to the Windows command prompt but it is
+provided specifically to manage Anaconda distribution.
+
+4. Create an environment which would contain all the Python packages needed
+for proper work of NRAP-Open-IAM.
+ -- Navigate to the folder "installers/Windows_10" in the Anaconda prompt
+ -- Type
+
+	conda create --name OpenIAMEnv --file Windows_Python397_OpenIAMEnv.txt
+
+One can also try to install an alternative version of the environment by typing
+the following command instead of the one listed above:
+
+    conda create --channel conda-forge --name OpenIAMEnv python=3.9 tensorflow=2.6 keras scikit-learn scipy numpy pandas matplotlib yaml pyyaml jupyter spyder pmw six pip sphinx
+
+The last command contains a list of Python packages (together with versions
+for some of them) needed for the proper work of NRAP-Open-IAM.
+
+If conda asks you to proceed, type "y" for yes.
+Above "OpenIAMEnv" is a name of the environment created for the NRAP-Open-IAM
+tool. The name can be replaced with any other suitable name.
+File "Windows_Python39_OpenIAMEnv.txt" contains names (and versions)
+of the Python libraries that will be downloaded and installed
+in the environment "OpenIAMEnv".
+
+5. Once setup is complete, the newly created environment has to be activated
+by typing in the Anaconda prompt
+
+	conda activate OpenIAMEnv
+
+6. Now the environment "OpenIAMEnv" is ready to be used. Test the Python and
+NRAP-Open-IAM setup by following directions provided at the end of this document.
+
+Tests and GUI can also be run from Spyder, integrated development environment
+(IDE), installed with other packages needed for proper work of NRAP-Open-IAM.
+The Spyder IDE allows users to modify and run Python code, including script
+examples and GUI.To access Spyder, find "Anaconda3 (64-bit)" submenu in Windows
+menu and choose "Spyder (OpenIAMEnv)".
+
+7. To deactivate environment and return to initial set of Anaconda/Python
+packages, type in the Anaconda prompt
+
+	conda deactivate
+
+8. In the future to continue working with NRAP-Open-IAM, follow the activation
+step 5 above. There is no need to recreate the environment.
+
+Additional information about conda environments can be found here:
+https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html
+
+Cheat sheet for conda environment related commands is here:
+https://docs.conda.io/projects/conda/en/4.6.0/_downloads/52a95608c49671267e40c689e0bc00ca/conda-cheatsheet.pdf
+
+
+============================================================
+Testing Python and NRAP-Open-IAM Setup
+============================================================
+
+After installing Python and required packages please test the Python installation
+and setup of NRAP-Open-IAM by running "openiam_setup_tests.py" in the folder
+"setup" of the NRAP-Open-IAM root folder.
+
+After testing the installations return to the root directory
+of the NRAP-Open-IAM distribution and run the GUI by selecting/running the
+"Run_OpenIAM_GUI_Windows.bat" file, or navigate directly to the folder
+"source/GUI" and run file "NRAP_OpenIAM.py".

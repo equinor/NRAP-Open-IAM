@@ -1,0 +1,145 @@
+# OpenIAM Control File Example 9b
+#
+# This example is similar to Control File example 9a,  but it uses a forward
+# analysis. The AtmPlumeEnsemble plot type is still included, but this plot type only
+# works when the analysis is LHS (Latin Hypercube Sampling) or parstudy.
+# The code does not producer an error, however. It prints a warning message and
+# does not make the AtmPlumeEnsemble figure. When using the AtmPlumeSingle plot
+# type in an LHS simulation, you can specify the individial realization to evaluate.
+# If unspecified, the realization is taken as the default value of 0. When using
+# AtmPlumeSingle in a forward model, however, there is only one model
+# realization and you do not have to specify which realization to use. Therefore,
+# the "Realization: 9" entry used in Control File example 9a is not used here.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#  python ../../source/openiam/openiam_cf.py --file ControlFile_ex9b.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 5
+    TimeStep: 1.0
+    Analysis: forward
+    Components: [SimpleReservoir1,
+                 OpenWellbore1,
+                 atmRom1]
+    OutputDirectory: output/output_ex9b_{datetime}
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        min: 500.0
+        max: 550.0
+        value: 525.0
+    shale2Thickness:
+        min: 450.0
+        max: 500.0
+        value: 475.0
+    shale3Thickness:
+        vary: False
+        value: 11.2
+    aquifer1Thickness:
+        vary: False
+        value: 100.4
+    aquifer2Thickness:
+        vary: False
+        value: 109.2
+    reservoirThickness:
+        vary: False
+        value: 51.2
+#-------------------------------------------------
+# SimpleReservoir1 is a user defined name for component
+# the type SimpleReservoir is the ROM model name
+#-------------------------------------------------
+SimpleReservoir1:
+    Type: SimpleReservoir
+    Parameters:
+        logResPerm:
+            min: -11.5
+            max: -10.5
+        reservoirPorosity:
+            min: 0.3
+            max: 0.4
+        injRate:
+            min: 0.1
+            max: 0.4
+    Outputs: [pressure]
+#-------------------------------------------------
+OpenWellbore1:
+    Type: OpenWellbore
+    Connection: SimpleReservoir1
+    Number: 2
+    Locations:
+        coordx: [100, 105]
+        coordy: [100, 105]
+    LeakTo: atmosphere
+    Parameters:
+        wellRadius:
+            min: 0.026
+            max: 0.046
+            value: 0.036
+        logReservoirTransmissivity:
+            min: -11.0
+            max: -9.0
+            value: -10.0
+        logAquiferTransmissivity:
+            min: -11.0
+            max: -9.0
+            value: -10.0
+        brineSalinity: 0.1
+    Outputs: [CO2_atm]
+#-------------------------------------------------
+atmRom1:
+    Type: AtmosphericROM
+    Connection: OpenWellbore1
+    # Alternative way to specify receptor locations
+    receptors: 'examples/Control_Files/input_data/ex9/receptor_locations.csv'
+    # x_receptor: [367.57, 374.77, 381.98, 389.19, 396.39
+    #              403.6, 410.81, 418.01, 425.22, 432.42]
+    # y_receptor: [497.28, 504.49, 511.7, 518.9, 526.11,
+    #              533.32, 540.52, 547.73, 554.93, 295.5]
+    Parameters:
+        T_amb:
+            value: 15
+            vary: False
+        P_amb:
+            min: 0.9
+            max: 1.08
+        V_wind:
+            min: 3.3
+            max: 15.5
+        C0_critical:
+            value: 0.01
+            vary: False
+        T_source:
+            value: 15
+            vary: False
+    Outputs: ['num_sources', 'outflag', 'x_new', 'y_new', 'critical_distance']
+#-------------------------------------------------
+Plots:
+    Receptor_Flags:
+        TimeSeries: [outflag_r001, outflag_r003]
+        Subplots:
+            Use: True
+    Receptor_Flags1:
+        TimeSeries: [outflag_r001]
+    Receptor_Flags2:
+        TimeSeries: [outflag_r002]
+    CO2_Leakage:
+        TimeSeries: [CO2_atm]
+    ATM_single:
+        AtmPlumeSingle:
+            FigureDPI: 100
+            PlotInjectionSites: False
+            PlotReceptors: False
+            SaveCSVFiles: True
+            SpecifyXandYLims:
+                xLims: [75, 125]
+                yLims: [82.5, 117.5]
+    ATM_ensemble:
+        AtmPlumeEnsemble:
+    Critical_distance:
+        TimeSeries: [critical_distance_s000]

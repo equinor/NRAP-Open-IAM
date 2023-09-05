@@ -1,0 +1,69 @@
+# OpenIAM Control File Example 7b
+#
+# This example is similar to control file example 7a, but the pressures
+# and CO2 saturations provided directly to the MultisegmentedWellbore component
+# (through the DynamicParameters field) are entered with .csv files.
+# Additionally, this example uses a forward analysis type (deterministic)
+# instead of Latin Hypercube Sampling (lhs, stochastic).
+#
+# To run this file, use the command (\ for Windows and / for Mac or Linux)
+#   python openiam_cf.py --file ../../examples/Control_Files/ControlFile_ex7b.yaml
+# in the folder source/openiam,
+# or command
+#   python ../source/openiam/openiam_cf.py --file ControlFile_ex7b.yaml
+# in the folder examples/Control_Files.
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 200
+    TimeStep: 1
+    Analysis:
+        type: forward
+    Components: [msw1]
+    OutputDirectory: output/output_ex7b_{datetime}
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers: 3
+    shale1Thickness: 50.0
+    shale2Thickness: 45.0
+    shale3Thickness: 250.0
+    aquifer1Thickness: 100.0
+    aquifer2Thickness: 100.0
+#-------------------------------------------------
+# The MultisegmentedWellbore will not be connected
+# to a reservoir component but instead will be driven
+# by input pressures and saturations provided in the files through the
+# DynamicParameters keywords.  Note the number of elements in the files given
+# in the DynamicParameters must match the total number of timesteps.
+#-------------------------------------------------
+msw1:
+    Type: MultisegmentedWellbore
+    Locations:
+        coordx: [100]
+        coordy: [100]
+    Parameters:
+        logWellPerm:
+            min: -14.0
+            max: -11.0
+            value: -13.5
+        wellRadius:
+            vary: false
+            value: 0.01
+    DynamicParameters:
+        structure: array
+        pressure: 'examples/Control_Files/input_data/ex7b/pressure.csv'
+        CO2saturation: 'examples/Control_Files/input_data/ex7b/CO2saturation.csv'
+    Outputs: [CO2_aquifer1, brine_aquifer1, CO2_aquifer2, brine_aquifer2]
+#-------------------------------------------------
+Plots:
+    Plot1:
+        TimeSeries: [CO2_aquifer1, CO2_aquifer2]
+        Subplot:
+            Use: True
+            NumCols: 2
+    Plot3:
+        TimeSeries: [brine_aquifer1, brine_aquifer2]
+        Subplot:
+            Use: True
+            NumCols: 2

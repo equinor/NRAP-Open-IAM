@@ -1,0 +1,22 @@
+clean:
+    cmd: [rm -f *.o *.mod carbonate.dll carbonate.dylib carbonate.so]
+objects: [read_geochem,
+          mars_rsm_sub,
+          read_param,
+          link_model,
+          gw_rom]
+windows: 
+    flags: 
+    comp_flags:
+    link_flags: -shared -static
+    library: carbonate.dll
+mac:
+    flags: 
+    comp_flags: 
+    link_flags: -dynamiclib
+    library: carbonate.dylib
+linux:
+    flags: -fpic
+    comp_flags:
+    link_flags: -shared
+    library: carbonate.so

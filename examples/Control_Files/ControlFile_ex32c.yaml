@@ -1,0 +1,146 @@
+# OpenIAM Control File Example 32c
+#
+# This example is similar to Control File example 32b, but this example
+# also demonstrates the use of the TimeList entry with the AoR plot type.
+# The TimeList entry is also shown in Control File example 31d.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex32c.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 20
+    TimeStep: 1.0
+    Analysis: forward
+    Components: [LookupTableReservoir1, OpenWellbore1, FutureGen2Aquifer1]
+    OutputDirectory: 'output/output_ex32c_{datetime}'
+    GenerateOutputFiles: False
+    GenerateCombOutputFile: False
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    spatiallyVariable:
+        LookupTableStratigraphy:
+            FileName: 'stratigraphy.csv'
+            FileDirectory: 'examples/Control_Files/input_data/ex32b'
+            MaxPointDistance: 100
+#-------------------------------------------------
+LookupTableReservoir1:
+    Type: LookupTableReservoir
+    FileDirectory: source/components/reservoir/lookuptables/FutureGen2/1008_sims
+    TimeFile: time_points.csv
+    ParameterFilename: parameters_and_filenames_trunc.csv
+    Interpolation2D: False
+    Parameters:
+        index: 1
+    Outputs: [pressure, CO2saturation]
+#-------------------------------------------------
+OpenWellbore1:
+    Type: OpenWellbore
+    Connection: LookupTableReservoir1
+    Locations:
+        file: source/components/reservoir/lookuptables/FutureGen2/1008_sims/fg1.csv
+        read_z_values: True
+        thin_point_density: True
+        min_x_spacing: 10000
+        min_y_spacing: 10000
+    LeakTo: aquifer4
+    Controls:
+        critPressureApproach: True
+    Parameters:
+        wellRadius:
+            value: 0.05
+            vary: False
+        logReservoirTransmissivity:
+            value: -10.0
+            vary: False
+        logAquiferTransmissivity:
+            value: -10.0
+            vary: False
+        brineSalinity:
+            value: 0.0475
+            vary: False
+        wellTop:
+            value: aquifer4Depth
+            vary: False
+        reservoirDepth:
+            value: shale1Depth
+            vary: False
+        brineDensity:
+            value: 1075
+            vary: False
+    Outputs: [CO2_aquifer,
+              brine_aquifer]
+#-------------------------------------------------
+FutureGen2Aquifer1:
+    Type: FutureGen2Aquifer
+    Connection: OpenWellbore1
+    AquiferName: aquifer4
+    Parameters:
+        aqu_thick:
+            value: aquifer4Thickness
+            vary: False
+        depth:
+            value: aquifer4Depth
+            vary: False
+        por:
+            value: 0.18
+            vary: False
+        log_permh:
+            value: -11.92
+            vary: False
+        log_aniso:
+            value: 0.3
+            vary: False
+        rel_vol_frac_calcite:
+            value: 0.01
+            vary: False
+    Outputs: [pH_volume, TDS_volume]
+#-------------------------------------------------
+Plots:
+    Strat_Plot:
+        Stratigraphy:
+            FigureDPI: 300
+            PlotWellbores: True
+            PlotWellLabels: False
+            PlotInjectionSites: True
+            PlotInjectionSiteLabels: True
+            PlotStratComponents: True
+            InjectionCoordx: 2.37e5
+            InjectionCoordy: 4.41e6
+            View:
+                ViewAngleElevation: [5, 5, 5, 5, 5]
+                ViewAngleAzimuth: [240, 255, 270, 285, 300]
+    AoR_Pressure:
+        AoR: [pressure]
+        TimeList: [1, 5, 10, 15, 20]
+        PlotInjectionSites: True
+        InjectionCoordx: 2.37e5
+        InjectionCoordy: 4.41e6
+        FigureDPI: 100
+        SaveCSVFiles: True
+    AoR_CO2Sat:
+        AoR: [CO2saturation]
+        TimeList: [1, 5, 10, 15, 20]
+        PlotInjectionSites: True
+        InjectionCoordx: 2.37e5
+        InjectionCoordy: 4.41e6
+        FigureDPI: 100
+        SaveCSVFiles: False
+    AoR_pH:
+        AoR: [pH_volume]
+        TimeList: [10, 20]
+        PlotInjectionSites: True
+        InjectionCoordx: 2.37e5
+        InjectionCoordy: 4.41e6
+        FigureDPI: 100
+        SaveCSVFiles: False
+    AoR_TDS:
+        AoR: [TDS_volume]
+        TimeList: All
+        PlotInjectionSites: True
+        InjectionCoordx: 2.37e5
+        InjectionCoordy: 4.41e6
+        FigureDPI: 100
+        SaveCSVFiles: False

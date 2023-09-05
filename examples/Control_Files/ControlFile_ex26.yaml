@@ -1,0 +1,170 @@
+# OpenIAM Control File Example 26
+#
+# This example demonstrates the use of 3D interpolation with a LookupTableReservoir.
+# When using 3D interpolation, reservoir conditions like pressure and CO2 saturation
+# are calculated with x, y, and z values (not just x and y). This approach considers
+# the depth of the wellbore base (coordz under Locations).
+#
+# To have a LookupTableReservoir use 3D interpolation in a Control File interface,
+# it must have 'Interpolation2D: False,' as shown below. The locations at which
+# the conditions are interpolated are specified in the wellbore component below
+# (coordx, coordy, and coordz). These locations can be considered the bottom
+# of the MultisegmentedWellbores. Note that an error will occur if the used
+# locations are not within the space covered by the lookup table data.
+# The locations used here were selected by assessing the distribution of z
+# with x and y in the file fg1.csv (from the FutureGen2 data set).
+#
+# This example requires the additional FutureGen 2.0 data set.
+# FutureGen 2.0 data set can be downloaded from the following source:
+# https://edx.netl.doe.gov/dataset/futuregen-2-0-1008-simulation-reservoir-lookup-table
+#
+# The downloaded data set should be placed here:
+#    source/components/reservoir/lookuptables/FutureGen2/1008_sims
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex26.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 20.
+    TimeStep: 1
+    Analysis: forward
+    Components: [LookupTableReservoir1, MultisegmentedWellbore1, FutureGen2Aquifer1]
+    OutputDirectory: output/output_ex26_{datetime}
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        value: 5
+        vary: False
+    shale1Thickness:
+        value: 198.7
+        vary: False
+    shale2Thickness:
+        value: 74.4
+        vary: False
+    shale3Thickness:
+        value: 110.3
+        vary: False
+    shale4Thickness:
+        value: 118.9
+        vary: False
+    shale5Thickness:
+        value: 637.7
+        vary: False
+    aquifer1Thickness:
+        value: 33.2
+        vary: False
+    aquifer2Thickness:
+        value: 84.1
+        vary: False
+    aquifer3Thickness:
+        value: 31.1
+        vary: False
+    aquifer4Thickness:
+        value: 61.6
+        vary: False
+    reservoirThickness:
+        value: 7
+        vary: False
+#-------------------------------------------------
+LookupTableReservoir1:
+    Type: LookupTableReservoir
+    FileDirectory: source/components/reservoir/lookuptables/FutureGen2/1008_sims
+    TimeFile: time_points.csv
+    ParameterFilename: parameters_and_filenames_trunc.csv
+    Interpolation2D: False
+    Parameters:
+        index: 5
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+MultisegmentedWellbore1:
+    Type: MultisegmentedWellbore
+    Connection: LookupTableReservoir1
+    Locations:
+        coordx: [225000.0, 275000.0]
+        coordy: [4410000.0, 4410000.0]
+        coordz: [-1000.0, -1350.0]
+    Parameters:
+        wellRadius:
+            value: 0.05715
+            vary: False
+        logAqu1Perm:
+            value: -13.39
+            vary: False
+        logAqu2Perm:
+            value: -11.05
+            vary: False
+        logAqu3Perm:
+            value: -12.48
+            vary: False
+        logAqu4Perm:
+            value: -11.92
+            vary: False
+        logWellPerm:
+            value: -13.0
+            vary: False
+        brineDensity:
+            value: 1010.9
+            vary: False
+        CO2Density:
+            value: 775.0
+            vary: False
+        brineViscosity:
+            value: 7.5e-4
+            vary: False
+        CO2Viscosity:
+            value: 6.6e-5
+            vary: False
+    Outputs: [CO2_aquifer1, CO2_aquifer2, CO2_aquifer3, CO2_aquifer4, CO2_atm,
+              brine_aquifer1, brine_aquifer2, brine_aquifer3, brine_aquifer4, brine_atm]
+#-------------------------------------------------
+FutureGen2Aquifer1:
+    Type: FutureGen2Aquifer
+    Connection: MultisegmentedWellbore1
+    AquiferName: aquifer4
+    Parameters:
+        aqu_thick:
+            value: 61.6
+            vary: False
+        depth:
+            value: 699.3
+            vary: False
+        por:
+            value: 0.18
+            vary: False
+        log_permh:
+            value: -11.92
+            vary: False
+        log_aniso:
+            value: 0.3
+            vary: False
+        rel_vol_frac_calcite:
+            value: 0.1
+            vary: False
+    Outputs: [pH_volume, TDS_volume, Pressure_volume]
+#-------------------------------------------------
+Plots:
+    Reservoir_Conditions:
+        Subplot:
+            Use: True
+            Numcols: 2
+        TimeSeries: [pressure, CO2saturation]
+    CO2_Leakage_Aq3and4:
+        Subplot:
+            Use: True
+            Numcols: 2
+        TimeSeries: [CO2_aquifer3, CO2_aquifer4]
+    Brine_Leakage_Aq3and4:
+        Subplot:
+            Use: True
+            Numcols: 2
+        TimeSeries: [brine_aquifer3, brine_aquifer4]
+    Plume_Volumes_Aq4:
+        Subplot:
+            Use: True
+            Numcols: 2
+        FigureSize: [12, 10]     # width, height in inches; default for TimeSeries is [10, 8]
+        TimeSeries: [pH_volume, TDS_volume, Pressure_volume]

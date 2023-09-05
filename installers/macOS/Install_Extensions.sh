@@ -1,0 +1,1 @@
+python3 -m pip install -U pippython3 -m pip install -U -r macOS_Python397_requirements.txt

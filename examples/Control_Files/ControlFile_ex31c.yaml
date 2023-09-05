@@ -1,0 +1,153 @@
+# OpenIAM Control File Example 31c
+#
+# This example is similar to Control File Example 31a, but it demonstrates
+# the use of the AoR plot type with Latin Hypercube Sampling (lhs). The AoR
+# figures created specify the number of lhs samples used.
+#
+# Note that when using a large number of OpenWellbore components, as shown here
+# with the grid placement option, simulations using lhs can require a large
+# number of samples (the "siz" entry) in order to run correctly. If the simulation
+# does not include enough realizations, python will raise a numpy LinAlgError
+# error saying "Matrix is not positive definite." This behavior occurs because
+# Latin Hypercube Sampling requires a minimum number of realizations in order
+# to evenly sample the parameter space. If a parameter of the OpenWellbore
+# component is set up to vary (e.g., between minimum and maximum values), then
+# each OpenWellbore component included increases the minimum number
+# of realizations required. Additionally, one reservoir component and one
+# aquifer component will be made for each wellbore location, so any parameter
+# variations for those components will also increase the required number of
+# realizations.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex31c.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 10
+    TimeStep: 1.0
+    Analysis:
+        type: lhs
+        siz: 40
+    Components: [SimpleReservoir1, OpenWellbore1, FutureGen2Aquifer1]
+    OutputDirectory: 'output/output_ex31c_{datetime}'
+    GenerateOutputFiles: False
+    GenerateCombOutputFile: False
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        value: 750.0
+        vary: False
+    shale2Thickness:
+        value: 950.0
+        vary: False
+    shale3Thickness:
+        value: 365
+        vary: False
+    aquifer1Thickness:
+        vary: False
+        value: 85
+    aquifer2Thickness:
+        vary: False
+        value: 85
+    reservoirThickness:
+        vary: False
+        value: 150
+#-------------------------------------------------
+SimpleReservoir1:
+    Type: SimpleReservoir
+    Parameters:
+        injRate:
+            value: 0.33
+            vary: False
+        logResPerm:
+            value: -11.0
+            vary: False
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+OpenWellbore1:
+    Type: OpenWellbore
+    Connection: SimpleReservoir1
+    Number: 36   # 6*6
+    LeakTo: aquifer2
+    Locations:
+        grid:
+            xmin: -25000
+            xmax: 25000
+            xsize: 6
+            ymin: -25000
+            ymax: 25000
+            ysize: 6
+    Controls:
+        critPressureApproach: True
+    Parameters:
+        wellRadius:
+            value: 0.05
+            vary: False
+        logReservoirTransmissivity:
+            value: -10.0
+            vary: False
+        logAquiferTransmissivity:
+            value: -10.5
+            min: -11.0
+            max: -10.0
+        brineSalinity:
+            value: 0.2
+            vary: False
+        brineDensity:
+            value: 1050
+            vary: False
+        # If critPressureApproach is set to True and enforceCritPressure
+        # is left at the default of False, the parameters wellTop, reservoirDepth,
+        # and brineDensity are used to calculate critical pressure.
+        # If both critPressureApproach and enforceCritPressure are set to True
+        # and the critPressure parameter is given, then the critPressure value
+        # will be used instead.
+    Outputs: [CO2_aquifer,
+              brine_aquifer]
+#-------------------------------------------------
+FutureGen2Aquifer1:
+    Type: FutureGen2Aquifer
+    Connection: OpenWellbore1
+    AquiferName: aquifer2
+    Parameters:
+        # Parameters aqu_thick (85 m) and depth (450 m) are linked
+        # to stratigraphy and don't require to be setup explicitily unless
+        # different value of the parameter is required.
+        por:
+            value: 0.18
+            vary: False
+        log_permh:
+            value: -11.92
+            vary: False
+        log_aniso:
+            value: 0.3
+            vary: False
+        rel_vol_frac_calcite:
+            value: 0.01
+            vary: False
+    Outputs: [pH_volume, TDS_volume]
+#-------------------------------------------------
+Plots:
+    Plot1:
+        AoR: [pressure]
+        PlotInjectionSites: True
+        FigureDPI: 200
+        CriticalPressureMPa: Calculated
+    Plot2:
+        AoR: [CO2saturation]
+        PlotInjectionSites: True
+        FigureDPI: 200
+    Plot3:
+        AoR: [pH_volume]
+        PlotInjectionSites: True
+        FigureDPI: 200
+    Plot4:
+        AoR: [TDS_volume]
+        PlotInjectionSites: True
+        FigureDPI: 200

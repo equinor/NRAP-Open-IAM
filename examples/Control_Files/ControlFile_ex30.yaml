@@ -1,0 +1,249 @@
+# OpenIAM Control File Example 30
+#
+# This example illustrates six different options of setting Locations for
+# MultisegmentedWellbore components:
+#
+# (1) through direct entry (e.g., coordx: [235310.172, 235462.572] and
+# coordy: [4408964.6136, 4408964.6136] under MultisegmentedWellbore1),
+#
+# (2) through a .csv file (file: 'examples/Control_Files/input_data/ex30/locations.csv'
+# under MultisegmentedWellbore2),
+#
+# (3) as equally spaced array points with a specified number of points
+# ('linspace:' under MultisegmentedWellbore5),
+#
+# (4) as equally spaced points with a specified interval
+# ('range:' under MultisegmentedWellbore6),
+#
+# (5) as a grid with a specified number of nodes in the x and y directions
+# ('grid:' under MultisegmentedWellbore3),
+#
+# and (6) as a grid with nodes that are explicity stated
+# ('grid:' under MultisegmentedWellbore4).
+#
+# Note that one LookuptableReservoir component is setup to provide inputs
+# for each MultisegmentedWellbore component, so the LookuptableReservoir
+# components also use the same locations as its input.
+# If the MultisegmentedWellbore components were connected to aquifer
+# components, one aquifer component would be created for each
+# MultisegmentedWellbore component at each location.
+#
+# This example requires additional FutureGen 2.0 data set.
+# FutureGen 2.0 data set can be downloaded from the following source:
+# https://edx.netl.doe.gov/dataset/futuregen-2-0-1008-simulation-reservoir-lookup-table
+#
+# The downloaded data set should be placed here:
+#    source/components/reservoir/lookuptables/FutureGen2/1008_sims
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex30.yaml
+#
+# Created August 23, 2022
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 10.
+    TimeStep: 1.
+    Analysis: forward
+    Components: [LookupTableReservoir1, MultisegmentedWellbore1, MultisegmentedWellbore2,
+                 MultisegmentedWellbore3, MultisegmentedWellbore4, MultisegmentedWellbore5,
+                 MultisegmentedWellbore6]
+    OutputDirectory: 'output/output_ex30_{datetime}'
+    Logging: Info
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers: 5
+    shale1Thickness: 198.7
+    shale2Thickness: 74.4
+    shale3Thickness: 110.3
+    shale4Thickness: 118.9
+    shale5Thickness: 530.4
+    aquifer1Thickness: 33.2
+    aquifer2Thickness: 84.1
+    aquifer3Thickness: 31.1
+    aquifer4Thickness: 61.6
+    reservoirThickness: 7
+#-------------------------------------------------
+LookupTableReservoir1:
+    Type: LookupTableReservoir
+    FileDirectory: 'source/components/reservoir/lookuptables/FutureGen2/1008_sims'
+    TimeFile: 'time_points.csv'
+    ParameterFilename: 'parameters_and_filenames_trunc.csv'
+    Parameters:
+        index: 3
+    Outputs: [pressure, CO2saturation]
+#-------------------------------------------------
+MultisegmentedWellbore1:
+    Type: MultisegmentedWellbore
+    Connection: LookupTableReservoir1
+    Number: 2
+    Locations:
+        # total number of known locations is len(x)=len(y)(=len(z))
+        coordx: [235310.172, 235462.572]
+        coordy: [4408964.6136, 4408964.6136]
+        # And also if required by scenario
+        # coordz:
+    Parameters:
+        wellRadius: 0.05715
+        logAqu1Perm: -13.39
+        logAqu2Perm: -11.05
+        logAqu3Perm: -12.48
+        logAqu4Perm: -11.92
+        logWellPerm: -13.0
+        brineDensity: 1030.9
+        CO2Density: 775.0
+        brineViscosity: 7.5e-4
+        CO2Viscosity: 6.6e-5
+    Outputs: [CO2_aquifer1, brine_aquifer1]
+#-------------------------------------------------
+MultisegmentedWellbore2:
+    Type: MultisegmentedWellbore
+    Connection: LookupTableReservoir1
+    Locations:
+        # total number of known locations is number of rows in the specified file
+        file: 'examples/Control_Files/input_data/ex30/locations.csv'
+    Parameters:
+        wellRadius: 0.05715
+        logAqu1Perm: -13.39
+        logAqu2Perm: -11.05
+        logAqu3Perm: -12.48
+        logAqu4Perm: -11.92
+        logWellPerm: -13.0
+        brineDensity: 1030.9
+        CO2Density: 775.0
+        brineViscosity: 7.5e-4
+        CO2Viscosity: 6.6e-5
+    Outputs: [CO2_aquifer1, brine_aquifer1]
+#-------------------------------------------------
+MultisegmentedWellbore3:
+    Type: MultisegmentedWellbore
+    Connection: LookupTableReservoir1
+    Number: 6
+    Locations:
+        grid:  # for equally spaced x and y
+            # total number of known locations is xsize*ysize(*zsize)
+            xmin: 235310.172
+            xmax: 235919.772
+            xsize: 2    # number of different x
+            ymin: 4407897.8136
+            ymax: 4408964.6136
+            ysize: 3    # number of different y
+            # And also if required by scenario
+            # zmin:
+            # zmax:
+            # zsize:    # number of different z
+    Parameters:
+        wellRadius: 0.05715
+        logAqu1Perm: -13.39
+        logAqu2Perm: -11.05
+        logAqu3Perm: -12.48
+        logAqu4Perm: -11.92
+        logWellPerm: -13.0
+        brineDensity: 1030.9
+        CO2Density: 775.0
+        brineViscosity: 7.5e-4
+        CO2Viscosity: 6.6e-5
+    Outputs: [CO2_aquifer1, brine_aquifer1]
+#-------------------------------------------------
+MultisegmentedWellbore4:
+    Type: MultisegmentedWellbore
+    Connection: LookupTableReservoir1
+    Number: 6
+    Locations:
+        grid: # x and y are list of coordinates defined by user
+            # total number of known locations is len(x)*len(y)(*len(z))
+            x: [235310.172, 235462.572, 235919.772]
+            y: [4407897.8136, 4408964.6136]
+            # And also if required by scenario
+            # z:
+    Parameters:
+        wellRadius: 0.05715
+        logAqu1Perm: -13.39
+        logAqu2Perm: -11.05
+        logAqu3Perm: -12.48
+        logAqu4Perm: -11.92
+        logWellPerm: -13.0
+        brineDensity: 1030.9
+        CO2Density: 775.0
+        brineViscosity: 7.5e-4
+        CO2Viscosity: 6.6e-5
+    Outputs: [CO2_aquifer1, brine_aquifer1]
+#-------------------------------------------------
+MultisegmentedWellbore5:
+    Type: MultisegmentedWellbore
+    Connection: LookupTableReservoir1
+    Number: 3
+    Locations:
+        linspace:
+            xmin: 235310.172
+            xmax: 235919.772
+            ymin: 4407897.8136
+            ymax: 4408964.6136
+            size: 3  # total number of locations
+            # And also if required by scenario
+            # zmin:
+            # zmax:
+    Parameters:
+        wellRadius: 0.05715
+        logAqu1Perm: -13.39
+        logAqu2Perm: -11.05
+        logAqu3Perm: -12.48
+        logAqu4Perm: -11.92
+        logWellPerm: -13.0
+        brineDensity: 1030.9
+        CO2Density: 775.0
+        brineViscosity: 7.5e-4
+        CO2Viscosity: 6.6e-5
+    Outputs: [CO2_aquifer1, brine_aquifer1]
+#-------------------------------------------------
+MultisegmentedWellbore6:
+    Type: MultisegmentedWellbore
+    Connection: LookupTableReservoir1
+    Number: 5
+    Locations:
+        range: # total number of locations is determined by how much points fit within each interval
+            xmin: 235310.0
+            xmax: 235910.0
+            dx: 150.0    # (xmax-xmin)/dx = (235910-235310)/150 = 4, +1=5 endpoints are accounted for
+            ymin: 4407897.0
+            ymax: 4408897.0
+            dy: 250.0   # (ymax-ymin)/dy = (4408897-4407897)/250 = 4 = (xmax-xmin)/dx
+            # And also if required by scenario
+            # zmin:
+            # zmax:
+            # dz
+    Parameters:
+        wellRadius: 0.05715
+        logAqu1Perm: -13.39
+        logAqu2Perm: -11.05
+        logAqu3Perm: -12.48
+        logAqu4Perm: -11.92
+        logWellPerm: -13.0
+        brineDensity: 1030.9
+        CO2Density: 775.0
+        brineViscosity: 7.5e-4
+        CO2Viscosity: 6.6e-5
+    Outputs: [CO2_aquifer1, brine_aquifer1]
+#-------------------------------------------------
+Plots:
+    pressure_all:
+        TimeSeries: [pressure]
+        VaryLineStyles: True
+        FigureSize: [12, 8]  # [width, height] in inches; default for TimeSeries is [10, 8]
+        Subplot:
+            Use: False
+        FigureDPI: 150
+    saturation_plot:
+        TimeSeries: [CO2saturation]
+        VaryLineStyles: True
+        FigureSize: [12, 8]
+        Subplot:
+            Use: False
+        FigureDPI: 150
+    leakage_plot:
+        TimeSeries: [CO2_aquifer1]
+        VaryLineStyles: True
+        FigureSize: [12, 8]
+        Subplot:
+            Use: False
+        FigureDPI: 150

@@ -1,0 +1,159 @@
+# OpenIAM Control File Example 40
+#
+# This example is the same as Control File example 40, but the output directory 
+# has been changed. The {datetime} addition was removed so that the output directory 
+# could be conveniently accessed from a Jupyter Notebook example.
+#
+# This Control File demonstrates the use of the time to first detection (TTFD)
+# plot type. Using this plot type requires aquifer component(s) producing
+# the plume dimension metrics for the type of plume specified with PlumeType.
+# For example, each of the aquifer components used here produces results for
+# Dissolved_CO2_dx, Dissolved_CO2_dy, and Dissolved_CO2_dz. Note that aquifers
+# to be used for TTDS plots must be included in the ComponentNameList.
+# For an explanation of the MonitoringLocations section of the TTFD plot,
+# see ControlFile_ex39a.yaml.
+#
+# For the injection site(s) to be plotted, the TTFD plot must
+# include PlotInjectionSites: True. When using a LookupTableReservoir,
+# you must also include entries for InjectionCoordx and InjectionCoordy.
+#
+# This example requires the additional FutureGen 2.0 data set.
+# FutureGen 2.0 data set can be downloaded from the following source:
+# https://edx.netl.doe.gov/dataset/futuregen-2-0-1008-simulation-reservoir-lookup-table
+#
+# The downloaded data set should be placed here:
+#    source/components/reservoir/lookuptables/FutureGen2/1008_sims
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex40.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 15.
+    TimeStep: 1
+    Analysis:
+        type: lhs
+        siz: 30
+    Components: [LookupTableReservoir1, MultisegmentedWellbore1,
+                 FutureGen2AZMI1, FutureGen2AZMI2]
+    OutputDirectory: output/output_ex40_jupyter
+    Logging: Info
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers: 5
+    shale1Thickness: 198.7
+    shale2Thickness: 74.4
+    shale3Thickness: 110.3
+    shale4Thickness: 118.9
+    shale5Thickness: 530.4
+    aquifer1Thickness: 33.2
+    aquifer2Thickness: 84.1
+    aquifer3Thickness: 31.1
+    aquifer4Thickness: 61.6
+    reservoirThickness: 7
+#-------------------------------------------------
+LookupTableReservoir1:
+    Type: LookupTableReservoir
+    FileDirectory: source/components/reservoir/lookuptables/FutureGen2/1008_sims
+    TimeFile: time_points.csv
+    ParameterFilename: parameters_and_filenames_trunc.csv
+    Parameters:
+        index: 5
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+MultisegmentedWellbore1:
+    Type: MultisegmentedWellbore
+    Connection: LookupTableReservoir1
+    Number: 2
+    Locations:
+        coordx: [236377.0, 236758.0]
+        coordy: [4409269.5, 4410107.6]
+    Parameters:
+        wellRadius: 0.05715
+        logAqu1Perm:
+            value: -13.39
+            vary: False
+        logAqu2Perm:
+            value: -11.05
+            vary: False
+        logAqu3Perm:
+            value: -12.48
+            vary: False
+        logAqu4Perm:
+            value: -11.92
+            vary: False
+        logWellPerm:
+            min: -14.0
+            max: -11.0
+            value: -13.0
+        brineDensity: 1030.9
+        CO2Density: 775.0
+        brineViscosity: 7.5e-4
+        CO2Viscosity: 6.6e-5
+    Outputs: [CO2_aquifer1, CO2_aquifer2, CO2_aquifer3, CO2_aquifer4, CO2_atm,
+              brine_aquifer1, brine_aquifer2, brine_aquifer3, brine_aquifer4, brine_atm]
+#-------------------------------------------------
+FutureGen2AZMI1:
+    Type: FutureGen2AZMI
+    Connection: MultisegmentedWellbore1
+    AquiferName: aquifer1
+    Parameters:
+        # aqu_thick (33.2 m for aquifer 1) and depth (1044 m) parameter do not need
+        # to be set up as they are linked to stratigraphy
+        por: 0.118
+        log_permh: -13.39
+        log_aniso: 0.3
+        rel_vol_frac_calcite: 0.1
+    Outputs: [pH_volume, TDS_volume, Dissolved_CO2_volume,
+              Dissolved_CO2_dx, Dissolved_CO2_dy, Dissolved_CO2_dz]
+#-------------------------------------------------
+FutureGen2AZMI2:
+    Type: FutureGen2AZMI
+    Connection: MultisegmentedWellbore1
+    AquiferName: aquifer3
+    Parameters:
+        # aqu_thick (31.1 m for aquifer 3) and depth (742 m) parameter do not need
+        # to be set up as they are linked to stratigraphy
+        por: 0.132
+        log_permh: -12.48
+        log_aniso: 0.3
+        rel_vol_frac_calcite: 0.1
+    Outputs: [pH_volume, TDS_volume, Dissolved_CO2_volume,
+              Dissolved_CO2_dx, Dissolved_CO2_dy, Dissolved_CO2_dz]
+#-------------------------------------------------
+Plots:
+    pH_plume_volumes:
+        TimeSeriesAndStats: [pH_volume]
+        subplot:
+            use: True
+            ncols: 2
+    TDS_plume_volumes:
+        TimeSeriesAndStats: [TDS_volume]
+        subplot:
+            use: True
+            ncols: 2
+    Dissolved_CO2_volumes:
+        TimeSeries: [Dissolved_CO2_volume]
+        subplot:
+            use: True
+            ncols: 2
+    TTFD_Plot:
+        TTFD:
+            PlumeType: Dissolved_CO2
+            FigureSize: (15, 12)
+            FigureDPI: 300
+            PlotInjectionSites: True
+            InjectionCoordx: 2.37e5
+            InjectionCoordy: 4.41e6
+            MonitoringLocations:
+                # coordx: 236377.0
+                # coordy: 4409269.5
+                # coordz: -1015
+                coordx: [236377.0, 236758.0, 236377.0, 236758.0]
+                coordy: [4409269.5, 4410107.6, 4409269.5, 4410107.6]
+                coordz: [-1015, -715, -1015, -715] # Near the tops of aquifers 1 and 3
+                HorizontalWindow: 1
+                VerticalWindow: 5
+            ComponentNameList: [FutureGen2AZMI1, FutureGen2AZMI2]

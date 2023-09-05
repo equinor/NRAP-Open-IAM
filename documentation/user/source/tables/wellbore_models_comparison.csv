@@ -1,0 +1,14 @@
+Input variable,Cemented wellbore ROM,Multisegmented wellbore ROM,Open wellbore ROM
+"logWellPerm (well Permeability)",-13.95 to -10.1,-17 to -9,Open tubing or casing
+"logAquPerm or logThiefPerm (aquifer or thief zone permeability)",-13.995 to -12,-14 to -9,log of aquifer and reservoir transmissivity: -11.27 to -8.39 
+"wellRadius (radius of the leaky well)",0.025 to 0.25,0.01 to 0.5,0.025 to 0.25
+Brine and |CO2| properties,Included in the ROM simulations,Calculated as a function of depth. Pressure gradient: 9792 Pa/m. Temperature gradient: 25 C/km.,Mass fraction of salt: 0 to 0.2. Temperature gradient: 25 C/km. Temperature at surface: 15 degrees Celcius.
+Number of shale layers,3,3 to 30,1
+"reservoirDepth and wellDepth (depth of the reservoir, well)",960 to 3200,No limitation,1000 to 4000
+"shaleThickness, aquiferThickness, reservoirThickness (thickness of shale, aquifer or reservoir)","reservoir: 51.2 m, thief zone: 22.4 m, aquifer: 29.2 m, upper caprock layer: 11.2 m",1 to 1600 m,"Well Top: 0 to 500 m"
+"brineResSaturation (residual brine saturation)",0.001,Used as tuning parameter to allow |CO2| to accumulate in intermediate aquifers,Not needed
+"deltaP (increase in pressure due to injection)",0.1 to 9.3 MPa,No limitations,0 to 20 MPa
+Energy transport consideration,Nonisothermal,Isothermal,Nonisothermal
+Governing wellbore equation employed,Two phase Darcy equation,Two phase Darcy equation,Drift flux
+Type of ROM,numerical,analytical,numerical
+Reference,"D. R. Harp, R. Pawar, J. W. Carey, C. W. Gable, Reduced order models of transient |CO2| and brine leakage along abandoned wellbores from geologic carbon sequestration reservoirs, Int. J. Greenhouse Gas Control, 45 (2016), pp. 150-162","S. Baek, D. H. Bacon, N. J. Huerta, NRAP-Open-IAM Multisegmented Wellbore Reduced-Order Model, 2021, PNNL-32364","L. H. Pan, S. W. Webb, C. M. Oldenburg, Analytical solution for two-phase flow in a wellbore using the drift-flux model. Adv. Water Resour. 34 (2011), pp. 1656-1665"

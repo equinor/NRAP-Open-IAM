@@ -1,0 +1,196 @@
+# OpenIAM Control File Example 8a
+#
+# This example demonstrates the use of the Analysis section of a control file.
+# The entries CorrelationCoeff, SensitivityCoeff, MultiSensitivities,
+# StackedSensitivityBars, and TimeSeriesSensitivity each produce figures and
+# .csv files that address the sensitivity of component output to component
+# parameter input. Descriptions are provided for each entry further below.
+# The Analysis section can only be used if the simulation uses Latin Hypercube
+# Sampling (lhs). Note that when sensitivities are stacked (in StackedSensitivityBars
+# or TimeSeriesSensitivity), positive and negative values are stacked separately.
+# In other words, positive sensitivities only contribute to the accumulation of the
+# stack above 0. Negative sensitivities only contribute to the accumulation
+# of the stack below 0.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#  python ../../source/openiam/openiam_cf.py --file ControlFile_ex8a.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 50
+    TimeStep: 1.0
+    Analysis:
+        type: lhs
+        siz: 300
+    Components: [Reservoir1, Wellbore1]
+    OutputDirectory: output/output_ex8a_{datetime}
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        value: 625.0
+        vary: False
+    shale2Thickness:
+        value: 575.0
+        vary: False
+    shale3Thickness:
+        vary: False
+        value: 11.2
+    aquifer1Thickness:
+        value: 122.4
+        vary: False
+    aquifer2Thickness:
+        value: 119.2
+        vary: False
+    reservoirThickness:
+        vary: False
+        value: 51.2
+#-------------------------------------------------
+# Reservoir1 is a user defined name for component
+# Type SimpleReservoir is the component class name
+#-------------------------------------------------
+Reservoir1:
+    Type: SimpleReservoir
+    Parameters:
+        reservoirPorosity:
+            min: 0.2
+            max: 0.4
+            value: 0.3
+        injRate:
+            min: 0.01
+            max: 0.02
+            value: 0.015
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+Wellbore1:
+    Type: MultisegmentedWellbore
+    Number: 1
+    Locations:
+        coordx: [100]
+        coordy: [100]
+    Connection: Reservoir1
+    Parameters:
+        logWellPerm:
+            min: -14.0
+            max: -11.0
+            value: -13.5
+        logAquPerm:
+            min: -13.8
+            max: -10.3
+            value: -12.05
+    Outputs: [CO2_aquifer1,
+              brine_aquifer1,
+              CO2_aquifer2,
+              brine_aquifer2]
+#-------------------------------------------------
+Analysis:
+# Analyze model parameter and observation interactions.
+# All sensitivity analysis done with Random Balanced Design
+# Fourier Amplitude Sensitivity Test (RBD-Fast).
+# All output files are written to the OutputDirectory
+# specified in the ModelParams section.
+# Sobol Analysis available through scripting interface.
+#-------------------------------------------------
+    #------------------------------------------------------
+    CorrelationCoeff:
+    # Calculates the Pearson or Spearman correlation coefficients
+    # between model parameters and observations.
+    #------------------------------------------------------
+        CorrelationType: pearson      # Type of correlation to calculate (options: pearson or spearman)
+        OutputTimeIndex: [10, 25, 50] # Time Index to use for calculations (default is the index for EndTime, can be a single value or a list)
+        FigureDPI: 300
+        SaveCSVFiles: True
+        Excludes: [Reservoir1_000.pressure, Reservoir1_000.CO2saturation] # Observations to exclude for
+        # correlation coefficients calculation; default []. Note that these entries must follow the naming
+        # convention used in the Control File Interface: COMPNAME_000.OUTPUTNAME, where COMPNAME is provided
+        # by the user in the .yaml file (e.g., Reservoir1 or Wellbore1), 000 is the location index (e.g.,
+        # 000 is for the first location represented in a list of coordx and coordy values - here, x = 100 m
+        # and y = 100 m), and OUTPUTNAME is the name of the output (e.g., pressure or CO2_aquifer1).
+    #------------------------------------------------------
+    SensitivityCoeff:
+    # Calculate the Sensitivity Coefficients for a single observation
+    # and plot on a bar chart.
+    #------------------------------------------------------
+        Outputs: [CO2_aquifer1, brine_aquifer1]
+        FigureDPI: 300
+        SaveCSVFiles: True
+        OutputTimeIndex: [10, 25, 50] # When setting the times with EndTime and TimeStep (not TimePoints),
+        # index 0 is for year 0. These correspond with times of 10, 25, and 50 years.
+    #------------------------------------------------------
+    StackedSensitivityBars:
+    # This is similar to SensitivityCoeff, but the x-axis has output
+    # names instead of component parameters. The sensitivities to
+    # parameters are stacked on top of each other (in bar plots) to
+    # show their relative influences. Additionally, one figure is made
+    # for each OutputTimeIndex, with each figure showing the
+    # sensitivities of all Outputs at the corresponding time index.
+    # In contrast, SensitivityCoeff creates one figure for each combination
+    # of output and time index.
+    #------------------------------------------------------
+        Outputs: [CO2_aquifer1, brine_aquifer1]
+        FigureDPI: 300
+        SaveCSVFiles: True
+        OutputTimeIndex: [10, 25, 50] # When setting the times with EndTime and TimeStep (not TimePoints),
+        # index 0 is for year 0. These correspond with times of 10, 25, and 50 years.
+    #------------------------------------------------------
+    MultiSensitivities:
+    # Calculate the Sensitivity Coefficients for multiple observations
+    # all combined on a single bar chart.
+    #------------------------------------------------------
+        Outputs: [CO2_aquifer1, brine_aquifer1, CO2_aquifer2, brine_aquifer2]
+        OutputTimeIndex: [10, 25, 50]
+        FigureDPI: 300
+        SaveCSVFiles: True
+    #------------------------------------------------------
+    TimeSeriesSensitivity:
+    # Create time series plot of how parameter sensitivities change
+    # through time.
+    # (To reduce clutter on the output plot only the top sensitivities
+    # from capture_point time are used)
+    #------------------------------------------------------
+        Outputs: CO2_aquifer1
+        FigureDPI: 300
+        SaveCSVFiles: True
+        NumberIncluded: 5 # Number of top sensitivities to include in calculations, the default is 5
+Plots:
+    #------------------------------------------------------
+    # The TimeSeriesStats option can be used to plot
+    # percentiles, min, mean, median, and max values.
+    # This is the best way to view large numbers of
+    # realization results.
+    #------------------------------------------------------
+    # Plot the brine leakage (statistics) into the aquifer
+    #------------------------------------------------------
+    Brine_Leakage_Stats:
+        TimeSeriesStats: [brine_aquifer1]
+    #------------------------------------------------------
+    # Plot the CO2 leakage (statistics) into the aquifer
+    #------------------------------------------------------
+    CO2_Leakage_Stats:
+        TimeSeriesStats: [CO2_aquifer1]
+        Title: $CO_2$ leakage Stats
+    # Plot the brine leakage (series) into the aquifer
+    #------------------------------------------------------
+    Brine_Leakage_Series:
+        TimeSeries: [brine_aquifer1]
+    #------------------------------------------------------
+    # Plot the CO2 leakage (series) into the aquifer
+    #------------------------------------------------------
+    CO2_Leakage_Series:
+        TimeSeries: [CO2_aquifer1]
+        Title: $CO_2$ leakage Stats
+    #------------------------------------------------------
+    # Plot the reservoir pressure and saturation
+    #------------------------------------------------------
+    Reservoir:
+        TimeSeriesStats: [pressure, CO2saturation]
+        Title: Reservoir Response
+        Subplot:
+            NumCols: 1
+            Reservoir1_000.pressure: 'Pressure at well #0'
+            Reservoir1_000.CO2saturation: '$CO_2$ Saturation at well #0'

@@ -1,0 +1,124 @@
+# OpenIAM Control File Example 42
+#
+# This example demonstrates the use of the time to first detection (TTFD) plot
+# with CarbonateAquifer component. Because the CarbonateAquifer component
+# reports dx and dy values for impacted lengths and widths of volumes
+# (i.e., instead of separate dimensions for TDS, pH, Dissovled_salt, or Dissolved_CO2),
+# the TTFD plot must have "PlumeType: CarbonateAquifer."
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex42.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 100
+    TimeStep: 1
+    Analysis:
+        type: lhs
+        siz: 30
+    Components: [SimpleReservoir1, MultisegmentedWellbore1, CarbonateAquifer1]
+    OutputDirectory: output/output_ex42_{datetime}
+    Logging: Info
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        value: 100.0
+        vary: False
+    shale2Thickness:
+        value: 250.0
+        vary: False
+    shale3Thickness:
+        value: 250.0
+        vary: False
+    aquifer1Thickness:
+        vary: False
+        value: 100
+    aquifer2Thickness:
+        vary: False
+        value: 100
+    reservoirThickness:
+        vary: False
+        value: 50
+#-------------------------------------------------
+SimpleReservoir1:
+    Type: SimpleReservoir
+    Parameters:
+        injRate:
+            value: 1
+            vary: False
+    Outputs: [pressure, CO2saturation, mass_CO2_reservoir]
+#-------------------------------------------------
+MultisegmentedWellbore1:
+    Type: MultisegmentedWellbore
+    Connection: SimpleReservoir1
+    Number: 2
+    Locations:
+        coordx: [500, 750]
+        coordy: [500, 750]
+    Parameters:
+        wellRadius:
+            value: 0.05
+            min: 0.025
+            max: 0.075
+        logWellPerm:
+            value: -13.5
+            min: -14.0
+            max: -13.0
+    Outputs: [CO2_aquifer1, CO2_aquifer2, CO2_atm,
+              brine_aquifer1, brine_aquifer2, brine_atm]
+#-------------------------------------------------
+CarbonateAquifer1:
+    Type: CarbonateAquifer
+    Connection: MultisegmentedWellbore1
+    AquiferName: aquifer1
+    Parameters:
+        perm_var:
+            value: 0.9535
+            min: 0.017
+            max: 1.89
+        corr_len:
+            value: 2.475
+            min: 1.0
+            max: 3.95
+        aniso:
+            value: 25.1
+            min: 1.1
+            max: 49.1
+        mean_perm:
+            value: -12.05
+            min: -13.8
+            max: -10.3
+        cl:
+            value: 0.776
+            min: 0.1
+            max: 6.025
+        hyd_grad:
+            value: 9.59e-3
+            min: 2.88e-4
+            max: 1.89e-2
+    Outputs: [dx, dy]
+#-------------------------------------------------
+Plots:
+    CO2_Leakage:
+        TimeSeries: [CO2_aquifer1, CO2_aquifer2]
+        subplot:
+            use: True
+            ncols: 2
+    Brine_Leakage:
+        TimeSeries: [brine_aquifer1, brine_aquifer2]
+        subplot:
+            use: True
+            ncols: 2
+    TTFD_Plot:
+        TTFD:
+            PlotInjectionSites: True
+            PlumeType: CarbonateAquifer
+            MonitoringLocations:
+                coordx: [500, 500, 750, 750]
+                coordy: [500, 500, 750, 750] # No coordz or VerticalWindow when using CarbonateAquifer!
+                HorizontalWindow: 5
+            ComponentNameList: [CarbonateAquifer1]

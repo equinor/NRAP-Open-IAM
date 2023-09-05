@@ -1,0 +1,7 @@
+ Fracture Data for Input - Verify - One line across at three levels -- 28 Feb 2021,,,,
+X1,Y1,X2,Y2,Aperture
+0,0,10,10,0.0002
+10,10,20,20,0.0002
+20,20,30,30,0.0002
+30,30,40,40,0.0002
+50,50,60,60,0.0002

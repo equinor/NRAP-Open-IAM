@@ -1,0 +1,96 @@
+# OpenIAM Control File Example 50
+#
+# This example demonstrates the use of a FaultFlow
+# component connected to a SimpleReservoir component.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex50.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 50.0
+    TimeStep: 1.0
+    Analysis:
+        type: lhs
+        siz: 30
+    Components: [SimpleReservoir1, FaultFlow1]
+    OutputDirectory: output/output_ex50_{datetime}
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        vary: False
+        value: 894.7
+    shale2Thickness:
+        vary: False
+        value: 894.7
+    shale3Thickness:
+        vary: False
+        value: 400.0
+    aquifer1Thickness:
+        vary: False
+        value: 594.7
+    aquifer2Thickness:
+        vary: False
+        value: 100.0
+    reservoirThickness:
+        vary: False
+        value: 30.0
+#-------------------------------------------------
+SimpleReservoir1:
+    Type: SimpleReservoir
+    InjectionWell:
+        coordx: 0
+        coordy: 0
+    Parameters:
+        logResPerm:
+            value: -12.25
+            min: -12.5
+            max: -12.0
+        injRate: 0.1
+        shale1Thickness: 894.7
+        shale2Thickness: 894.7
+        shale3Thickness: 400.0
+        aquifer1Thickness: 594.7
+        aquifer2Thickness: 100.0
+    Outputs: [pressure, CO2saturation]
+#-------------------------------------------------
+FaultFlow1:
+    Type: FaultFlow
+    Connection: SimpleReservoir1
+    Segments:
+        Number: 1
+    Parameters:
+        strike: 90
+        dip: 85
+        length: 100.0
+        xStart: 150.0
+        yStart: 1500.0
+        nSegments: 1
+        SGR: 0.0
+        stateVariable: 1.0
+        aperture:
+            value: 2.50e-5
+            min: 1.0e-5
+            max: 5.0e-05
+        aquiferDepth: 994.7
+        injectDepth: 2884.31
+        aquiferPressure: 4.9e+6
+        fieldPressure: 2.84e+7
+        injectPressure: 3.81e+7
+        finalPressure: 4.17e+7
+    Outputs: [brine_aquifer_total, CO2_aquifer_total]
+#-------------------------------------------------
+Plots:
+    Pressure:
+        TimeSeriesStats: [pressure]
+    CO2_Saturation:
+        TimeSeriesStats: [CO2saturation]
+    Brine_Leakage:
+        TimeSeriesStats: [brine_aquifer_total]
+    CO2_Leakage:
+        TimeSeriesStats: [CO2_aquifer_total]

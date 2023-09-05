@@ -1,0 +1,157 @@
+# OpenIAM Control File Example 36
+#
+# This example demonstrates the use of the Stratigraphy and StratigraphicColumn
+# plot types in a simulation with flat-lying units (i.e., no dip).
+#
+# This example also demonstrates how one can set variables with a string.
+# The wellTop and reservoirDepth parameters within the OpenWellbore
+# component are set as aquifer3Depth and shale1Depth, respectively. These
+# depths represent the bottom of the corresponding unit. The aqu_thick and
+# top_depth parameters of the GenericAquifer component are also set as
+# aquifer2Thickness and shale4Thickness. Because shale 4 is the top shale
+# (closest to the surface), shale4Thickness is equal to shale4Depth, which also
+# represents the top of aquifer 3.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex36.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 50
+    TimeStep: 1.0
+    Analysis: forward
+    Components: [SimpleReservoir1, OpenWellbore1, GenericAquifer1]
+    OutputDirectory: output/output_ex36_{datetime}
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 4
+    shale1Thickness:
+        value: 750.0
+        vary: False
+    shale2Thickness:
+        value: 1000.0
+        vary: False
+    shale3Thickness:
+        value: 250.0
+        vary: False
+    shale4Thickness:
+        value: 300.0
+        vary: False
+    aquifer1Thickness:
+        vary: False
+        value: 100.0
+    aquifer2Thickness:
+        vary: False
+        value: 250.0
+    aquifer3Thickness:
+        vary: False
+        value: 150.0
+    reservoirThickness:
+        vary: False
+        value: 150.0
+#-------------------------------------------------
+SimpleReservoir1:
+    Type: SimpleReservoir
+    Parameters:
+        injRate:
+            value: 1
+            vary: False
+        logResPerm:
+            value: -10.15
+            vary: False
+    Outputs: [pressure, CO2saturation]
+#-------------------------------------------------
+OpenWellbore1:
+    Type: OpenWellbore
+    Connection: SimpleReservoir1
+    Locations:
+        grid:
+            xmin: 500
+            xmax: 1000
+            xsize: 2
+            ymin: 500
+            ymax: 1000
+            ysize: 2
+    LeakTo: aquifer3
+    Controls:
+        critPressureApproach: True
+    Parameters:
+        wellRadius:
+            value: 0.05
+            vary: False
+        logReservoirTransmissivity:
+            value: -10.97
+            vary: False
+        logAquiferTransmissivity:
+            value: -10.0
+            vary: False
+        brineSalinity:
+            value: 0.2
+            vary: False
+        wellTop:
+            value: aquifer3Depth
+            vary: False
+        reservoirDepth:
+            value: shale1Depth
+            vary: False
+        brineDensity:
+            value: 1025
+            vary: False
+    Outputs: [CO2_aquifer, brine_aquifer]
+#-------------------------------------------------
+GenericAquifer1:
+    Type: GenericAquifer
+    Connection: OpenWellbore1
+    AquiferName: aquifer3
+    Parameters:
+        aqu_thick: aquifer3Thickness
+        top_depth: shale4Thickness
+    Outputs: [Dissolved_salt_volume, Dissolved_CO2_volume]
+#-------------------------------------------------
+Plots:
+    Plot1:
+        TimeSeries: [pressure]
+        Subplot:
+            Use: True
+            NumCols: 2
+    Plot2:
+        TimeSeries: [CO2saturation]
+        Subplot:
+            Use: True
+            NumCols: 2
+    Plot3:
+        TimeSeries: [CO2_aquifer]
+        Subplot:
+            Use: True
+            NumCols: 2
+    Plot4:
+        TimeSeries: [brine_aquifer]
+        Subplot:
+            Use: True
+            NumCols: 2
+    Plot5:
+        Subplot:
+            Use: True
+            NumCols: 2
+        TimeSeries: [Dissolved_salt_volume]
+    Plot6:
+        Subplot:
+            Use: True
+            NumCols: 2
+        TimeSeries: [Dissolved_CO2_volume]
+    Plot7:
+        Stratigraphy:
+            PlotWellbores: True
+            PlotWellLabels: True
+            StrikeAndDipSymbol:
+                PlotSymbol: True
+            View:
+                ViewAngleElevation: [10, 30]
+                ViewAngleAzimuth: [300, 300]
+    Plot8:
+        StratigraphicColumn:
+            FigureDPI: 300

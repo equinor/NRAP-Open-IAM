@@ -1,0 +1,103 @@
+# OpenIAM Control File Example 6
+#
+# This example uses a MultisegmentedWellbore component connected to a
+# LookupTableReservoir component with the Latin Hypercube Sampling (lhs)
+# analysis type. The LookupTableReservoir component is used to read the
+# pressures and CO2 saturations stored in .csv files and provide appropriate
+# values (i.e., spatially interpolated reservoir data of the results
+# in the .csv file) to the wellbores based on their locations. Based
+# on the pressures and CO2 saturations provided, the MultisegmentedWellbore
+# components then simulate the leakage of CO2 and brine into the intermediate
+# aquifer (aquifer1).
+#
+# The use of the LookupTableReservoir in this example requires the additional
+# Kimberlina data set. THe Kimberlina data set (pressure-in-pa-kimb-54-sims.zip or
+# Pressure_In_Pa_Kimb_54_sims.zip) can be downloaded from one of the following places:
+# 1. https://edx.netl.doe.gov/dataset/nrap-open-source-iam
+# 2. https://gitlab.com/NRAP/Kimberlina_data
+#
+# The downloaded data set should be placed here:
+#    source/components/reservoir/lookuptables/Kimb_54_sims
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#  python ../../source/openiam/openiam_cf.py --file ControlFile_ex6.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 50
+    TimeStep: 1.0
+    Analysis:
+        type: lhs
+        siz: 10
+    Components: [LUTReservoir1, msw1]
+    OutputDirectory: output/output_ex6_{datetime}
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        min: 500.0
+        max: 550.0
+        value: 525.0
+    shale2Thickness:
+        min: 450.0
+        max: 500.0
+        value: 475.0
+    shale3Thickness:
+        vary: False
+        value: 11.2
+    aquifer1Thickness:
+        vary: False
+        value: 1.4
+    aquifer2Thickness:
+        vary: False
+        value: 19.2
+    reservoirThickness:
+        vary: False
+        value: 51.2
+#-------------------------------------------------
+LUTReservoir1:
+    Type: LookupTableReservoir
+    FileDirectory: source/components/reservoir/lookuptables/Kimb_54_sims
+    TimeFile: time_points.csv
+    ParameterFilename: parameters_and_filenames.csv
+    Parameters:
+        logResPerm:
+            Values: [-13.3, -12.3, -12.8]
+            Weights: [0.5, 0.5, 0.5]
+        reservoirPorosity:
+            Values: [0.215, 0.338, 0.276]
+            Weights: [0.75, 0.20, 0.05]
+        logShalePerm:
+            Values: [-18.7, -17.7, -16.7]
+            #Weights: []
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+msw1:
+    Type: MultisegmentedWellbore
+    Connection: LUTReservoir1
+    Number: 2
+    Locations:
+        coordx: [37478.0, 37555.0]
+        coordy: [48333.0, 48999.0]
+    Parameters:
+        logWellPerm:
+            min: -14.0
+            max: -11.0
+            value: -13.5
+    Outputs: [CO2_aquifer1,
+              brine_aquifer1]
+#-------------------------------------------------
+Plots:
+    Plot1:
+        TimeSeries: [CO2saturation]
+    Plot2:
+        TimeSeries: [pressure]
+    Plot3:
+        TimeSeriesStats: [CO2_aquifer1]
+    Plot4:
+        TimeSeriesStats: [brine_aquifer1]

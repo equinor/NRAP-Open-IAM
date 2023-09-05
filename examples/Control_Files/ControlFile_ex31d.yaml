@@ -1,0 +1,169 @@
+# OpenIAM Control File Example 31d
+#
+# This example is similar to Control File examples 31c, but it
+# demonstrates the use of the TimeList option with the AoR plot type.
+# If the TimeList entry is not provided, the AoR plot will show the
+# maximum results at all locations across all model times and all
+# model realizations (i.e., the different lhs simulations). If TimeList
+# is provided, however, separate AoR plots will be made for different
+# model times. Having these separate plots can help inform the boundaries
+# of the potentially impacted aquifer region growing over time (i.e., areas
+# that could be impacted if an OpenWellbore was present there). Estimating
+# the spatiotemporal evolution of impacted aquifer regions can help inform
+# the planning of when different areas need to be surveyed for legacy wells.
+# It may be cost prohibitive to survey for legacy wells at arbitrarily large
+# distances from the injection site prior to site operation, so these analyses
+# can help inform how far operators need to survey for and plug legacy wells,
+# e.g., 5, 10, or 20 years into site operation.
+#
+# If the AoR plot entry includes 'TimeList: All,' then one plot will be made
+# for each model time step. Alternatively, one can provide a list with specific
+# times (in years; e.g., TimeList: [1, 5, 10, 15, 20]).
+#
+# Because this simulation uses Latin Hypercube Sampling (lhs), the plots made
+# for each time include the maximum results across all model realizations at
+# that time.
+#
+# A critical pressure can be shown in a pressure AoR figure by including
+# 'CriticalPressureMPa: Calculated' or 'CriticalPressureMPa: X'
+# (where X is a value in MPa). The figure will specify whether the critical
+# pressure has been exceeded.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex31d.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 10
+    TimeStep: 1.0
+    Analysis:
+        type: lhs
+        siz: 30
+    Components: [SimpleReservoir1, OpenWellbore1, FutureGen2Aquifer1]
+    OutputDirectory: 'output/output_ex31d_{datetime}'
+    GenerateOutputFiles: False
+    GenerateCombOutputFile: False
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        value: 750.0
+        vary: False
+    shale2Thickness:
+        value: 950.0
+        vary: False
+    shale3Thickness:
+        value: 365
+        vary: False
+    aquifer1Thickness:
+        vary: False
+        value: 85
+    aquifer2Thickness:
+        vary: False
+        value: 85
+    reservoirThickness:
+        vary: False
+        value: 150
+#-------------------------------------------------
+SimpleReservoir1:
+    Type: SimpleReservoir
+    Parameters:
+        injRate:
+            value: 1.0
+            vary: False
+        logResPerm:
+            value: -11.0
+            vary: False
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+OpenWellbore1:
+    Type: OpenWellbore
+    Connection: SimpleReservoir1
+    Number: 25   # 5*5
+    LeakTo: aquifer2
+    Locations:
+        grid:
+            xmin: -25000
+            xmax: 25000
+            xsize: 5
+            ymin: -25000
+            ymax: 25000
+            ysize: 5
+    Controls:
+        critPressureApproach: True
+        enforceCritPressure: False
+    Parameters:
+        wellRadius:
+            value: 0.05
+            vary: False
+        logReservoirTransmissivity:
+            value: -10.0
+            vary: False
+        logAquiferTransmissivity:
+            value: -10.5
+            min: -11.0
+            max: -10.0
+        brineSalinity:
+            value: 0.2
+            vary: False
+        brineDensity:
+            value: 1050
+            vary: False
+        # If critPressureApproach is set to True and enforceCritPressure
+        # is left at the default of False, the parameters wellTop, reservoirDepth,
+        # and brineDensity are used to calculate critical pressure.
+        # If both critPressureApproach and enforceCritPressure are set to True
+        # and the critPressure parameter is given, then the value
+        # of the critPressure parameter will be used instead.
+    Outputs: [CO2_aquifer,
+              brine_aquifer]
+#-------------------------------------------------
+FutureGen2Aquifer1:
+    Type: FutureGen2Aquifer
+    Connection: OpenWellbore1
+    AquiferName: aquifer2
+    Parameters:
+        # Parameters aqu_thick (85 m) and depth (450 m) are linked
+        # to stratigraphy and don't require to be setup explicitily unless
+        # different value of the parameter is required.
+        por:
+            value: 0.18
+            vary: False
+        log_permh:
+            value: -11.92
+            vary: False
+        log_aniso:
+            value: 0.3
+            vary: False
+        rel_vol_frac_calcite:
+            value: 0.01
+            vary: False
+    Outputs: [pH_volume, TDS_volume]
+#-------------------------------------------------
+Plots:
+    Plot1:
+        AoR: [pressure]
+        PlotInjectionSites: True
+        FigureDPI: 200
+        TimeList: All
+        CriticalPressureMPa: Calculated
+    Plot2:
+        AoR: [CO2saturation]
+        PlotInjectionSites: True
+        FigureDPI: 200
+        TimeList: [1, 5, 10]
+    Plot3:
+        AoR: [pH_volume]
+        PlotInjectionSites: True
+        FigureDPI: 200
+        TimeList: [1, 5, 10]
+    Plot4:
+        AoR: [TDS_volume]
+        PlotInjectionSites: True
+        FigureDPI: 200
+        TimeList: [1, 5, 10]

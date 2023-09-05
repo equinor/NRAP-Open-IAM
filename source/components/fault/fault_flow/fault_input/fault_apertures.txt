@@ -1,0 +1,3 @@
+! User-defined Aperture File for Fault ROM ->> 1 Fault, 4 Plates
+1,1
+1.50E-02

@@ -1,0 +1,124 @@
+# OpenIAM Control File Example 52b
+#
+# This example is similar to control file example 52a, but this model uses
+# Latin Hypercube Sampling (lhs). The model times are specified with the
+# TimePoints entry. In example 52a, only the EndTime and TimeStep are specified.
+# The HydrocarbonLeakage component provides (possibly) non-zero outputs for the time
+# range 100 to 410 years. When setting the time range with EndTime and TimeStep,
+# the range automatically begins at t = 0 years. The HydrocarbonLeakage component
+# produces all output values of 0 for years 0 to 99. In general, the model
+# applicable time range is between 100 to 410 years.
+#
+# In this example, the parameters reservoirPressureMult and logWellPerm are varied.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex52b.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    # Time is in years
+    TimePoints: [100, 110, 120, 130, 140, 150, 160, 170, 180, 190,
+                 200, 210, 220, 230, 240, 250, 260, 270, 280, 290,
+                 300, 310, 320, 330, 340, 350, 360, 370, 380, 390,
+                 400, 410]
+    Analysis:
+        type: lhs
+        siz: 30
+    Components: [HydrocarbonLeakage1]
+    OutputDirectory: output/output_ex52b_{datetime}
+    OutputType: 1  # 0 - row-wise; 1 - column-wise
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    # Thickness is in meters
+    shale1Thickness:
+        vary: False
+        value: 648.0
+    shale2Thickness:
+        vary: False
+        value: 255.0
+    shale3Thickness:
+        vary: False
+        value: 1.0    # the smallest allowable value
+    aquifer1Thickness:
+        vary: False
+        value: 125.0
+    aquifer2Thickness:
+        vary: False
+        value: 17.88  # the depth to the bottom of the aquifer is 18.88 m
+    reservoirThickness:
+        vary: False
+        value: 50.0
+#-------------------------------------------------
+HydrocarbonLeakage1:
+    Type: HydrocarbonLeakage
+    Parameters:
+        # In this example parameter reservoirDepth (1046.88 m) is linked
+        # to the Stratigraphy composite parameter shale1Depth (bottom of shale
+        # layer 1 and top of the reservoir) calculated as the sum of all layers
+        # thicknesses above the reservoir, i.e., for all shale and aquifer layers
+        NTG:
+            value: 0.444
+            vary: False
+        logResPerm:
+            value: -13.23
+            vary: False
+        reservoirPressureMult:
+            value: 1.13
+            min: 1.08
+            max: 1.18
+        avgWaterSaturation:
+            value: 0.719
+            vary: False
+        logWellPerm:
+            value: -12.44
+            min: -12.69
+            max: -12.19
+        FCO2:
+            value: 0.647
+            vary: False
+        FC1:
+            value: 0.062
+            vary: False
+        FC4:
+            value: 0.082
+            vary: False
+        FC7Plus:
+            value: 0.209
+            vary: False
+    Outputs: [mass_CO2_aquifer, mass_CO2_gas_aquifer,
+              mass_methane_oil_aquifer, mass_methane_gas_aquifer,
+              mass_oil_aquifer, mass_gas_aquifer]
+#-------------------------------------------------
+Plots:
+    CO2_Leakage:
+        TimeSeriesStats: [mass_CO2_aquifer, mass_CO2_gas_aquifer]
+        FigureDPI: 100
+        subplot:
+            use: True
+            ncols: 2
+            HydrocarbonLeakage1.mass_CO2_aquifer: 'CO$_2$ Liquid Leaked to Aquifer'
+    CH4_Leakage:
+        TimeSeriesStats: [mass_methane_oil_aquifer, mass_methane_gas_aquifer]
+        FigureDPI: 100
+        subplot:
+            use: True
+            ncols: 2
+    CO2_and_CH4_Leakage:
+        TimeSeriesStats: [mass_CO2_aquifer, mass_CO2_gas_aquifer,
+                          mass_methane_oil_aquifer, mass_methane_gas_aquifer]
+        FigureDPI: 100
+        subplot:
+            use: True
+            ncols: 2
+            nrows: 2
+    Total_Leakage:
+        TimeSeriesStats: [mass_oil_aquifer, mass_gas_aquifer]
+        FigureDPI: 100
+        subplot:
+            use: True
+            ncols: 2

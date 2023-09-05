@@ -1,0 +1,96 @@
+# OpenIAM Control File Example 45c
+#
+# This example demonstrates the use of the TheisReservoir
+# component. Note that this control file was created to
+# be equivalent to the script example iam_sys_theis_benchmark2.py.
+# The TheisReservoir component needs entries for injRates
+# and injTimes.
+#
+# While injRates and injTimes are directly provided as lists in
+# Control File ex 45a, this example shows how they can be provided
+# in .csv files. For a single injection well the injection rates and injection
+# times can be provided both row-wise and column-wise
+# (see example Control File Example 45b). For multiple injections wells
+# each row corresponds to a different injection well, each column
+# corresponds to a different injection times.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex45c.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 0.02737850787132101     # 10 days as a fraction of a year
+    TimeStep: 0.0006844626967830253  # 6 hours as a fraction of a year
+    Analysis: forward
+    Components: [TheisReservoir1]
+    OutputDirectory: output/output_ex45c_{datetime}
+    OutputType: 1  # 0 - row-wise; 1 - column-wise
+    GenerateOutputFiles: True
+    GenerateCombOutputFile: False
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        vary: False
+        value: 250.0
+    shale2Thickness:
+        vary: False
+        value: 250.0
+    shale3Thickness:
+        vary: False
+        value: 250.0
+    aquifer1Thickness:
+        vary: False
+        value: 100.0
+    aquifer2Thickness:
+        vary: False
+        value: 100.0
+    reservoirThickness:
+        vary: False
+        value: 50.0
+#-------------------------------------------------
+TheisReservoir1:
+    Type: TheisReservoir
+    InjectionWell:
+        coordx: 0
+        coordy: 0
+    Locations:
+        coordx: [3.131]
+        coordy: [0]
+    # injRates are given in m^3/s
+    injRates: examples/Control_Files/input_data/ex45c/inj_rates.csv
+    # injTimes are given in years
+    injTimes: examples/Control_Files/input_data/ex45c/inj_times.csv
+    Parameters:
+        # reservoirThickness parameter of reservoir component is linked to stratigraphy
+        initialPressure:
+            value: 6.0e+5
+            vary: False
+        logResPerm:
+            value: -10.6271524099
+            vary: False
+        reservoirPorosity:
+            value: 0.35
+            vary: False
+        brineDensity:
+            value: 9.98664e+02
+            vary: False
+        brineViscosity:
+            value: 1.01759e-03
+            vary: False
+        CO2Density:
+            value: 9.98664e+02
+            vary: False
+        compressibility:
+            value: 4.3531e-11
+            vary: False
+    Outputs: [pressure]
+#-------------------------------------------------
+Plots:
+    pressure:
+        TimeSeries: [pressure]
+        UseMarkers: True
+        FigureDPI: 150

@@ -1,0 +1,63 @@
+# This file is a template, and might need editing before it works on your project.
+# Official language image. Look for the different tagged releases at:
+# https://hub.docker.com/r/library/python/tags/
+image: python:3.9
+
+# Change pip's cache directory to be inside the project directory since we can
+# only cache local items.
+#variables:
+#  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+# Pip's cache doesn't store the python packages
+# https://pip.pypa.io/en/stable/reference/pip_install/#caching
+#
+# If you want to also cache the installed packages, you have to install
+# them in a virtualenv and cache it as well.
+cache:
+  paths:
+    - .cache/pip
+    - .cache/apt
+    - venv/
+
+before_script:
+  - python -V  # Print out python version for debugging
+  - export PIP_CACHE_DIR=`pwd`/.cache/pip
+  - export APT_CACHE_DIR=`pwd`/.cache/apt
+  - pip install --cache-dir "$PIP_CACHE_DIR" --upgrade pip
+  - pip install --cache-dir "$PIP_CACHE_DIR" virtualenv
+  - virtualenv venv
+  - source venv/bin/activate
+  - pip install --cache-dir "$PIP_CACHE_DIR" tensorflow==2.6 keras scikit-learn==1.0.2 scipy==1.7.3 matplotlib==3.5.1 pandas==1.4.1 pyyaml
+  - pip install --cache-dir "$PIP_CACHE_DIR" --upgrade "protobuf<=3.20.1"
+  - apt-get update
+  - apt-get -o Dir::Cache::Archives="$APT_CACHE_DIR" install -yqq gfortran
+  - apt-get -o Dir::Cache::Archives="$APT_CACHE_DIR" install -yqq latexmk
+  - apt-get -o Dir::Cache::Archives="$APT_CACHE_DIR" install -yqq xzdec
+  - apt-get -o Dir::Cache::Archives="$APT_CACHE_DIR" install -yqq texlive-fonts-recommended
+  - apt-get -o Dir::Cache::Archives="$APT_CACHE_DIR" install -yqq texlive-latex-recommended
+  - apt-get -o Dir::Cache::Archives="$APT_CACHE_DIR" install -yqq texlive-latex-extra
+    #- apt-get -o Dir::Cache::Archives="$APT_CACHE_DIR" install -yqq libnvinfer-plugin6=6.0.1-1+cuda10.1
+
+test:
+  stage: test
+  script:
+    - export PYTHONPATH="/builds/NRAP/OpenIAM/:$PYTHONPATH"
+    - echo $PYTHONPATH
+    - cd setup
+    - python openiam_setup_tests.py
+
+pages:
+  stage: deploy
+  script:
+    - pip install sphinx==4.4.0 sphinx-rtd-theme sphinxcontrib-bibtex==1.0 sphinx_numfig nbsphinx
+    - cd documentation/website ; make html
+    - mv build/html/ ../../public/
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+
+stages:
+  - test
+  - deploy

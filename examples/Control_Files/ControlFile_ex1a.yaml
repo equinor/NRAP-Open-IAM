@@ -1,0 +1,143 @@
+# OpenIAM Control File Example 1a
+#
+# This example links a SimpleReservoir component to a CementedWellbore component.
+# Based on the pressures and CO2 saturations provided by the SimpleReservoir,
+# the CementedWellbore component calculates the leakage rates from 4 leaky wellbores.
+# The leakage enters aquifers 1 and 2 as well as the atmosphere.
+#
+# This example produces three plots. The first two plots show the CO2 leakage
+# into the intermediate aquifer (aquifer1) and the shallow aquifer (aquifer2).
+# The third plot shows the reservoir pressures at the wellbore locations. Each
+# plot has different outputs in separate subplots through the inclusion of
+# 'Use: True' under the 'Subplot' entry. The 'NumCols: 2' entry in each plot
+# specifies that each plot will have two columns of subplots. The subplot rows
+# are determined as the number required to show the number of outputs included
+# (here, two rows, so there are four subplots for four locations).
+#
+# In the plot Pressure_plot, the subplot titles are specified through the inclusion
+# of 'COMPONENTNAME.OUTPUTNAME: SUBPLOT TITLE' under the 'Subplot' entry. In the
+# control file interface, the component name is a combination of what the user
+# provides ('SimpleReservoir1') and a location index preceeded by an underscore
+# and containing three digits ('_000'). For example, the formatting of
+# 'COMPONENTNAME.OUTPUTNAME' here leads to 'SimpleReservoir1_000.pressure' for the
+# pressure at location 0 (the indexing starts at 0). If subplot titles are not
+# specified, they are generated based on the data shown.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#  python ../../source/openiam/openiam_cf.py --file ControlFile_ex1a.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    # Time is in years
+    EndTime: 10    # EndTime and TimeStep - 1st option to enter time
+    TimeStep: 1.0
+    # TimePoints: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] # 2nd option to enter time
+    # TimePoints: 'examples/Control_Files/input_data/ex1/time_points.csv' # 3rd option to enter time
+    Analysis: forward
+    Components: [SimpleReservoir1,
+                 CementedWellbore1]
+    OutputDirectory: output/output_ex1a_{datetime}
+    OutputType: 1  # 0 - row-wise; 1 - column-wise
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    # Thickness is in meters
+    shale1Thickness:
+        vary: False
+        value: 525.0
+    shale2Thickness:
+        vary: False
+        value: 475.0
+    shale3Thickness:
+        vary: False
+        value: 11.2
+    aquifer1Thickness:
+        vary: False
+        value: 22.4
+    aquifer2Thickness:
+        vary: False
+        value: 19.2
+    reservoirThickness:
+        vary: False
+        value: 51.2
+# All coordinates are in meters.
+# With the SimpleReservoir the default injection location is at (0, 0)
+#-------------------------------------------------
+# SimpleReservoir1 is a user defined name for component
+# the type SimpleReservoir is the ROM model name
+#-------------------------------------------------
+SimpleReservoir1:
+    Type: SimpleReservoir
+    InjectionWell:
+        coordx: 10
+        coordy: 20
+    Parameters:
+        injRate: 0.1
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+# Here, 4 leaky wellbores are added using the Cemented wellbore model.
+# Two of the wellbores have predetermined locations; locations of another two
+# wellbores will be generated randomly within the specified domain.
+#-------------------------------------------------
+CementedWellbore1:
+    Type: CementedWellbore
+    Connection: SimpleReservoir1
+    Number: 4
+    Locations:
+        coordx: [100, 540]
+        coordy: [100, 630]
+    RandomLocDomain:
+        xmin: 150
+        xmax: 250
+        ymin: 200
+        ymax: 300
+    Parameters:
+        logWellPerm:
+            vary: False
+            value: -13.0
+    Outputs: [CO2_aquifer1,
+              CO2_aquifer2,
+              CO2_atm,
+              brine_aquifer1,
+              brine_aquifer2]
+#-------------------------------------------------
+# Time-series plots of the output observations are
+# specified in the next section.
+#-------------------------------------------------
+Plots:
+    #------------------------------------------------------
+    # The following commands will plot the CO2 leakage
+    # rates to both aquifers.  The plots will be given
+    # the names 'CO2_Leakage1' and 'CO2_Leakage2' and saved as 'CO2_Leakage1.png'
+    # and 'CO2_Leakage2.png' respectively in the output directory.
+    #------------------------------------------------------
+    CO2_Leakage1:
+        TimeSeries: [CO2_aquifer1]
+        Subplot:
+            NumCols: 2
+            Use: True
+    CO2_Leakage2:
+        TimeSeries: [CO2_aquifer2]
+        Subplot:
+            NumCols: 2
+            Use: True
+    #------------------------------------------------------
+    # Next do the same thing for the pressure at the base
+    # of the leaky wellbores.
+    # A custom title and subtitles for each subplot are added to the produced figure.
+    #------------------------------------------------------
+    Pressure_plot:
+        TimeSeries: [pressure]
+        Subplot:
+            NumCols: 2
+            Use: True
+            SimpleReservoir1_000.pressure: 'Pressure at well #1'   # the '' are required because the number
+            SimpleReservoir1_001.pressure: 'Pressure at well #2'   # would be silenced by the # and excluded
+            SimpleReservoir1_002.pressure: 'Pressure at well #3'
+            SimpleReservoir1_003.pressure: 'Pressure at well #4'
+        Title: Reservoir Pressure at Wellbore Location

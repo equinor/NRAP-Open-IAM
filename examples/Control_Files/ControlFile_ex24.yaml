@@ -1,0 +1,110 @@
+# OpenIAM Control File Example 24
+#
+# This example demonstrates the use of the GenericAquifer component. Here,
+# a LookupTableReservoir utilizes smaller set of lookup tables list of which is
+# provided in parameters_and_filenames_trunc.csv file.
+# The reservoir data is then provided to a MultisegmentedWellbore component, which
+# calculates the leakage of CO2 and brine into aquifers 1, 2, 3, and 4.
+# The GenericAquifer is set up to represent aquifer 4 (i.e., it includes
+# AquiferName: aquifer4), so the leakage rates into aquifer 4 impact the
+# evolution of the GenericAquifer's dissolved salt and dissolved CO2 plume
+# volumes. The plume volumes produced reflect the areas with dissolved salt and
+# dissolved CO2 concentrations exceeding the thresholds used. The
+# dissolved_salt_threshold and dissolved_co2_threshold parameters are not
+# included here and will therefore be set to the default values of 0.02 and
+# 0.01, respectively.
+#
+# This example requires the additional FutureGen 2.0 data set.
+# FutureGen 2.0 data set can be downloaded from the following source:
+# https://edx.netl.doe.gov/dataset/futuregen-2-0-1008-simulation-reservoir-lookup-table
+#
+# The downloaded data set should be placed here:
+#    source/components/reservoir/lookuptables/FutureGen2/1008_sims
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex24.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 10.
+    TimeStep: 1.
+    Analysis: forward
+    Components: [LookupTableReservoir1, MultisegmentedWellbore1, GenericAquifer1]
+    OutputDirectory: output/output_ex24_{datetime}
+    Logging: Info
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers: 5
+    shale1Thickness: 198.7
+    shale2Thickness: 74.4
+    shale3Thickness: 110.3
+    shale4Thickness: 118.9
+    shale5Thickness: 530.4
+    aquifer1Thickness: 33.2
+    aquifer2Thickness: 84.1
+    aquifer3Thickness: 31.1
+    aquifer4Thickness: 61.6
+    reservoirThickness: 7
+#-------------------------------------------------
+LookupTableReservoir1:
+    Type: LookupTableReservoir
+    FileDirectory: source/components/reservoir/lookuptables/FutureGen2/1008_sims
+    TimeFile: time_points.csv
+    ParameterFilename: parameters_and_filenames_trunc.csv
+    Parameters:
+        index: 5
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+MultisegmentedWellbore1:
+    Type: MultisegmentedWellbore
+    Connection: LookupTableReservoir1
+    Locations:
+        coordx: [236377.0, 236758.0]
+        coordy: [4409269.5, 4410107.6]
+    Parameters:
+        wellRadius: 0.05715
+        logAqu1Perm: -13.39
+        logAqu2Perm: -11.05
+        logAqu3Perm: -12.48
+        logAqu4Perm: -11.92
+        logWellPerm: -13.0
+        brineDensity: 1030.9
+        CO2Density: 775.0
+        brineViscosity: 7.5e-4
+        CO2Viscosity: 6.6e-5
+    Outputs: [CO2_aquifer1, CO2_aquifer2, CO2_aquifer3, CO2_aquifer4, CO2_atm,
+              brine_aquifer1, brine_aquifer2, brine_aquifer3, brine_aquifer4, brine_atm]
+#-------------------------------------------------
+GenericAquifer1:
+    Type: GenericAquifer
+    Connection: MultisegmentedWellbore1
+    AquiferName: aquifer4
+    Parameters:
+        por: 0.2
+        log_permh: -12.0
+        log_aniso: 0.6
+    Outputs: [Dissolved_salt_volume, Dissolved_CO2_volume]
+#-------------------------------------------------
+Plots:
+    pressure_plot:
+        subplot:
+            use: True
+            ncols: 2
+        TimeSeries: [pressure]
+    saturation_plot:
+        subplot:
+            use: True
+            ncols: 2
+        TimeSeries: [CO2saturation]
+    salt_volume:
+        subplot:
+            use: True
+            ncols: 2
+        TimeSeries: [Dissolved_salt_volume]
+    CO2_volume:
+        subplot:
+            use: True
+            ncols: 2
+        TimeSeries: [Dissolved_CO2_volume]

@@ -1,0 +1,89 @@
+# OpenIAM Control File Example 55b
+#
+# This example is similar to control file example 55a, but it uses the
+# LookupTableStratigraphy option (see control file examples 32b and 38).
+# Because unit depths will vary over space, the critical pressure calculated
+# for each component will also vary over space.
+#
+# This version of control file 55b has an output location ('output/output_ex55b_jupyter')
+# that excludes the time ('output/output_ex55b_{datetime}'). This version is also different 
+# from the original version of control file 55b because it includes the 'TimeList' entry 
+# and it uses a higher brineDensity value (1150 kg m^-3 vs 1075 kg m^-3).
+#
+# This example requires the additional FutureGen 2.0 data set.
+# FutureGen 2.0 data set can be downloaded from the following source:
+# https://edx.netl.doe.gov/dataset/futuregen-2-0-1008-simulation-reservoir-lookup-table
+#
+# The downloaded data set should be placed here:
+#    source/components/reservoir/lookuptables/FutureGen2/1008_sims
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex55b.yaml
+#
+# Last Modified: July, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 20
+    TimeStep: 1.0
+    Analysis: forward
+    Components: []
+    OutputDirectory: 'output/output_ex55b_jupyter'
+    GenerateOutputFiles: False
+    GenerateCombOutputFile: False
+    Logging: Error
+#-------------------------------------------------
+Stratigraphy:
+    spatiallyVariable:
+        LookupTableStratigraphy:
+            FileName: 'stratigraphy.csv'
+            FileDirectory: 'examples/Control_Files/input_data/ex32b'
+            MaxPointDistance: 100
+#-------------------------------------------------
+Workflow:
+    Type: AoR
+    Options:
+        AoRFigureName: Overall_AoR_Plot.tiff
+        FigureDPI: 300
+        TimeList: [0, 1, 5, 10, 15, 20]
+        PlotInjectionSites: True
+        InjectionCoordx: 2.37e5
+        InjectionCoordy: 4.41e6
+        CriticalPressureMPa: Calculated
+        AutomateResCompSetup: True
+        AutomateWellCompSetup: True
+        AutomateAqCompSetup: True
+        AutomatePlotsSetup: True
+        ReservoirComponentType: LookupTableReservoir
+        ReservoirOptions:
+            FileDirectory: source/components/reservoir/lookuptables/FutureGen2/1008_sims
+            TimeFile: time_points.csv
+            ParameterFilename: parameters_and_filenames_trunc.csv
+            Interpolation2D: True
+            Parameters:
+                index: 1
+        WellboreComponentType: OpenWellbore
+        WellboreOptions:
+            Locations:
+                grid:
+                    x: [207222.852, 217720.8147, 228689.9084, 
+                        238815.372, 250862.3802]
+                    y: [4380572.494, 4391070.415, 4402039.405, 
+                        4412165.014, 4424212.081, 4439642.734]
+            Controls:
+                critPressureApproach: True
+                enforceCritPressure: False
+            Parameters:
+                wellRadius: 0.05
+                logReservoirTransmissivity: -10.0
+                logAquiferTransmissivity: -10.0
+                brineSalinity: 0.0475
+                brineDensity: 1150
+        AquiferName: aquifer4
+        AquiferComponentType: FutureGen2Aquifer
+        AquiferOptions:
+            Parameters:
+                por: 0.18
+                log_permh: -11.92
+                log_aniso: 0.3
+                rel_vol_frac_calcite: 0.01
+                depth: aquifer4Depth

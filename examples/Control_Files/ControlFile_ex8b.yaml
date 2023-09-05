@@ -1,0 +1,127 @@
+# OpenIAM Control File Example 8b
+#
+# This example is similar to Control File example 8a, but this simulation
+# uses more locations (coordx and coordy values). Copies of the components
+# Reservoir1 and Wellbore are made for each location, so the Excludes entry
+# under CorrelationCoeff has been changed. It excludes the pressure and CO2saturation
+# from the Reservoir1 components at each of the three locations. Additionally,
+# this example demonstrates the use of the UseFormattedLabels option.
+# If this option is set to True, the names of parameters and outputs will be
+# replaced with more descriptive phrases (e.g., 'CO_2 leakage rate to aquifer 2'
+# for the output 'CO2_aquifer2'). This option is available because users that
+# are not well-familiar with NRAP-Open-IAM will not know the names of specific
+# parameters and outputs. Figures with formatted labels may be more approachable
+# and may not require the presenter to define as many variables (e.g., stating
+# that logResPerm is the logarithm of reservoir permeability). Note that
+# UseFormattedLabels cannot be provided to CorrelationCoeff.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#  python ../../source/openiam/openiam_cf.py --file ControlFile_ex8b.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 50
+    TimeStep: 1.0
+    Analysis:
+        type: lhs
+        siz: 300
+    Components: [Reservoir1, Wellbore1]
+    OutputDirectory: output/output_ex8b_{datetime}
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        value: 625.0
+        vary: False
+    shale2Thickness:
+        value: 575.0
+        vary: False
+    shale3Thickness:
+        vary: False
+        value: 11.2
+    aquifer1Thickness:
+        value: 122.4
+        vary: False
+    aquifer2Thickness:
+        value: 119.2
+        vary: False
+    reservoirThickness:
+        vary: False
+        value: 51.2
+#-------------------------------------------------
+# Reservoir1 is a user defined name for component
+# Type SimpleReservoir is the component class name
+#-------------------------------------------------
+Reservoir1:
+    Type: SimpleReservoir
+    Parameters:
+        reservoirPorosity:
+            min: 0.2
+            max: 0.4
+            value: 0.3
+        injRate:
+            min: 0.01
+            max: 0.02
+            value: 0.015
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+Wellbore1:
+    Type: MultisegmentedWellbore
+    Number: 3
+    Locations:
+        coordx: [100, 200, 300]
+        coordy: [100, 200, 300]
+    Connection: Reservoir1
+    Parameters:
+        logWellPerm:
+            min: -14.0
+            max: -11.0
+            value: -13.5
+        logAquPerm:
+            min: -13.8
+            max: -10.3
+            value: -12.05
+    Outputs: [CO2_aquifer1,
+              brine_aquifer1,
+              CO2_aquifer2,
+              brine_aquifer2]
+#-------------------------------------------------
+Analysis:
+    CorrelationCoeff:
+        CorrelationType: pearson # (options: pearson or spearman)
+        # (default is the index for EndTime, can be a single value or a list)
+        OutputTimeIndex: 5       # Time Index to use for calculations
+        FigureDPI: 300
+        SaveCSVFiles: True
+        Excludes: [Reservoir1_000.pressure, Reservoir1_000.CO2saturation,
+                   Reservoir1_001.pressure, Reservoir1_001.CO2saturation,
+                   Reservoir1_002.pressure, Reservoir1_002.CO2saturation]
+    SensitivityCoeff:
+        Outputs: [CO2_aquifer1, brine_aquifer1]
+        FigureDPI: 300
+        UseFormattedLabels: True
+        SaveCSVFiles: True
+        OutputTimeIndex: 5
+    StackedSensitivityBars:
+        Outputs: [CO2_aquifer1, brine_aquifer1]
+        FigureDPI: 300
+        UseFormattedLabels: True
+        SaveCSVFiles: True
+        OutputTimeIndex: 5
+    MultiSensitivities:
+        Outputs: [CO2_aquifer1, brine_aquifer1, CO2_aquifer2, brine_aquifer2]
+        OutputTimeIndex: 5
+        FigureDPI: 300
+        UseFormattedLabels: True
+        SaveCSVFiles: True
+    TimeSeriesSensitivity:
+        Outputs: CO2_aquifer1
+        FigureDPI: 300
+        UseFormattedLabels: True
+        SaveCSVFiles: True
+        NumberIncluded: 8 # Number of top sensitivities to include in calculations; default is 5

@@ -1,0 +1,155 @@
+# OpenIAM Control File Example 19
+#
+# This example demonstrates the use of a SealHorizon
+# component linked to a LookupTableReservoir component.
+# It also demonstrates the use of the GriddedMetric plot
+# type with a SealHorizon component. The GriddedMetric plot
+# is also described in control file example 18.
+#
+# When using the GriddedMetric plot type with a SealHorizon
+# component, the results can be displayed over the area used
+# for each cell (i.e., the area entry under the Cells section
+# of the section for SealLayer1) or as a simple point. To plot
+# values over the area used, set PlotOverAreas to True (default
+# setting is False). If PlotOverAreas is set to True, the length
+# and width of each cell can be specified with the CellLengthX and
+# CellLengthY entries. These entries take values in meters. If one
+# of these enties is provided but not the other, the provided entry
+# will be ignored. If CellLengthX and CellLengthY are not provided,
+# then the default values are each the square root of the area used.
+# Depending on the domain and the x and y limits used (see control
+# file example 18), the resulting square may be too small to show details.
+# In such cases, we recommend setting PlotOverAreas to False.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#  python ../../source/openiam/openiam_cf.py --file ControlFile_ex19.yaml
+#-------------------------------------------------
+ModelParams:
+    EndTime: 50
+    TimeStep: 1.0
+    Analysis:
+        type: lhs
+        siz: 5
+    Components: [LUTReservoir1, SealLayer1]
+    OutputDirectory: output/output_ex19_{datetime}
+    Logging: Debug
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        vary: False
+        value: 525.0
+    shale2Thickness:
+        vary: False
+        value: 475.0
+    shale3Thickness:
+        vary: False
+        value: 11.2
+    aquifer1Thickness:
+        vary: False
+        value: 1.4
+    aquifer2Thickness:
+        vary: False
+        value: 19.2
+    reservoirThickness:
+        vary: False
+        value: 51.2
+#-------------------------------------------------
+LUTReservoir1:
+    Type: LookupTableReservoir
+    FileDirectory: source/components/reservoir/lookuptables/Kimb_54_sims
+    TimeFile: time_points.csv
+    ParameterFilename: parameters_and_filenames.csv
+    Parameters:
+        index:
+            Values: [1, 2, 3, 4, 5]
+            Weights: [0.2, 0.2, 0.2, 0.2, 0.2]
+    Outputs: [pressure,
+              CO2saturation]
+#------------------------------------------------------------------------------
+SealLayer1:
+    Type: SealHorizon
+    Connection: LUTReservoir1
+    Cells:
+        Number: 3
+        Locations:
+            coordx: [38919.0, 39639.9, 40360.3]
+            coordy: [48333.0, 48333.0, 48333.0]
+            # or
+            # file: path to the csv file with locations in column format (x, y)
+        area: 100              # can be value, list or from csv file; not random
+        baseDepth: 1100        # can be value, list or from csv file; not random
+        # if dict for thickness or permeability then generate (not yet implemented)
+        thickness: 500.0       # can be value, list or from csv file; random but from particular distribution (not yet implemented)
+        permeability: [1.0e-18, 1.2e-18, 1.1e-18] # can be value, list or from csv file; random but from particular distribution (not yet implemented)
+        entryPressure: 5000.0  # can be value, list or from csv file; not random
+        influence: 1.0         # can be value, list or from csv file; not random
+    Controls:  # not required part of the setup
+        # available options: correlateApproach, interpolateApproach,
+        # heterogeneityApproach, and varyPressureApproach
+        correlateApproach: False
+        interpolateApproach: False
+        heterogeneityApproach: False
+        varyPressureApproach: False   # True option is not available in control file interface
+    Parameters:
+        influenceModel: 0           # single number 0, 1, or 2; not random
+        salinity: 15000.0           # ppm
+        aveTemperature: 50.0        # oC
+        aveBaseDepth: 1130          # !!! m; Ave. seal base depth, positive below grade
+        aveBasePressure: 3.20e+7    # Pa; Ave. at seal base
+        staticDepth:  1000.0        # m;  Reference Depth, positive below grade
+        staticPressure: 1.00e+7     # Pa; Reference Pressure - at Reference Depth
+        CO2Density: 597.8           # !!! kg/m^3; Ignored if Interpolate = yes
+        CO2Viscosity: 4.52e-5       # !!! Pa*s;   Ignored if Interpolate = yes
+        brineDensity: 1004.00       # kg/m^3; Ignored if Interpolate = yes
+        brineViscosity: 5.634e-4    # Pa*s;   Ignored if Interpolate = yes
+        CO2Solubility: 0.0          # !!! kg/kg ; Ignored if Interpolate = yes
+        brineResSaturation: 0.15    # !!! Residual wetting
+        CO2ResSaturation: 0.00      # !!! Residual nonwetting; typically = 0.0
+        relativeModel: LET          # Model type; options: BC, LET
+        wetting1: 1.0               # Used only if relativeModel = LET
+        wetting2: 10.0              # Used only if relativeModel = LET
+        wetting3: 1.25              # Used only if relativeModel = LET
+        nonwet1: 1.05               # Used only if relativeModel = LET
+        nonwet2: 3.50               # Used only if relativeModel = LET
+        nonwet3: 1.25               # Used only if relativeModel = LET
+        capillary1: 0.20            # Used only if relativeModel = LET
+        capillary2: 2.80            # Used only if relativeModel = LET
+        capillary3: 0.43            # Used only if relativeModel = LET
+        maxCapillary: 1.0E+07       # Pa; Used only if relativeModel = LET
+        # or
+        # relativeModel: BC
+        # lambda:  2.5              # Used only if relativeModel = BC
+        permRatio: 0.6              # Ratio of nonwetting/wetting
+        # Parameters rateEffect and totalEffect are used only when parameter
+        # influenceModel is set to 1 or 2. These parameters control the initial time
+        # delay and the maximum extent of effect.
+        # rateEffect: 0.1             # Time model -> Rate of effect
+        # totalEffect: 0.1            # Time model -> Total effect as ratio
+        # Parameters reactivity, clayType, carbonateContent, and clayContent are
+        # used only when parameter influenceModel is set to 2.
+        # reactivity: 8.0             # Value 1 to 10
+        # clayContent: 60.0           # percent
+        # carbonateContent: 8.0       # percent
+        # clayType: smectite          # Clay type; types: smectite/illite/chlorite
+    Outputs: ['CO2_aquifer_total', 'brine_aquifer_total',
+              'CO2_aquifer', 'brine_aquifer']  # gridded observations
+Plots:
+    Plot1:
+        TimeSeries: ['CO2_aquifer_total']
+    Plot2:
+        TimeSeries: ['brine_aquifer_total']
+    Plot3:
+        TimeSeries: ['CO2_aquifer_cell_1']   # output for the first cell
+    Plot4:
+        TimeSeries: ['CO2_aquifer_cell_2']   # output for the second cell
+    Plot5:
+        GriddedMetric:
+            ComponentNameList: [SealLayer1]
+            MetricName: brine_aquifer
+            FigureDPI: 200
+            PlotOverAreas: False
+            SaveCSVFiles: True
+            # CellLengthX: 10     # These are silenced because PlotOverAreas
+            # CellLengthY: 10     # is set to False.

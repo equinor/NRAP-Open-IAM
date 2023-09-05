@@ -1,0 +1,110 @@
+# OpenIAM Control File Example 3
+#
+# This example computes the aquifer impact (CarbonateAquifer component)
+# from 2 leaky wellbores (MultisegmentedWellbore component) connected
+# to a SimpleReservoir component. The aquifer impact is quantified with
+# the pH and TDS plume volumes resulting from CO2 and brine leakage,
+# respectively.
+#
+# This example uses the Latin Hypercube Sampling (lhs) analysis type to randomly
+# vary certain parameter values (those given with min and max values) across
+# 30 realizations ('siz: 30'). Any parameters that are not explicitly given for
+# a component will be fixed at the default values.
+#
+# This example produces four plots:
+#   1. Volume of the aquifer below the pH threshold.
+#   2. Volume of the aquifer above the TDS threshold.
+#   3. CO2 leakage into the intermediate aquifer (aquifer1)
+#   4. Brine leakage into the intermediate aquifer (aquifer1)
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex3.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 50
+    TimeStep: 1.0
+    Analysis:
+        type: lhs
+        siz: 30
+    Components: [SimpleReservoir1,
+                 msw1,
+                 CarbonateAquifer1]
+    OutputDirectory: output/output_ex3_{datetime}
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        min: 500.0
+        max: 550.0
+        value: 525.0
+    shale2Thickness:
+        min: 450.0
+        max: 500.0
+        value: 475.0
+    shale3Thickness:
+        vary: False
+        value: 11.2
+    aquifer1Thickness:
+        vary: False
+        value: 100.4
+    aquifer2Thickness:
+        vary: False
+        value: 109.2
+    reservoirThickness:
+        vary: False
+        value: 51.2
+#-------------------------------------------------
+# SimpleReservoir1 is a user defined name for component
+# the type SimpleReservoir is the ROM model name
+#-------------------------------------------------
+SimpleReservoir1:
+    Type: SimpleReservoir
+    Parameters:
+        injRate:
+            min: 6.5
+            max: 10.0
+    Outputs: [pressure]
+#-------------------------------------------------
+msw1:
+    Type: MultisegmentedWellbore
+    Connection: SimpleReservoir1
+    Number: 5
+    RandomLocDomain:
+        xmin: 0
+        ymin: 50
+        xmax: 100
+        ymax: 200
+    Locations:
+        coordx: [100, 40]
+        coordy: [100, 4000]
+    Parameters:
+        logWellPerm:
+            min: -14.0
+            max: -11.0
+            value: -13.5
+        wellRadius:
+            vary: false
+            value: 0.01
+    Outputs: [CO2_aquifer1,
+              brine_aquifer1]
+#-------------------------------------------------
+CarbonateAquifer1:
+    Type: CarbonateAquifer
+    Connection: msw1
+    AquiferName: aquifer1
+    Outputs: ['pH_volume', 'TDS_volume']
+#-------------------------------------------------
+Plots:
+    pH_plume_volumes:
+        TimeSeries: [pH_volume]
+    TDS_plume_volumes:
+        TimeSeries: [TDS_volume]
+    CO2_Leakage:
+        TimeSeries: [CO2_aquifer1]
+    Brine_Leakage:
+        TimeSeries: [brine_aquifer1]

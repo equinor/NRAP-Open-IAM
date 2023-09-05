@@ -1,0 +1,160 @@
+# OpenIAM Control File Example 29
+#
+# This example illustrates the use of known and random wellbore locations
+# in a 3D domain. The reservoir pressures and CO2 saturations are obtained
+# from a LookupTableReservoir component using 3-dimensional interpolation.
+# Specifically, having 'Interpolation2D: False' entered for the
+# LookupTableReservoir makes it interpolate over the x-, y-, and z-directions
+# instead of just the x- and y-directions (x: easting, y: northing, z: depth).
+# If the bases of the wellbore components are at different depths within the
+# reservoir (controlled by the 'coordz' entry under 'Locations'), 3-dimensional
+# interpolation will take such differences into account when providing pressures
+# and CO2 saturations to the wellbores.
+#
+# The MultisegmentedWellbore component is setup with 3 known locations. Because
+# the total number of wellbores is set to 8, there are 5 randomly generateded
+# MultisegmentedWellbore locations within the x, y, and z bounds contained
+# in the 'RandomLocDomain' entry. Given the pressure and CO2 saturation inputs
+# from the LookupTableReservoir, the MultisegmentedWellbore component simulates
+# the leakage of CO2 and brine into the intermediate and shallow aquifers
+# (aquifers 1 and 2, respectively) as well as the atmosphere.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex29.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 40.
+    TimeStep: 1
+    Analysis: forward
+    Components: [LookupTableReservoir1, MultisegmentedWellbore1]
+    OutputDirectory: output/output_ex29_{datetime}
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        value: 3
+        vary: False
+    shale1Thickness:
+        value: 608.0
+        vary: False
+    shale2Thickness:
+        value: 608.0
+        vary: False
+    shale3Thickness:
+        value: 608.0
+        vary: False
+    aquifer1Thickness:
+        value: 608.0
+        vary: False
+    aquifer2Thickness:
+        value: 608.0
+        vary: False
+    reservoirThickness:
+        value: 50.0
+        vary: False
+#-------------------------------------------------
+LookupTableReservoir1:
+    Type: LookupTableReservoir
+    FileDirectory: source/components/reservoir/lookuptables/Test_3d
+    TimeFile: time_points.csv
+    ParameterFilename: parameters_and_filenames.csv
+    Interpolation2D: False
+    Parameters:
+        index: 1
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+MultisegmentedWellbore1:
+    Type: MultisegmentedWellbore
+    Connection: LookupTableReservoir1
+    Number: 8
+    Locations:
+        coordx: [10.0, 200.0, 150.0]
+        coordy: [50.0, 50.0, 250.0]
+        coordz: [17.0, 17.0, 17.0]
+    RandomLocDomain:
+        xmin: 100
+        xmax: 250
+        ymin: 200
+        ymax: 300
+        zmin: 16
+        zmax: 17
+    Parameters:
+        wellRadius:
+            value: 0.05715
+            vary: False
+        logAqu1Perm:
+            value: -13.39
+            vary: False
+        logAqu2Perm:
+            value: -11.05
+            vary: False
+        logWellPerm:
+            value: -13.0
+            vary: False
+        brineDensity:
+            value: 1000.0
+            vary: False
+        CO2Density:
+            value: 775.0
+            vary: False
+        brineViscosity:
+            value: 7.5e-4
+            vary: False
+        CO2Viscosity:
+            value: 6.6e-5
+            vary: False
+    Outputs: [CO2_aquifer1, CO2_aquifer2, CO2_atm,
+              brine_aquifer1, brine_aquifer2, brine_atm]
+#-------------------------------------------------
+Plots:
+    Pressure_plot:
+        Subplot:
+            Use: True
+            NumCols: 2
+        FigureSize: [12, 12]
+        TimeSeries: [pressure]
+    Saturation_plot:
+        Subplot:
+            Use: True
+            NumCols: 2
+        FigureSize: [12, 12]
+        TimeSeries: [CO2saturation]
+    CO2_leakage1:
+        Subplot:
+            Use: True
+            NumCols: 2
+        FigureSize: [12, 12]
+        TimeSeries: [CO2_aquifer1]
+    brine_leakage1:
+        Subplot:
+            Use: True
+            NumCols: 2
+        FigureSize: [12, 12]
+        TimeSeries: [brine_aquifer1]
+    CO2_leakage2:
+        Subplot:
+            Use: True
+            NumCols: 2
+        FigureSize: [12, 12]
+        TimeSeries: [CO2_aquifer2]
+    brine_leakage2:
+        Subplot:
+            Use: True
+            NumCols: 2
+        FigureSize: [12, 12]
+        TimeSeries: [brine_aquifer2]
+    CO2_leakage3:
+        Subplot:
+            Use: True
+            NumCols: 2
+        FigureSize: [12, 12]
+        TimeSeries: [CO2_atm]
+    brine_leakage3:
+        Subplot:
+            Use: True
+            NumCols: 2
+        FigureSize: [12, 12]
+        TimeSeries: [brine_atm]

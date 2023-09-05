@@ -1,0 +1,55 @@
+============================================================
+Installing Python on Linux
+============================================================
+
+Python comes preinstalled on most Linux distributions.
+In the case Python is not installed different versions of Python for Linux
+can be found here: https://www.python.org/downloads/source/
+Instructions related to different versions of Linux can be found here:
+https://docs.python.org/3.9/using/unix.html
+
+Anaconda distribution of Python for Linux can be found here:
+https://www.anaconda.com/products/individual
+
+The general installation instructions of Anaconda for Linux are available here:
+https://docs.anaconda.com/anaconda/install/linux/
+
+We provide additional instructions to help users create a Python virtual environment
+suitable for NRAP-Open-IAM in the file "Virtual_Python_Environment.txt".
+
+============================================================
+General requirements for Python Distributions on Linux
+============================================================
+
+Needed software:
+Python 3.9 or above (we recommend Python 3.9.7)
+gfortran
+
+Needed Python libraries:
+pip
+numpy
+scipy
+pandas
+matplotlib
+Pmw
+certifi
+pyDOE
+pytz
+PyYAML
+tornado
+jupyter
+tensorflow
+keras
+scikit-learn
+
+============================================================
+Testing Python and NRAP-Open-IAM Setup
+============================================================
+
+After installing Python and required packages please test the Python installation
+and setup of NRAP-Open-IAM by running "openiam_setup_tests.py" in the folder "setup".
+
+After testing the installations return to the root directory
+of the NRAP-Open-IAM distribution and run the GUI by selecting/running the
+"Run_OpenIAM_GUI_Linux.sh" file, or navigate directly to the folder "source/GUI"
+and run file "NRAP_OpenIAM.py".

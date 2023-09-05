@@ -1,0 +1,165 @@
+# OpenIAM Control File Example 41
+#
+# This example demonstrates the use of the time to first detection (TTFD)
+# plot type with two Generic Aquifer components. Because the specified PlumeType
+# is Dissolved_salt, each aquifer component must produce Dissolved_salt_dr
+# and Dissolved_salt_dz. Note that although there are two OpenWellbore components
+# included, these are intended to represent the same wells. Specifically,
+# the wellTop parameter is varied (being linked to Stratigraphy) to reflect
+# the bottom depths of aquifers 1 and 2.
+#
+# The leakage from each well into aquifer 1 and 2 are portrayed separately
+# with OpenWellbore1 and OpenWellbore2, respectively. Both OpenWellbore1 and
+# OpenWellbore2 have the same coordx and coordy, so practically there are only
+# two open wellbores in the domain. This example also has "WriteDreamOutput: True"
+# which enables the creation of files for DREAM (Designs for Risk Evaluation
+# and Management).
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex41.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 1
+    TimeStep: 0.1
+    Analysis: forward
+    Components: [SimpleReservoir1, OpenWellbore1, OpenWellbore2,
+                 GenericAquifer1, GenericAquifer2]
+    OutputDirectory: output/output_ex41_{datetime}
+    Logging: Info
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        value: 540.0
+        vary: False
+    shale2Thickness:
+        value: 110.0
+        vary: False
+    shale3Thickness:
+        value: 250.0
+        vary: False
+    aquifer1Thickness:
+        vary: False
+        value: 45
+    aquifer2Thickness:
+        vary: False
+        value: 60
+    reservoirThickness:
+        vary: False
+        value: 200
+#-------------------------------------------------
+SimpleReservoir1:
+    Type: SimpleReservoir
+    InjectionWell:
+        coordx: 500
+        coordy: 500
+    Parameters:
+        injRate:
+            value: 0.1
+            vary: False
+        logResPerm:
+            value: -13
+            vary: False
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+OpenWellbore1:
+    Type: OpenWellbore
+    Connection: SimpleReservoir1
+    Number: 2
+    Locations:
+        coordx: [400, 600]
+        coordy: [600, 400]
+    LeakTo: aquifer1
+    Controls:
+        critPressureApproach: True
+    Parameters:
+        wellRadius:
+            vary: False
+            value: 0.05
+        logAquiferTransmissivity:
+            vary: False
+            value: -9.83
+        logReservoirTransmissivity:
+            vary: False
+            value: -9.83
+        brineDensity:
+            value: 1010
+            vary: False
+    Outputs: [CO2_aquifer, CO2_atm,
+              brine_aquifer, brine_atm]
+#-------------------------------------------------
+OpenWellbore2:
+    Type: OpenWellbore
+    Connection: SimpleReservoir1
+    Number: 2
+    Locations:
+        coordx: [400, 600]
+        coordy: [600, 400]
+    LeakTo: aquifer2
+    Controls:
+        critPressureApproach: True
+    Parameters:
+        wellRadius:
+            vary: False
+            value: 0.05
+        logAquiferTransmissivity:
+            vary: False
+            value: -9.83
+        logReservoirTransmissivity:
+            vary: False
+            value: -9.83
+        brineDensity:
+            value: 1010
+            vary: False
+    Outputs: [CO2_aquifer, CO2_atm,
+              brine_aquifer, brine_atm]
+#-------------------------------------------------
+GenericAquifer1:
+    Type: GenericAquifer
+    Connection: OpenWellbore1
+    AquiferName: aquifer1
+    Parameters:
+        aqu_thick: aquifer1Thickness
+        top_depth: shale2Depth
+        por: 0.118
+        log_permh: -13.39
+        log_aniso: 0.3
+    Outputs: [Dissolved_CO2_volume, Dissolved_salt_volume,
+              Dissolved_salt_dr, Dissolved_salt_dz]
+#-------------------------------------------------
+GenericAquifer2:
+    Type: GenericAquifer
+    Connection: OpenWellbore2
+    AquiferName: aquifer2
+    Parameters:
+        aqu_thick: aquifer2Thickness
+        top_depth: shale3Depth
+        por: 0.118
+        log_permh: -13.39
+        log_aniso: 0.3
+    Outputs: [Dissolved_CO2_volume, Dissolved_salt_volume,
+              Dissolved_salt_dr, Dissolved_salt_dz]
+#-------------------------------------------------
+Plots:
+    Dissolved_CO2_plume_volumes:
+        TimeSeries: [Dissolved_CO2_volume]
+        Subplot:
+            Use: True
+            NumCols: 2
+    Dissolved_salt_plume_volumes:
+        TimeSeries: [Dissolved_salt_volume]
+        Subplot:
+            Use: True
+            NumCols: 2
+    TTFD_Plot:
+        TTFD:
+            PlotInjectionSites: True
+            PlumeType: Dissolved_salt
+            SaveCSVFiles: True
+            WriteDreamOutput: True
+            ComponentNameList: [GenericAquifer1, GenericAquifer2]

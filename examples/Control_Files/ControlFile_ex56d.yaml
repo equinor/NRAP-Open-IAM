@@ -1,0 +1,78 @@
+# OpenIAM Control File Example 56d
+#
+# This example is similar to examples 31a and 56c, but it uses
+# Latin Hypercube Sampling (lhs). Over 50 different realizations,
+# the logResPerm value is varied between -9.9 and -10.4. The overall
+# area of review (AoR) created will reflect the maximum areas of
+# reservoir and aquifer impact across the 50 realizations. Additionally,
+# this example includes the 'TimeList' entry under 'Workflow: Options:'.
+# An AoR plot will be made for all model times (years 0 to 10).
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex56d.yaml
+#
+# Last Modified: July, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 10
+    TimeStep: 1.0
+    Analysis:
+        type: lhs
+        siz: 50
+    Components: []
+    OutputDirectory: 'output/output_ex56d_{datetime}'
+    GenerateOutputFiles: False
+    GenerateCombOutputFile: False
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        value: 750.0
+        vary: False
+    shale2Thickness:
+        value: 950.0
+        vary: False
+    shale3Thickness:
+        value: 365
+        vary: False
+    aquifer1Thickness:
+        vary: False
+        value: 85
+    aquifer2Thickness:
+        vary: False
+        value: 85
+    reservoirThickness:
+        vary: False
+        value: 150
+#-------------------------------------------------
+Workflow:
+    Type: AoR
+    Options:
+        PlotInjectionSites: True
+        FigureDPI: 300
+        TimeList: All
+        CriticalPressureMPa: 22.07
+        ReservoirComponentType: SimpleReservoir
+        ReservoirOptions:
+            Parameters:
+                injRate: 0.33
+                logResPerm:
+                    min: -10.4
+                    max: -9.9
+                    value: -10.2
+        AquiferName: aquifer2                 # the wellbores will leak to this aquifer
+        WellboreOptions:                      # Uses the default locations, the grid options with x and y ranging from -50 km to 50 km (xsize and ysize of 6)
+            Controls:
+                critPressureApproach: True
+                enforceCritPressure: True     # Because this is set to True, the critPressure parameter will be used
+            Parameters:
+                wellRadius: 0.05
+                logReservoirTransmissivity: -10.97
+                logAquiferTransmissivity: -10.0
+                brineSalinity: 0.2
+                critPressure: 2.207e+7        # in Pa here, equal to 22.07 MPa
+                # brineDensity: 1050          # brineDensity is only used if critical pressure is calculated - not when it is specified
+        AquiferComponentType: FutureGen2Aquifer

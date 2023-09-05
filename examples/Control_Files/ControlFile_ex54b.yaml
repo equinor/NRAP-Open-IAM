@@ -1,0 +1,116 @@
+# OpenIAM Control File Example 54b
+#
+# This example is similar to Control File example 54a, but it uses the default
+# settings for the GriddedRadialMetric plot. These versions are provided
+# to demonstrate the minimum input required to use the GriddedRadialMetric plot type.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex54b.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 10.
+    TimeStep: 1.
+    Analysis: forward
+    Components: [SimpleReservoir1, OpenWellbore1, GenericAquifer1]
+    OutputDirectory: output/output_ex54b_{datetime}
+    Logging: Info
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        value: 750.0
+        vary: False
+    shale2Thickness:
+        value: 950.0
+        vary: False
+    shale3Thickness:
+        value: 200
+        vary: False
+    aquifer1Thickness:
+        vary: False
+        value: 200
+    aquifer2Thickness:
+        vary: False
+        value: 200
+    reservoirThickness:
+        vary: False
+        value: 150
+#-------------------------------------------------
+SimpleReservoir1:
+    Type: SimpleReservoir
+    Parameters:
+        injRate:
+            value: 0.1
+            vary: False
+        logResPerm:
+            value: -12.0
+            vary: False
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+OpenWellbore1:
+    Type: OpenWellbore
+    Connection: SimpleReservoir1
+    Locations:
+        coordx: [100]
+        coordy: [100]
+    LeakTo: aquifer2
+    Parameters:
+        wellRadius:
+            value: 0.05
+            vary: False
+        logReservoirTransmissivity:
+            value: -10.97
+            vary: False
+        logAquiferTransmissivity:
+            value: -10.0
+            vary: False
+        brineSalinity:
+            value: 0.2
+            vary: False
+        wellTop:
+            value: aquifer2Depth
+            vary: False
+        reservoirDepth:
+            value: shale1Depth
+            vary: False
+    Outputs: [CO2_aquifer,
+              brine_aquifer]
+#-------------------------------------------------
+GenericAquifer1:
+    Type: GenericAquifer
+    Connection: OpenWellbore1
+    AquiferName: aquifer2
+    Parameters:
+        por: 0.2
+        log_permh: -10.0
+        log_aniso: 0.6
+        aqu_thick: aquifer2Thickness
+        top_depth: shale3Depth
+    Outputs: [Dissolved_salt_volume, Dissolved_CO2_volume,
+              r_coordinate, z_coordinate,                                 # gridded coordinates
+              Dissolved_CO2_mass_fraction, Dissolved_salt_mass_fraction]  # gridded observations
+#-------------------------------------------------
+Plots:
+    Gridded_salt_Mass_Frac_Default:
+        GriddedRadialMetric:
+            ComponentNameList: [GenericAquifer1]
+            MetricName: Dissolved_salt_mass_fraction
+            ZList: [-300] # in the middle of aquifer 2
+    Gridded_CO2_Mass_Frac_Default:
+        GriddedRadialMetric:
+            ComponentNameList: [GenericAquifer1]
+            MetricName: Dissolved_CO2_mass_fraction
+            ZList: [-300] # in the middle of aquifer 2
+    pressure_plot:
+        TimeSeries: [pressure]
+    saturation_plot:
+        TimeSeries: [CO2saturation]
+    salt_volume:
+        TimeSeries: [Dissolved_salt_volume]
+    CO2_volume:
+        TimeSeries: [Dissolved_CO2_volume]

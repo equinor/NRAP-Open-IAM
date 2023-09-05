@@ -1,0 +1,126 @@
+# OpenIAM Control File Example 10
+#
+# This example evaluates the leakage through a CementedWellbore
+# component connected to a LookupTableReservoir component (requires
+# the Kimberlina data set - see below). Given the pressures and CO2
+# saturations provided by the LookupTableReservoir, the CementedWellbore
+# component simulates the CO2 and brine leakage into the intermediate
+# and shallow aquifers (aquifers 1 and 2, respectively).
+# A DeepAlluviumAquifer is then used to simulate the pH and TDS plume
+# volumes in the intermediate aquifer (aquifer 1). These analyses are
+# conducted with Latin Hypercube Sampling (lhs), which allows parameter
+# values to vary between minimum and maximum values across 30 different
+# realizations (siz: 30).
+#
+# This example produces four plots:
+#   1. Volume of the aquifer below the pH threshold.
+#   2. Volume of the aquifer above the TDS threshold.
+#   3. CO2 leakage into the intermediate aquifer (aquifer1)
+#   4. Brine leakage into the intermediate aquifer (aquifer1)
+#
+# This example requires the additional Kimberlina data set.
+# Kimberlina data set (kimb-closed-200-sims.zip or Kimb_closed_200_sims.zip)
+# can be downloaded from one of the following places:
+# 1. https://edx.netl.doe.gov/dataset/nrap-open-source-iam
+# 2. https://gitlab.com/NRAP/Kimberlina_data
+#
+# The downloaded data set should be placed here:
+#    source/components/reservoir/lookuptables/Kimb_closed_200_sims
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex10.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 50
+    TimeStep: 1.0
+    Analysis:
+        type: lhs
+        siz: 30
+    Components: [ClosedKimberlina, CementedWellbore1, DeepAlluviumAquifer1]
+    OutputDirectory: output/output_ex10_{datetime}
+    Logging: Info
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        min: 500.0
+        max: 550.0
+        value: 525.0
+    shale2Thickness:
+        min: 450.0
+        max: 500.0
+        value: 475.0
+    shale3Thickness:
+        vary: False
+        value: 11.2
+    aquifer1Thickness:
+        vary: False
+        value: 1.4
+    aquifer2Thickness:
+        vary: False
+        value: 19.2
+    reservoirThickness:
+        vary: False
+        value: 51.2
+#-------------------------------------------------
+ClosedKimberlina:
+    Type: LookupTableReservoir
+    FileDirectory: source/components/reservoir/lookuptables/Kimb_closed_200_sims
+    TimeFile: time_points.csv
+    ParameterFilename: parameters_and_filenames.csv
+    Parameters:
+        index:
+            Values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+CementedWellbore1:
+    Type: CementedWellbore
+    Connection: ClosedKimberlina
+    Locations:
+        coordx: [300978.0, 301155.0]
+        coordy: [3934330.0, 3934890.0]
+    Number: 2
+    Parameters:
+        logWellPerm:
+            min: -13.5
+            max: -12.0
+            value: -13.0
+    Outputs: [mass_CO2_aquifer1,
+              mass_CO2_aquifer2,
+              CO2_aquifer1,
+              CO2_aquifer2,
+              CO2_atm,
+              brine_aquifer1,
+              brine_aquifer2]
+#-------------------------------------------------
+DeepAlluviumAquifer1:
+    Type: DeepAlluviumAquifer
+    Connection: CementedWellbore1
+    AquiferName: aquifer1
+    Parameters:
+        sandFraction:
+            min: 0.7
+            max: 0.9
+            value: 0.8
+        logK_sand1:
+            min: -12
+            max: -11
+            value: -11.5
+        correlationLengthX: 360
+        correlationLengthZ: 18
+    Outputs: ['pH_volume', 'TDS_volume']
+#-------------------------------------------------
+Plots:
+    pH_plume_volumes:
+        TimeSeries: [pH_volume]
+    TDS_plume_volumes:
+        TimeSeries: [TDS_volume]
+    CO2_Leakage:
+        TimeSeries: [CO2_aquifer1]
+    Brine_Leakage:
+        TimeSeries: [brine_aquifer1]

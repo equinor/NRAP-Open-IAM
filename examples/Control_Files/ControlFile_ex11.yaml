@@ -1,0 +1,153 @@
+# OpenIAM Control File Example 11
+#
+# This example couples the simple reservoir, multisegmented wellbore, and
+# carbonate aquifer models. The saturation/pressure output produced by the simple
+# reservoir model is used to drive leakage from five multisegmented wellbore
+# models separated into two groups according to their properties (i.e.,
+# differences in well permeability and wellbore radius). Two of the five wellbore
+# models are setup within the component entry msw1 (i.e., the two pairs of
+# x and y values) while three of the five models are setup within msw2 (i.e.,
+# the three pairs of x and y values).
+#
+# The carbonate aquifer components are linked to both groups of wellbores and
+# estimate the impact from the leakage of CO2 and brine into aquifers 1 and 2.
+# Specifically, the components calculate the pH and TDS plume volumes resulting
+# from CO2 and brine leakage into each aquifer, respectively.
+#
+# To run this file, use the command (\ for Windows and / for Mac or Linux)
+#   python ../source/openiam/openiam_cf.py --file ControlFile_ex11.yaml
+# in the folder examples/Control_Files,
+# or command
+#   python openiam_cf.py --file ../../examples/Control_Files/ControlFile_ex11.yaml
+# in the folder source/openiam.
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 50
+    TimeStep: 1.0
+    Analysis: forward
+    Components: [ca1, ca2, sr1, msw1, msw2]
+    OutputDirectory: output/output_ex11_{datetime}
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        min: 10.0
+        max: 25.0
+        value: 15.0
+    shale2Thickness:
+        min: 10.0
+        max: 25.0
+        value: 25.0
+    shale3Thickness:
+        min: 300.0
+        max: 500.0
+        value: 350.0
+    aquifer1Thickness:
+        min: 100.0
+        max: 150.0
+        value: 120.0
+    aquifer2Thickness:
+        min: 100.0
+        max: 140.0
+        value: 110.0
+    reservoirThickness:
+        min: 30.0
+        max: 50.0
+        value: 40.0
+
+#-------------------------------------------------
+# SimpleReservoir1 is a user defined name for component
+# the type SimpleReservoir is the ROM model name
+#-------------------------------------------------
+sr1:
+    Type: SimpleReservoir
+    Parameters:
+        injRate:
+            min: 0.1
+            max: 10.0
+            value: 1.0
+        logResPerm:
+            min: -12.5
+            max: -11.0
+            value: -11.5
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+msw1:
+    Locations:
+        coordx: [100, 450]
+        coordy: [100, 125]
+    Type: MultisegmentedWellbore
+    Connection: sr1
+    Parameters:
+        logWellPerm:
+            min: -14.0
+            max: -12.0
+            value: -12.5
+        wellRadius:
+            min: 0.01
+            max: 0.02
+            value: 0.015
+    Outputs: [CO2_aquifer1,
+              CO2_aquifer2,
+              CO2_atm,
+              brine_aquifer1,
+              brine_aquifer2,
+              brine_atm]
+#-------------------------------------------------
+msw2:
+    Locations:
+        coordx: [200, 450, 340]
+        coordy: [100, 225, 50]
+    Type: MultisegmentedWellbore
+    Connection: sr1
+    Parameters:
+        logWellPerm:
+            min: -13.0
+            max: -11.5
+            value: -12
+        wellRadius:
+            min: 0.015
+            max: 0.018
+            value: 0.016
+    Outputs: [CO2_aquifer1,
+              CO2_aquifer2,
+              CO2_atm,
+              brine_aquifer1,
+              brine_aquifer2,
+              brine_atm]
+#-------------------------------------------------
+ca1:
+    Type: CarbonateAquifer
+    Connection: [msw1, msw2]
+    AquiferName: aquifer1
+    Outputs: [pH_volume, TDS_volume]
+#-------------------------------------------------
+ca2:
+    Type: CarbonateAquifer
+    Connection: [msw1, msw2]
+    AquiferName: aquifer2
+    Outputs: [pH_volume, TDS_volume]
+#-------------------------------------------------
+Plots:
+    Pressure:
+        TimeSeries: [pressure]
+    Saturation:
+        TimeSeries: [CO2saturation]
+    CO2_Leakage1:
+        TimeSeries: [CO2_aquifer1]
+    CO2_Leakage2:
+        TimeSeries: [CO2_aquifer2]
+    Brine_Leakage1:
+        TimeSeries: [brine_aquifer1]
+    Brine_Leakage2:
+        TimeSeries: [brine_aquifer2]
+    pH_plume_volumes:
+        TimeSeries: [pH_volume]
+    TDS_plume_volumes:
+        TimeSeries: [TDS_volume]

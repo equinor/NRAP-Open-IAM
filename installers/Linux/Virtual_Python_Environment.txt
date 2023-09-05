@@ -1,0 +1,50 @@
+============================================================
+Virtual Python 3.9.7 Environment
+============================================================
+File Linux_Python397_requirements.txt in the folder "installers/Linux" can be
+used to create a Python virtual environment suitable for running NRAP-Open-IAM.
+Note that the requirements file assumes that Python 3.9.7 is installed on the machine.
+
+You may want to start with updating pip to ensure you have the latest version.
+We recommend to use the system pip to update a user installation of pip:
+
+	python3 -m pip install --user --upgrade pip
+
+1. To create a virtual environment navigate to the NRAP-Open-IAM root folder
+and type in the terminal
+
+	python3 -m venv env
+
+This will create a folder "env" folder within the NRAP-Open-IAM root folder
+to hold a virtual Python installation. (Package venv is part of the Python
+standard library and does not require additional installation.)
+
+2. Activate just created virtual environment "env" by typing
+
+	source env/bin/activate
+
+This will activate the "env" environment and prepares your system
+for the installation of the required Python packages.
+
+3. Type
+
+	pip install -r Linux_Python397_requirements.txt
+
+This will install all Python packages needed for the proper work of NRAP-Open-IAM.
+
+4. Test the Python and NRAP-Open-IAM setup by following directions provided
+in the "Installation_Instructions_Linux.txt" file.
+
+5. In order to return to your default Python environment type
+
+	deactivate
+
+If you want to return to the virtual environment "env" simply follow the activation step 2 above,
+from the NRAP-Open-IAM root folder.
+You do not need to recreate the virtual environment (step 1).
+
+Note: Before testing and working with NRAP-Open-IAM make sure that the proper environment is activated.
+
+Additional information about Python virtual environments can be found here:
+
+https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/

@@ -1,0 +1,145 @@
+# OpenIAM Control File Example 52a
+#
+# This example demonstrates the use of the HydrocarbonLeakage component
+# in a forward model. HydrocarbonLeakage component produces valid results
+# for times between 100 and 410 years. This component type also assumes
+# that injection stops at t = 0 years, so t = 100 years means 100 years
+# after injection stops. The mass_CO2_aquifer and mass_CO2_gas_aquifers outputs
+# from HydrocarbonLeakage components represent the leaked masses of CO2 liquid
+# and gas, respectively. To clarify this point, a subplot title has been
+# manually added for the figure CO2_Leakage.
+# The mass_gas_aquifer and mass_oil_aquifer represent the cumulative masses
+# of all hydrocarbons (light, intermediate, and heavy) and CO2 in gas and
+# liquid phases, respectively, that have been leaked to the aquifer. The bottom
+# depth of the aquifer here is fixed at 18.288 m, and the aquifer extends
+# to the surface. The reservoir depth can be changed using the reservoirDepth
+# parameter.
+#
+# When setting the time range with EndTime and TimeStep (as shown here),
+# the range automatically begins at t = 0 years. The HydrocarbonLeakge component
+# produces outputs of values 0 for years 0 to 99. Any results outside
+# the applicable time range of 100 to 410 should not be considered valid,
+# however. The outputs for years from 0 to 99 years can be avoided by modifying
+# simulation time points with TimePoints, as shown in the control file example 52b.
+#
+# Also note that HydrocarbonLeakage components cannot be linked to
+# any other components except Stratigraphy. Parameter reservoirDepth of the
+# HydrocarbonLeakage component will be linked to the composite
+# parameter reservoirDepth of Stratigraphy if no value is provided.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex52a.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    # Time is in years
+    EndTime: 410
+    TimeStep: 10.0
+    Analysis: forward
+    Components: [HydrocarbonLeakage1]
+    OutputDirectory: output/output_ex52a_{datetime}
+    OutputType: 1  # 0 - row-wise; 1 - column-wise
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    # Thickness is in meters
+    shale1Thickness:
+        vary: False
+        value: 648.0
+    shale2Thickness:
+        vary: False
+        value: 255.0
+    shale3Thickness:
+        vary: False
+        value: 1.0    # the smallest allowable value
+    aquifer1Thickness:
+        vary: False
+        value: 125.0
+    aquifer2Thickness:
+        vary: False
+        value: 17.88  # the depth to the bottom of the aquifer is 18.88 m
+    reservoirThickness:
+        vary: False
+        value: 50.0
+#-------------------------------------------------
+HydrocarbonLeakage1:
+    Type: HydrocarbonLeakage
+    Parameters:
+        reservoirDepth:
+            value: 1046.88
+            vary: False
+        NTG:
+            value: 0.444
+            vary: False
+        logResPerm:
+            value: -13.23
+            vary: False
+        reservoirPressureMult:
+            value: 1.13
+            vary: False
+        logWellPerm:
+            value: -12.44
+            vary: False
+        avgWaterSaturation:
+            value: 0.719
+            vary: False
+        FCO2:
+            value: 0.647
+            vary: False
+        FC1:
+            value: 0.062
+            vary: False
+        FC4:
+            value: 0.082
+            vary: False
+        FC7Plus:
+            value: 0.209
+            vary: False
+    Outputs: [mass_CO2_aquifer, mass_CO2_gas_aquifer,
+              mass_methane_oil_aquifer, mass_methane_gas_aquifer,
+              mass_oil_aquifer, mass_gas_aquifer]
+#-------------------------------------------------
+Plots:
+    CO2_Leakage:
+        TimeSeries: [mass_CO2_aquifer, mass_CO2_gas_aquifer]
+        UseMarkers: False
+        UseLines: True
+        VaryLineStyles: True
+        FigureDPI: 100
+        Subplot:
+            Use: True
+            NumCols: 2
+            HydrocarbonLeakage1.mass_CO2_aquifer: 'CO$_2$ Liquid Leaked to Aquifer'
+    CH4_Leakage:
+        TimeSeries: [mass_methane_oil_aquifer, mass_methane_gas_aquifer]
+        UseMarkers: False
+        UseLines: True
+        VaryLineStyles: True
+        FigureDPI: 100
+        Subplot:
+            Use: True
+            NumCols: 2
+    CO2_and_CH4_Leakage:
+        TimeSeries: [mass_CO2_aquifer, mass_CO2_gas_aquifer,
+                     mass_methane_oil_aquifer, mass_methane_gas_aquifer]
+        UseMarkers: False
+        UseLines: True
+        VaryLineStyles: True
+        FigureDPI: 100
+        Subplot:
+            Use: True
+            NumCols: 2
+            HydrocarbonLeakage1.mass_CO2_aquifer: 'CO$_2$ Liquid Leaked to Aquifer'
+    Total_Leakage:
+        TimeSeries: [mass_oil_aquifer, mass_gas_aquifer]
+        UseMarkers: False
+        UseLines: True
+        VaryLineStyles: True
+        FigureDPI: 100
+        Subplot:
+            Use: True
+            NumCols: 2

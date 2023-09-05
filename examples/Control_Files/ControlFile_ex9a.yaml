@@ -1,0 +1,169 @@
+# OpenIAM Control File Example 9a
+#
+# This example demonstrates the use of the AtmPlumeSingle and AtmPlumeEnsemble
+# plot types. To use this plot type, the simulation must have an AtmosphericROM.
+# AtmPlumeSingle plots show the area around a CO2 source that is impacted by
+# CO2 leakage in one realization of a simulation (i.e., one forward model or
+# one realization of an lhs simulation). The impacted area is that within
+# the 'critical_distance' output from the CO2 source. The critical_distance
+# is the distance from the leakage source within which the CO2 concentration
+# is above above the critical value defined by the parameter C0_critical
+# (see the User Guide). Because this simulation uses the LHS (Latin Hypercube
+# Sampling) analysis type ('type: lhs'), the realization for the AtmPlumeSingle
+# plot type is specified as Realization: 9. Because the number of realizations
+# is 30 here ('siz: 30'), the realization number could range from 0 to 29.
+# The AtmPlumeEnsemble plot type uses all realizations to create a map view image
+# of the probability of impact (i.e., being within the critical distance
+# of the source). Note that all of the entries under AtmPlumeSingle and
+# AtmPlumeEnsemble are optional. If left out, these plots will be created with
+# the default options (e.g., using realization 0, a figure dpi of 100,
+# PlotInjectionSites: False, and PlotReceptors: False). To demonstrate this aspect,
+# there are two modified versions of the AtmPlumeEnsemble plot made. One has
+# all options specified, while the other has no options specified.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#  python ../../source/openiam/openiam_cf.py --file ControlFile_ex9a.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 5
+    TimeStep: 1.0
+    Analysis:
+        type: lhs
+        siz: 30
+    Components: [SimpleReservoir1,
+                 OpenWellbore1,
+                 atmRom1]
+    OutputDirectory: output/output_ex9a_{datetime}
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        min: 500.0
+        max: 550.0
+        value: 525.0
+    shale2Thickness:
+        min: 450.0
+        max: 500.0
+        value: 475.0
+    shale3Thickness:
+        vary: False
+        value: 11.2
+    aquifer1Thickness:
+        vary: False
+        value: 100.4
+    aquifer2Thickness:
+        vary: False
+        value: 109.2
+    reservoirThickness:
+        vary: False
+        value: 51.2
+#-------------------------------------------------
+# SimpleReservoir1 is a user defined name for component
+# the type SimpleReservoir is the ROM model name
+#-------------------------------------------------
+SimpleReservoir1:
+    Type: SimpleReservoir
+    Parameters:
+        logResPerm:
+            min: -11.5
+            max: -10.5
+        reservoirPorosity:
+            min: 0.3
+            max: 0.4
+        injRate:
+            min: 0.1
+            max: 0.4
+    Outputs: [pressure]
+#-------------------------------------------------
+OpenWellbore1:
+    Type: OpenWellbore
+    Connection: SimpleReservoir1
+    Number: 2
+    Locations:
+        coordx: [100, 105]
+        coordy: [100, 105]
+    LeakTo: atmosphere
+    Parameters:
+        wellRadius:
+            min: 0.026
+            max: 0.046
+            value: 0.036
+        logReservoirTransmissivity:
+            min: -11.0
+            max: -9.0
+            value: -10.0
+        logAquiferTransmissivity:
+            min: -11.0
+            max: -9.0
+            value: -10.0
+        brineSalinity: 0.1
+    Outputs: [CO2_atm]
+#-------------------------------------------------
+atmRom1:
+    Type: AtmosphericROM
+    Connection: OpenWellbore1
+    # Alternative way to specify receptor locations
+    receptors: 'examples/Control_Files/input_data/ex9/receptor_locations.csv'
+    # x_receptor: [367.57, 374.77, 381.98, 389.19, 396.39
+    #              403.6, 410.81, 418.01, 425.22, 432.42]
+    # y_receptor: [497.28, 504.49, 511.7, 518.9, 526.11,
+    #              533.32, 540.52, 547.73, 554.93, 295.5]
+    Parameters:
+        T_amb:
+            value: 15
+            vary: False
+        P_amb:
+            min: 0.9
+            max: 1.08
+        V_wind:
+            min: 3.3
+            max: 15.5
+        C0_critical:
+            value: 0.01
+            vary: False
+        T_source:
+            value: 15
+            vary: False
+    Outputs: ['num_sources', 'outflag', 'x_new', 'y_new', 'critical_distance']
+#-------------------------------------------------
+Plots:
+    Receptor_Flags:
+        TimeSeries: [outflag_r001, outflag_r003]
+        Subplots:
+            Use: True
+    Receptor_Flags1:
+        TimeSeries: [outflag_r001]
+    Receptor_Flags2:
+        TimeSeries: [outflag_r002]
+    CO2_Leakage:
+        TimeSeries: [CO2_atm]
+    ATM_single:
+        AtmPlumeSingle:
+            Realization: 9
+            FigureDPI: 100
+            PlotInjectionSites: False
+            PlotReceptors: False
+            SaveCSVFiles: False
+    ATM_ensemble_v1:
+        AtmPlumeEnsemble:
+    ATM_ensemble_v2.tiff:
+        AtmPlumeEnsemble:
+            FigureDPI: 100
+            PlotInjectionSites: True
+            PlotReceptors: False
+            xGridSpacing: 1
+            yGridSpacing: 1
+            SpecifyXandYGridLims:
+                gridXLims: [-50, 250]
+                gridYLims: [-50, 250]
+            SpecifyXandYLims:
+                xLims: [-100, 300]
+                yLims: [-55, 255]
+            SaveCSVFiles: True
+    Critical_distance:
+        TimeSeries: [critical_distance_s000]

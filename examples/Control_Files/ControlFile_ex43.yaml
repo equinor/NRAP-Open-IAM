@@ -1,0 +1,105 @@
+# OpenIAM Control File Example 43
+#
+# This Control File demonstrates the use of the time to first detection (TTFD)
+# plot with DeepAlluviumAquifer component.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex43.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 100
+    TimeStep: 1
+    Analysis:
+        type: lhs
+        siz: 30
+    Components: [SimpleReservoir1, MultisegmentedWellbore1, DeepAlluviumAquifer1]
+    OutputDirectory: output/output_ex43_{datetime}
+    Logging: Info
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        value: 100.0
+        vary: False
+    shale2Thickness:
+        value: 250.0
+        vary: False
+    shale3Thickness:
+        value: 250.0
+        vary: False
+    aquifer1Thickness:
+        vary: False
+        value: 100
+    aquifer2Thickness:
+        vary: False
+        value: 100
+    reservoirThickness:
+        vary: False
+        value: 50
+#-------------------------------------------------
+SimpleReservoir1:
+    Type: SimpleReservoir
+    Parameters:
+        injRate:
+            value: 2
+            vary: False
+    Outputs: [pressure, CO2saturation, mass_CO2_reservoir]
+#-------------------------------------------------
+MultisegmentedWellbore1:
+    Type: MultisegmentedWellbore
+    Connection: SimpleReservoir1
+    Number: 3
+    Locations:
+        coordx: [-300, 100, -100]
+        coordy: [-100, 300, 300]
+    Parameters:
+        logWellPerm:
+            value: -13.5
+            min: -14.0
+            max: -13.0
+    Outputs: [CO2_aquifer1, CO2_aquifer2, CO2_atm,
+              brine_aquifer1, brine_aquifer2, brine_atm]
+#-------------------------------------------------
+DeepAlluviumAquifer1:
+    Type: DeepAlluviumAquifer
+    Connection: MultisegmentedWellbore1
+    AquiferName: aquifer1
+    Parameters:
+        sandFraction:
+            min: 0.7
+            max: 0.9
+            value: 0.8
+    Outputs: ['pH_volume', 'TDS_volume',
+              'TDS_dx', 'TDS_dy', 'TDS_dz']
+Plots:
+    pH_volume_plot:
+        TimeSeries: [pH_volume]
+        subplot:
+            use: True
+            ncols: 3
+    TDS_volume_plot:
+        TimeSeries: [TDS_volume]
+        subplot:
+            use: True
+            ncols: 3
+    TDS_dz_plot:
+        TimeSeries: [TDS_dz]
+        subplot:
+            use: True
+            ncols: 3
+    TTFD_Plot:
+        TTFD:
+            FigureDPI: 100
+            PlotInjectionSites: True
+            MonitoringLocations:
+                coordx: [-100, 50]
+                coordy: [270, 260]
+                coordz: [-700, -700]
+                HorizontalWindow: 1
+                VerticalWindow: 2.5
+            PlumeType: TDS
+            ComponentNameList: [DeepAlluviumAquifer1]

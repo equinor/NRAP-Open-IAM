@@ -1,0 +1,105 @@
+# OpenIAM Control File Example 16
+#
+# This example demonstrates the use of the PlumeStability component.
+# The PlumeStability component uses the same type of .csv files as
+# those used by the LookupTableReservoir component. By analyzing changes
+# in pressure and CO2 saturation over time in these files, the PlumeStability
+# component can produce a variety of metrics describing the changes in
+# pressure and CO2 saturation plumes over time (e.g., plume areas, velocity of
+# the plume centroid, direction in which a plume is moving, and the direction in
+# which the dispersion of the plume occurs). The plumes are defined by areas
+# exceeding the values presented in the 'Thresholds' entry (here, a pressure of
+# 1 MPa and a CO2saturation of 0.01).
+#
+# Note that LookupTableReservoir and PlumeStability components can both accept
+# additional outputs other than pressure and CO2saturation (e.g., temperature).
+# The outputs of the PlumeStability component can be named to track whatever
+# metric is stored in the .csv files used (e.g., including 'temperature: 20'
+# in the Thresholds entry and producing outputs of temperature_areas and
+# temperature_mobility).
+# Control file examples 27 and 28 demonstrate how to include other metrics in
+# the .csv files used for LookupTableReservoir and PlumeStability components.
+#
+# Note that the PlumeStability component does not connect with the Stratigraphy
+# component, so it will ignore the information entered under Stratigraphy.
+#
+# This example requires the additional Kimberlina data set.
+# Kimberlina data set (pressure-in-pa-kimb-54-sims.zip or
+# Pressure_In_Pa_Kimb_54_sims.zip) can be downloaded from one of the following places:
+# 1. https://edx.netl.doe.gov/dataset/nrap-open-source-iam
+# 2. https://gitlab.com/NRAP/Kimberlina_data
+#
+# The downloaded data set should be placed here:
+#    source/components/reservoir/lookuptables/Kimb_54_sims
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex16.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 200.
+    TimeStep: 1.0
+    Analysis:
+        type: parstudy
+        nvals: 10
+    Components: [PlumeStabilityCmpnt]
+    OutputDirectory: output/output_ex16_{datetime}
+    Logging: Warning
+#-------------------------------------------------
+PlumeStabilityCmpnt:
+    Type: PlumeStability
+    FileDirectory: source/components/reservoir/lookuptables/Kimb_54_sims
+    TimeFile: time_points.csv
+    ParameterFilename: parameters_and_filenames.csv
+    Variables: [pressure, CO2saturation]
+    Thresholds:
+        pressure: 1.0e+6
+        CO2saturation: 0.01
+    Parameters:
+        index:
+            Values: [1, 2, 4, 5, 7, 10, 12, 15, 21, 36]
+            Weights: [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+    Outputs: [pressure_areas, pressure_areas_dt,
+              CO2saturation_areas, CO2saturation_areas_dt,
+              pressure_mobility, pressure_spreading,
+              CO2saturation_mobility, CO2saturation_spreading]
+#-------------------------------------------------
+Plots:
+    Areas_Stats:
+        Subplot:
+            Use: True
+            NumCols: 2
+        TimeSeriesStats: [pressure_areas, CO2saturation_areas]
+        Title: "Statistics for Pressure and CO$_2$ Saturation Plume Areas"
+    Areas_Series:
+        Subplot:
+            Use: True
+            NumCols: 2
+        TimeSeries: [pressure_areas, CO2saturation_areas]
+        Title: "Pressure and CO$_2$ Saturation Plume Areas"
+    Areas_dt_Stats:
+        Subplot:
+            Use: True
+            NumCols: 2
+        TimeSeriesStats: [pressure_areas_dt, CO2saturation_areas_dt]
+        Title: "Statistics for the Rate of Change in the Areas of Pressure and CO$_2$ Saturation Plumes"
+    Areas_dt_Series:
+        Title: "Rates of Change in the Areas of Pressure and CO$_2$ Saturation Plumes"
+        Subplot:
+            Use: True
+            NumCols: 2
+        TimeSeries: [pressure_areas_dt, CO2saturation_areas_dt]
+        Title: "Rates of Change in the Areas of Pressure and CO$_2$ Saturation Plumes"
+    Pressure_Mobility_Stats:
+        Subplot:
+            Use: True
+            NumCols: 2
+        TimeSeriesStats: [pressure_mobility, pressure_spreading]
+        Title: "Pressure Plume Velocities and Dispersion"
+    CO2_Mobility_Stats:
+        Subplot:
+            Use: True
+            NumCols: 2
+        TimeSeriesStats: [CO2saturation_mobility, CO2saturation_spreading]
+        Title: "CO$_2$ Saturation Plume Velocities and Dispersion"

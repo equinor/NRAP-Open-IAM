@@ -1,0 +1,181 @@
+# OpenIAM Control File Example 4a
+#
+# This example demonstrates the leakage through an OpenWellbore component
+# connected to a SimpleReservoir component, as well as the resulting
+# aquifer impact (i.e., pH and TDS plume volumes from a CarbonateAquifer
+# component). Parameter values are varied with Latin Hypercube Sampling
+# (lhs) across 30 realizations.
+#
+# This example produces eight plots. The plots produced by this example
+# are meant to display the different ways the OpenIAM can create
+# visualizations of observations and the user controls available for
+# plot customization.
+#
+# The OpenWellbore component also uses a critical pressure in the calculation
+# of leakage rates. This approach is enforced through the inclusion of
+# 'critPressureApproach: True' in the 'Controls' entry. For more details
+# regarding critical pressures, see control file example 31a.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#  python ../../source/openiam/openiam_cf.py --file ControlFile_ex4a.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 1
+    TimeStep: 0.1
+    Analysis:
+        type: lhs
+        siz: 30
+    Components: [SimpleReservoir1,
+                 OpenWellbore1,
+                 CarbonateAquifer1]
+    OutputDirectory: output/output_ex4a_{datetime}
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        min: 500.0
+        max: 550.0
+        value: 525.0
+    shale2Thickness:
+        min: 450.0
+        max: 500.0
+        value: 475.0
+    shale3Thickness:
+        vary: False
+        value: 111.2
+    aquifer1Thickness:
+        vary: False
+        value: 122.4
+    aquifer2Thickness:
+        vary: False
+        value: 119.2
+    reservoirThickness:
+        vary: False
+        value: 51.2
+#-------------------------------------------------
+# SimpleReservoir1 is a user defined name for component
+# the type SimpleReservoir is the ROM model name
+#-------------------------------------------------
+SimpleReservoir1:
+    Type: SimpleReservoir
+    Parameters:
+        injRate: 0.005
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+OpenWellbore1:
+    Type: OpenWellbore
+    Connection: SimpleReservoir1
+    Number: 2
+    Locations:
+        coordx: [100, 100]
+        coordy: [-100, 300]
+    LeakTo: aquifer2
+    Controls:
+        critPressureApproach: True     # If set to True, uses a critical pressure in the calculation of leakage rates
+        enforceCritPressure: False     # If set to True, sets the critical pressure to the critPressure parameter instead of a calcualted critical pressure
+    Parameters:
+        wellRadius:
+            min: 0.03
+            max: 0.05
+            value: 0.04
+        logReservoirTransmissivity:
+            min: -11.0
+            max: -9.0
+            value: -10.0
+        logAquiferTransmissivity:
+            min: -11.0
+            max: -9.0
+            value: -10.0
+        brineSalinity: 0.1
+        brineDensity: 1025
+        # critPressure: 1.35e+07       # Value in Pa. If you keep 'critPressureApproach: True', set 'enforceCritPressure: True', and unsilence this line by removing the first '#', this value will be used in leakage rate calculations
+    Outputs: [CO2_aquifer2,
+              brine_aquifer2]
+#-------------------------------------------------
+CarbonateAquifer1:
+    Type: CarbonateAquifer
+    Connection: OpenWellbore1
+    AquiferName: aquifer2
+    Parameters:
+    Outputs: ['pH_volume', 'TDS_volume']
+#-------------------------------------------------
+Plots:
+    #------------------------------------------------------
+    # The TimeSeriesStats option can be used to plot
+    # percentiles, min, mean, median, and max values.
+    # This is the best way to view large numbers of
+    # realization results.
+    #------------------------------------------------------
+    pH_plume_volume_stats:
+        TimeSeriesStats: [pH_volume]
+    #------------------------------------------------------
+    # Since there is only 30 realizations in this example
+    # the data can be plotted on top of the statistics.
+    #------------------------------------------------------
+    TDS_plume_volumes:
+        TimeSeriesAndStats: [TDS_volume]
+        Title: TDS by Realizations and Statistics
+    #------------------------------------------------------
+    # Plot the brine leakage into the aquifer from both wells
+    # on one plot
+    #------------------------------------------------------
+    Brine_Leakage:
+        TimeSeriesStats: [brine_aquifer2]
+    #------------------------------------------------------
+    # Plot the brine leakage into the aquifer from each well
+    # on its own plot
+    #------------------------------------------------------
+    Brine_Leakage_subplots:
+        TimeSeriesStats: [brine_aquifer2]
+        Subplot:
+            Use: True
+    #------------------------------------------------------
+    # Plot the CO2 leakage into the aquifer from both wells
+    # on one plot (explicitly turning off subplots not needed)
+    #------------------------------------------------------
+    CO2_Leakage:
+        TimeSeriesStats: [CO2_aquifer2]
+        Title: $CO_2$ leakage Stats
+        Subplot:
+            Use: False
+    #------------------------------------------------------
+    # Plot the CO2 leakage into the aquifer from each well
+    # on its own plot
+    #------------------------------------------------------
+    CO2_Leakage_subplots:
+        TimeSeriesStats: [CO2_aquifer2]
+        Title: $CO_2$ leakage Stats
+        Subplot:
+            Use: True
+            NumCols: 1
+    #------------------------------------------------------
+    # Plot the CO2 leakage into the aquifer from each well
+    # on its own plot by realization instead of statistics
+    #------------------------------------------------------
+    CO2_Leakage_real:
+        TimeSeries: [CO2_aquifer2]
+        Title: $CO_2$ leakage by realization
+        Subplot:
+            Use: True
+    #------------------------------------------------------
+    # Plot the reservoir pressure and saturation for each well
+    # location with 2 columns of subplots and subplot titles
+    # renames with cleaner values
+    #------------------------------------------------------
+    Reservoir:
+        TimeSeriesStats: [pressure, CO2saturation]
+        Title: Reservoir Response
+        Subplot:
+            NumCols: 2
+            # The '' around titles are used because the numbers (0 and 1)
+            # would otherwise be silenced and excluded by the '#' symbols
+            SimpleReservoir1_000.pressure: 'Pressure at well #0'
+            SimpleReservoir1_001.pressure: 'Pressure at well #1'
+            SimpleReservoir1_000.CO2saturation: '$CO_2$ Saturation at well #0'
+            SimpleReservoir1_001.CO2saturation: '$CO_2$ Saturation at well #1'

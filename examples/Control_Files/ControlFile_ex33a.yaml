@@ -1,0 +1,167 @@
+# OpenIAM Control File Example 33a
+#
+# This example demonstrates the use of the strike and dip option for stratigraphy.
+# This option is enabled by having 'strikeAndDip' setup within 'spatiallyVariable,'
+# which in turn is within the Stratigraphy section. Note that the unit thicknesses
+# specified in the Stratigraphy section of the .yaml file apply to the
+# reference point located at x = coordxRefPoint and y = coordyRefPoint.
+# Unit thicknesses at other x and y locations are then calculated
+# with the strike and dip values provided. Also note that the wellTop
+# and reservoirDepth values for the OpenWellbore are specified with string inputs.
+# Because the reservoirDepth is set to shale1Depth (the bottom of shale 1),
+# this depth will vary according to the strike and dip values used.
+# In contrast, using a fixed reservoirDepth would not enable the wellbore bottoms
+# to match the reservoir's top depth across the domain. Similarly, wellTop
+# is set to match variations in aquifer 2's depth across the domain.
+#
+# In this example, the domain is also portrayed with the Stratigraphy plot type.
+# Note that the options listed under "Plot5: Stratigraphy" are optional -
+# if those options are not included, the default values will be used instead.
+# One version of Plot5 will be made for each pair of ViewAngleElevation
+# and ViewAngleAzimuth values. The FigureDPI entry allows one to manually set
+# the figure's dots per inch (dpi): higher values provide higher resolution
+# figures, while lower values provide smaller file sizes. The default dpi is 100.
+#
+# This example also demonstrates the use of the StratigraphicColumn plot type.
+# Unlike the three-dimensional figures made with the Stratigraphy plot type,
+# StratigraphicColumn figures are more simple, two-dimensional depictions of
+# unit thicknesses. If unit thicknesses vary across the domain, a specific location
+# for the plot can be provided with the XValue and YValue entries. These entries
+# take x and y values in meters. If XValue and YValue are not given, the default
+# values of x = 0 m and y = 0 m will be used.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex33a.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 50
+    TimeStep: 1.0
+    Analysis: forward
+    Components: [SimpleReservoir1, OpenWellbore1]
+    OutputDirectory: output/output_ex33a_{datetime}
+    Logging: Debug
+#-------------------------------------------------
+Stratigraphy:
+    spatiallyVariable:
+        strikeAndDip:
+            strike: 315
+            dip: 5
+            dipDirection: NE
+            coordxRefPoint: 1200
+            coordyRefPoint: 1200
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        value: 750.0
+        vary: False
+    shale2Thickness:
+        value: 950.0
+        vary: False
+    shale3Thickness:
+        value: 200
+        vary: False
+    aquifer1Thickness:
+        vary: False
+        value: 200
+    aquifer2Thickness:
+        vary: False
+        value: 200
+    reservoirThickness:
+        vary: False
+        value: 150
+#-------------------------------------------------
+SimpleReservoir1:
+    Type: SimpleReservoir
+    Parameters:
+        injRate:
+            value: 1
+            vary: False
+        logResPerm:
+            value: -10.15
+            vary: False
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+OpenWellbore1:
+    Type: OpenWellbore
+    Connection: SimpleReservoir1
+    Locations:
+        coordx: [500, 1000, 1500, 2000]
+        coordy: [500, 1000, 1500, 2000]
+    LeakTo: aquifer2
+    Controls:
+        critPressureApproach: True
+    Parameters:
+        wellRadius:
+            value: 0.05
+            vary: False
+        logReservoirTransmissivity:
+            value: -10.97
+            vary: False
+        logAquiferTransmissivity:
+            value: -10.0
+            vary: False
+        brineSalinity:
+            value: 0.2
+            vary: False
+        wellTop:
+            value: aquifer2Depth
+            vary: False
+        reservoirDepth:
+            value: shale1Depth
+            vary: False
+        brineDensity:
+            value: 1025
+            vary: False
+    Outputs: [CO2_aquifer,
+              brine_aquifer]
+#-------------------------------------------------
+Plots:
+    Plot1:
+        TimeSeries: [pressure]
+        Subplot:
+            Use: True
+            NumCols: 2
+    Plot2:
+        TimeSeries: [CO2saturation]
+        Subplot:
+            Use: True
+            NumCols: 2
+    Plot3:
+        TimeSeries: [CO2_aquifer]
+        Subplot:
+            Use: True
+            NumCols: 2
+    Plot4:
+        TimeSeries: [brine_aquifer]
+        Subplot:
+            Use: True
+            NumCols: 2
+    Plot5:
+        Stratigraphy:
+            FigureDPI: 200
+            PlotWellbores: True
+            PlotWellLabels: True
+            PlotStratComponents: True
+            SaveCSVFiles: True
+            StrikeAndDipSymbol:
+                PlotSymbol: True
+                coordx: 1250
+                coordy: 1250
+                length: 150
+            View:
+                ViewAngleElevation: [10, 30, -2, 0, 2]
+                ViewAngleAzimuth: [300, 300, 0, 0, 0]
+    Plot6:
+        StratigraphicColumn:
+            FigureDPI: 300
+            XValue: 1000
+            YValue: 1000
+    Plot7:
+        StratigraphicColumn:
+            FigureDPI: 300
+            XValue: 2000
+            YValue: 2000

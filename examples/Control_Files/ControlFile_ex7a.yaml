@@ -1,0 +1,90 @@
+# OpenIAM Control File Example 7a
+#
+# This example computes the CO2 and brine leakage from a leaky wellbore
+# (MultisegmentedWellbore component) to the intermediate aquifer (aquifer1).
+# Instead of connecting to a reservoir component, the MultisegmentedWellbore
+# component uses specified pressures and CO2 saturations entered through the
+# DynamicParameters entry. The example also uses Latin Hypercube Sampling
+# (lhs) to vary certain parameters values between minimum (min) and maximum
+# (max) values.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#  python ../../source/openiam/openiam_cf.py --file ControlFile_ex7a.yaml
+# or command
+#   python ../source/openiam/openiam_cf.py --file ControlFile_ex7a.yaml
+# in the folder examples/Control_Files.
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 5
+    TimeStep: 1.0
+    Analysis:
+        type: lhs
+        siz: 30
+        #seed: 721
+    Components: [msw1]
+    OutputDirectory: output/output_ex7a_{datetime}
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        min: 30.0
+        max: 50.0
+        value: 40.0
+    aquifer1Thickness:
+        min: 20.0
+        max: 60.0
+        value: 45.0
+    aquifer2Thickness:
+        min: 30.0
+        max: 50.0
+        value: 45.0
+    shale2Thickness:
+        vary: False
+        value: 250.0
+    shale3Thickness: 250
+#-------------------------------------------------
+# The MultisegmentedWellbore will not be connected
+# to a reservoir component but will be instead driven
+# by input pressures and saturations using the
+# DynamicParameters keywords.  Note the lists given
+# for the DynamicParameters must match the total number
+# of timesteps.
+#-------------------------------------------------
+msw1:
+    Type: MultisegmentedWellbore
+    Locations:
+        coordx: [100]
+        coordy: [100]
+    Parameters:
+        logWellPerm:
+            min: -14.0
+            max: -11.0
+            value: -13.5
+        wellRadius:
+            vary: false
+            value: 0.01
+    DynamicParameters:
+        pressure: [27119928.57,
+                   33166857.14,
+                   34104428.57,
+                   34160928.57,
+                   34088642.86,
+                   33982357.14]
+        CO2saturation: [0.,
+                        0.34310857,
+                        0.45430571,
+                        0.47404286,
+                        0.48760786,
+                        0.50069071]
+    Outputs: [CO2_aquifer1,
+              brine_aquifer1]
+#-------------------------------------------------
+Plots:
+    Plot1:
+        TimeSeriesAndStats: [CO2_aquifer1]
+    Plot2:
+        TimeSeriesAndStats: [brine_aquifer1]

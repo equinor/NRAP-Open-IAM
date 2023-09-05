@@ -1,0 +1,217 @@
+# OpenIAM Control File Example 54a
+#
+# This example demonstrates the use of the GriddedRadialMetric plot type.
+# This plot type is designed for component output that is defined on a radial
+# grid. The output is defined by the radius and depth coordinates, where radius
+# is the distance from the location associated with a given component.
+# The GenericAquifer component produces dissolved salt and dissolved CO2 mass
+# fractions that are defined on a radial grid. The sections of the grid
+# that have mass fractions exceeding one of the thresholds used
+# dissolved_salt_threshold and dissolved_co2_threshold) are included
+# in the corresponding plume volumes.
+#
+# The GriddedRadialMetric plot type shows the map-view evolution of dissolved
+# salt or dissolved CO2 mass fractions. Note that for displaying output
+# from a GenericAquifer, the outputs of the GenericAquifer must include
+# r_coordinate, z_coordinate, and the gridded radial output being used
+# (Dissolved_CO2_mass_fraction or Dissolved_salt_mass_fraction).
+# The names of components producing the output must be entered under
+# ComponentNameList (here, [GenericAquifer1]). Additionally, the name
+# of the gridded radial observation to be used must be entered under MetricName.
+# For the GenericAquifer component, this entry can be Dissolved_salt_mass_fraction
+# or Dissolved_CO2_mass_fraction.
+#
+# These map view figures can be made for all times (enter 'All' for TimeList;
+# 'All' is the default setting). Otherwise, specific times can be entered
+# as a list (e.g., [2, 5, 10] for years 2, 5, and 10). A figure will be made
+# for each time point specified. Additionally, the user must specify the depths
+# at which the radial data is to be evaluated. Depths are provided to the
+# 'ZList' entry. Note that for the 'ZList' entry, depths beneath the
+# surface are taken as negative. Specific depths can be entered in meters
+# (e.g., [-750] or [-750, -775, -800]). For each depth entered, the plot
+# will use the closest depth from the component's radial grid. Alternatively,
+# one can provide strings corresponding with unit depths. For example, one
+# of the plots uses 'ZList: [aquifer2Depth, shale3Depth]'. In NRAP-Open-IAM,
+# a shale or aquifer's bottom depth is specificed as shale#Depth or aquifer#Depth,
+# where # is the unit number. Because shale 3 is right above aquifer 2,
+# the depths evaluated are the top and bottom of aquifer 2. One figure will
+# be made for each depth and each specified time.
+#
+# The 'DegreeInterval' entry specifies the interval (degrees) to use when
+# displaying the gridded radial output. This entry can be 1, 5, 15, 30, or 45.
+# If 'DegreeInterval' is not provided, the default value is 15 degrees.
+# The 'EqualAxes' option specifies whether the x and y axes (distances east and
+# north, respectively) should be made to cover the same distances.
+# If 'EqualAxes: False' is used , the output will look elongated
+# in the x or y direction. The default setting is True. 'FigureDPI' specifies
+# the dots-per-inch (DPI) to use for the figure (default: 100). The option
+# 'PlotInjectionSites' specifies whether the injection site(s) will be shown
+# (default: False). Note that when using a LookupTableReservoir and
+# 'PlotInjectionSites: True', the injection site locations must also be provided
+# with InjectionCoordx and InjectionCoordy (see Control File example 37).
+# The limits for the x and y axes (distances east and north, respectively)
+# can be set with SpecifyXandYLims, xLims, and yLims (in meters), as shown here.
+# If the limits are not provided, each graph will have x and y limits that
+# extend far enough to encompass the features included (component location
+# and injection site(s)) as well as all output data exceeding MinValue (see below).
+#
+# One of the most important entries for the GriddedRadialMetric
+# plot type is MinValue. The figures made will only show values that are
+# greater than the mass fraction (dimensionless) provided by MinValue.
+# At time t = 0 years, all dissolved salt and dissolved CO2 mass
+# fraction values from the GenericAquifer will be 0. At times > 0 years,
+# however, these values are very small but nonzero.
+# For example, the dissolved CO2 mass fractions can be about 5.0e-3 at
+# the highest radii evaluated by the GenericAquifer component (about 78 km).
+# The dissolved salt mass fractions can be as low as 1.0e-30 at the
+# highest radii. The GenericAquifer component defines plumes as the
+# volumes with dissolved CO2 and dissolved salt mass fractions exceeding
+# a specified threshold (dissolved_co2_threshold and dissolved_salt_threshold,
+# which have default values of 0.01 and 0.02, respectively). If the MinValue
+# provided is 0, all of the figures will be zoomed out to show the small
+# concentrations extending to largest radii. For these figures to be useful,
+# one should specify a MinValue that is large enough to enable the figure to focus
+# on the area of interest (e.g., near the component's location) but small enough
+# to not exclude too much of the output data. We recommend using a MinValue of
+# 0.002 when evaluating Dissolved_salt_mass_fraction (10 times lower than the
+# default dissolved_salt_threshold of 0.02) and 0.01 when evaluating
+# Dissolved_CO2_mass_fraction (equal to the default dissolved_salt_threshold
+# of 0.01). If MinValue is not entered, these values will be used as the
+# defaults for the corresponding output type (dissolved salt or dissolved CO2).
+# If at all times the evaluated output does not exceed the MinValue, then one figure
+# will be made. This figure has a title that includes 'All Model Times.'
+# To enhance the contrast between locations with and without values above
+# MinValue, the figure background is gray. If at all times the evaluated output
+# is below or equal to MinValue, then the entire figures will be gray, with
+# the component's location shown as a black circle.
+#
+# To run this file, use the command (\ for Windows / for Mac or Linux):
+#   python ../../source/openiam/openiam_cf.py --file ControlFile_ex54a.yaml
+#
+# Last Modified: June, 2023
+#-------------------------------------------------
+ModelParams:
+    EndTime: 10.
+    TimeStep: 1.
+    Analysis: forward
+    Components: [SimpleReservoir1, OpenWellbore1, GenericAquifer1]
+    OutputDirectory: output/output_ex54a_{datetime}
+    Logging: Info
+#-------------------------------------------------
+Stratigraphy:
+    numberOfShaleLayers:
+        vary: False
+        value: 3
+    shale1Thickness:
+        value: 750.0
+        vary: False
+    shale2Thickness:
+        value: 950.0
+        vary: False
+    shale3Thickness:
+        value: 200
+        vary: False
+    aquifer1Thickness:
+        vary: False
+        value: 200
+    aquifer2Thickness:
+        vary: False
+        value: 200
+    reservoirThickness:
+        vary: False
+        value: 150
+#-------------------------------------------------
+SimpleReservoir1:
+    Type: SimpleReservoir
+    Parameters:
+        injRate:
+            value: 0.1
+            vary: False
+        logResPerm:
+            value: -12.0
+            vary: False
+    Outputs: [pressure,
+              CO2saturation]
+#-------------------------------------------------
+OpenWellbore1:
+    Type: OpenWellbore
+    Connection: SimpleReservoir1
+    Locations:
+        coordx: [100]
+        coordy: [100]
+    LeakTo: aquifer2
+    Parameters:
+        wellRadius:
+            value: 0.05
+            vary: False
+        logReservoirTransmissivity:
+            value: -10.97
+            vary: False
+        logAquiferTransmissivity:
+            value: -10.0
+            vary: False
+        brineSalinity:
+            value: 0.2
+            vary: False
+        wellTop:
+            value: aquifer2Depth
+            vary: False
+        reservoirDepth:
+            value: shale1Depth
+            vary: False
+    Outputs: [CO2_aquifer,
+              brine_aquifer]
+#-------------------------------------------------
+GenericAquifer1:
+    Type: GenericAquifer
+    Connection: OpenWellbore1
+    AquiferName: aquifer2
+    Parameters:
+        por: 0.2
+        log_permh: -10.0
+        log_aniso: 0.6
+        aqu_thick: aquifer2Thickness
+        top_depth: shale3Depth
+    Outputs: [Dissolved_salt_volume, Dissolved_CO2_volume,
+              r_coordinate, z_coordinate,                                 # gridded coordinates
+              Dissolved_CO2_mass_fraction, Dissolved_salt_mass_fraction]  # gridded observations
+#-------------------------------------------------
+Plots:
+    Gridded_salt_Mass_Frac:
+        GriddedRadialMetric:
+            ComponentNameList: [GenericAquifer1]
+            MetricName: Dissolved_salt_mass_fraction
+            ZList: [aquifer2Depth, shale3Depth]
+            TimeList: All
+            MinValue: 0.002
+            FigureDPI: 300
+            PlotInjectionSites: True
+            EqualAxes: True
+            DegreeInterval: 1
+            SaveCSVFiles: False
+            SpecifyXandYLims:
+                xLims: [-100, 300]
+                yLims: [-100, 300]
+    Gridded_CO2_Mass_Frac:
+        GriddedRadialMetric:
+            ComponentNameList: [GenericAquifer1]
+            MetricName: Dissolved_CO2_mass_fraction
+            ZList: [-300]   # middle of aquifer 2
+            MinValue: 0.01
+            TimeList: All
+            FigureDPI: 300
+            PlotInjectionSites: True
+            EqualAxes: True
+            DegreeInterval: 1
+            SaveCSVFiles: False
+            SpecifyXandYLims:
+                xLims: [-10, 120]
+                yLims: [-10, 120]
+    pressure_plot:
+        TimeSeries: [pressure]
+    saturation_plot:
+        TimeSeries: [CO2saturation]
+    salt_volume:
+        TimeSeries: [Dissolved_salt_volume]
+    CO2_volume:
+        TimeSeries: [Dissolved_CO2_volume]
