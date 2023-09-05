@@ -1,4 +1,7 @@
-<div style="background-color: #FFFF00">This is a clone of the original reporsitory stored in https://gitlab.com/NRAP/OpenIAM</div>
+#### $\textcolor{red}{\textsf{This is a clone of the original repository stored in GitLab }}$ 
+##### https://gitlab.com/NRAP/OpenIAM>
+
+
 
 
 NRAP-Open-IAM
