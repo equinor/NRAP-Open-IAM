@@ -1,7 +1,7 @@
 h5py==3.6.0
 ipython==7.31.1
 jupyter==1.0.0
-keras==2.6.0
+keras
 matplotlib==3.5.1
 numpy==1.21.5
 pandas==1.4.1
